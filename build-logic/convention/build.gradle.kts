@@ -51,6 +51,15 @@ kotlin {
                 id = "dev.gaddal.convention.kmp.library"
                 implementationClass = "KmpLibraryConventionPlugin"
             }
+
+            register("cmpLibrary") {
+                id = "dev.gaddal.convention.cmp.library"
+                implementationClass = "CmpLibraryConventionPlugin"
+            }
+            register("cmpFeature") {
+                id = "dev.gaddal.convention.cmp.feature"
+                implementationClass = "CmpFeatureConventionPlugin"
+            }
         }
     }
 }
