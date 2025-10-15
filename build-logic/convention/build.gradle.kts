@@ -41,6 +41,11 @@ kotlin {
                 id = "dev.gaddal.convention.android.application.compose"
                 implementationClass = "AndroidApplicationComposeConventionPlugin"
             }
+
+            register("cmpApplication") {
+                id = "dev.gaddal.convention.cmp.application"
+                implementationClass = "CmpApplicationConventionPlugin"
+            }
         }
     }
 }
