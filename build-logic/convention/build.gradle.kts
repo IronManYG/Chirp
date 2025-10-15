@@ -36,6 +36,11 @@ kotlin {
                 id = "dev.gaddal.convention.android.application"
                 implementationClass = "AndroidApplicationConventionPlugin"
             }
+
+            register("androidComposeApplication") {
+                id = "dev.gaddal.convention.android.application.compose"
+                implementationClass = "AndroidApplicationComposeConventionPlugin"
+            }
         }
     }
 }
