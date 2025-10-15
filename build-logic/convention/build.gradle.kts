@@ -22,4 +22,20 @@ kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
     }
+
+    tasks {
+        validatePlugins {
+            enableStricterValidation = true
+            failOnWarning = true
+        }
+    }
+
+    gradlePlugin {
+        plugins {
+            register("androidApplication") {
+                id = "dev.gaddal.convention.android.application"
+                implementationClass = "AndroidApplicationConventionPlugin"
+            }
+        }
+    }
 }
