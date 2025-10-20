@@ -2,8 +2,17 @@ package dev.gaddal.core.data.networking
 
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.Result
+import io.ktor.client.HttpClient
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 
 /**
@@ -23,6 +32,120 @@ expect suspend fun <T> platformSafeCall(
     execute: suspend () -> HttpResponse,
     handleResponse: suspend (HttpResponse) -> Result<T, DataError.Remote>
 ): Result<T, DataError.Remote>
+
+/**
+ * Executes an HTTP POST request with the specified route, query parameters, and request body.
+ *
+ * @param Request The type of the request body to be sent.
+ * @param Response The type of the response expected from the server.
+ * Must inherit from `Any` and is determined at runtime using reified type parameters.
+ * @param route The endpoint or route where the HTTP POST request should be sent.
+ * @param queryParams A map of query parameters that will be appended to the URL. Defaults to an empty map.
+ * @param body The payload of type `Request` to be included in the POST request body.
+ * @param builder A lambda function that allows additional configuration of the `HttpRequestBuilder`.
+ * @return A `Result` wrapper which contains the response of type `Response` on success
+ * or a `DataError.Remote` on failure.
+ */
+suspend inline fun <reified Request, reified Response : Any> HttpClient.post(
+    route: String,
+    queryParams: Map<String, Any> = mapOf(),
+    body: Request,
+    crossinline builder: HttpRequestBuilder.() -> Unit = {}
+): Result<Response, DataError.Remote> {
+    return safeCall {
+        post {
+            url(constructRoute(route))
+            queryParams.forEach { (key, value) ->
+                parameter(key, value)
+            }
+            setBody(body)
+            builder()
+        }
+    }
+}
+
+/**
+ * Makes a GET request to the specified route using the [HttpClient].
+ *
+ * @param route The API route or endpoint to make the GET request.
+ * @param queryParams A map of query parameters to append to the request URL. Defaults to an empty map.
+ * @param builder A lambda to customize the [HttpRequestBuilder] with additional configurations. Defaults to an empty lambda.
+ * @return A [Result] containing the response of type [Response] when successful, or a [DataError.Remote] in case of an error.
+ */
+suspend inline fun <reified Response : Any> HttpClient.get(
+    route: String,
+    queryParams: Map<String, Any> = mapOf(),
+    crossinline builder: HttpRequestBuilder.() -> Unit = {}
+): Result<Response, DataError.Remote> {
+    return safeCall {
+        get {
+            url(constructRoute(route))
+            queryParams.forEach { (key, value) ->
+                parameter(key, value)
+            }
+            builder()
+        }
+    }
+}
+
+/**
+ * Makes a HTTP DELETE request to the specified route, optionally including query parameters
+ * and allowing for additional customization of the request through the builder.
+ *
+ * @param Response The expected response type, which must conform to the `Any` type constraint.
+ * @param route The relative or absolute URL representing the endpoint where the DELETE request will be sent.
+ * @param queryParams A map of query parameters that will be appended to the URL. Defaults to an empty map.
+ * @param builder A lambda to customize the request further using the `HttpRequestBuilder` DSL.
+ * @return A `Result` that contains the response of type `Response` in case of success, or a `DataError.Remote` in case of failure.
+ */
+suspend inline fun <reified Response : Any> HttpClient.delete(
+    route: String,
+    queryParams: Map<String, Any> = mapOf(),
+    crossinline builder: HttpRequestBuilder.() -> Unit = {}
+): Result<Response, DataError.Remote> {
+    return safeCall {
+        delete {
+            url(constructRoute(route))
+            queryParams.forEach { (key, value) ->
+                parameter(key, value)
+            }
+            builder()
+        }
+    }
+}
+
+/**
+ * Executes an HTTP PUT request to the specified route with the provided request body and query parameters.
+ * The response is processed and encapsulated in a `Result` object.
+ *
+ * @param Request The type of the request body to be sent with the PUT request.
+ * @param Response The type of the expected response body, which must be non-null and parsed into the specified type.
+ * @param route The endpoint route where the PUT request will be directed.
+ * @param queryParams A map of key-value pairs to be added as query parameters to the URL. Defaults to an empty map if no query parameters are provided
+ * .
+ * @param body The request body object to be sent with the PUT request.
+ * @param builder A lambda function for additional configurations to the `HttpRequestBuilder`. This is optional and defaults to an empty lambda block
+ * .
+ *
+ * @return A `Result` object containing either the successfully parsed response of type `Response` or a `DataError.Remote` in case of an error.
+ */
+suspend inline fun <reified Request, reified Response : Any> HttpClient.put(
+    route: String,
+    queryParams: Map<String, Any> = mapOf(),
+    body: Request,
+    crossinline builder: HttpRequestBuilder.() -> Unit = {}
+): Result<Response, DataError.Remote> {
+    return safeCall {
+        put {
+            url(constructRoute(route))
+            queryParams.forEach { (key, value) ->
+                parameter(key, value)
+            }
+            setBody(body)
+            builder()
+        }
+    }
+}
 
 /**
  * Executes a suspending function in a safe manner, encapsulating its result in a [Result] object.
