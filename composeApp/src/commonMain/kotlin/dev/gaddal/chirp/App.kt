@@ -22,6 +22,7 @@ import chirp.composeapp.generated.resources.compose_multiplatform
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import dev.gaddal.core.presentation.example.MultilingualExampleDemo
 
 @Composable
 @Preview
@@ -48,6 +49,8 @@ fun App() {
                     Text("Compose: $greeting")
                 }
             }
+
+            MultilingualExampleDemo()
         }
     }
 }
