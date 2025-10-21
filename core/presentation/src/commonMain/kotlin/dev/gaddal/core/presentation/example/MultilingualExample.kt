@@ -36,15 +36,17 @@ import org.jetbrains.compose.resources.stringResource
  * 4. Use manager.setLanguage() to switch languages from settings or any screen
  */
 @Composable
-fun MultilingualExampleDemo() {
+fun MultilingualExampleDemo(
+    languageManager: LanguageManager,
+) {
     // In a real app, create this at app level and pass down or inject via DI
-    val languageManager = remember {
-        LanguageManager(
-            supportedLanguages = setOf("en", "ar"),
-            defaultLanguage = "en",
-            initialLanguage = null // In production: load from saved preferences
-        )
-    }
+//    val languageManager = remember {
+//        LanguageManager(
+//            supportedLanguages = setOf("en", "ar"),
+//            defaultLanguage = "en",
+//            initialLanguage = null // In production: load from saved preferences
+//        )
+//    }
 
     // Provide language state to the composition tree
     ProvideMultilingualSupport(languageManager.currentLanguage) {

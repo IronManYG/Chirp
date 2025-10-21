@@ -23,11 +23,23 @@ import dev.gaddal.core.designsystem.theme.ChirpTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import dev.gaddal.core.presentation.example.MultilingualExampleDemo
+import dev.gaddal.core.presentation.util.LanguageManager
 
 @Composable
 @Preview
 fun App() {
-    ChirpTheme {
+    
+    val languageManager = remember {
+        LanguageManager(
+            supportedLanguages = setOf("en", "ar"),
+            defaultLanguage = "en",
+            initialLanguage = null // In production: load from saved preferences
+        )
+    }
+
+    ChirpTheme(
+        languageCode = languageManager.currentLanguage
+    ) {
         var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
@@ -50,7 +62,7 @@ fun App() {
                 }
             }
 
-            MultilingualExampleDemo()
+            MultilingualExampleDemo(languageManager)
         }
     }
 }
