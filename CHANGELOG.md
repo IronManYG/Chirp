@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.3.0] - 2025-10-21
+
+### Added
+- Dynamic typography for multilingual support with Cairo font family and language-aware font selection; updated ChirpTheme to accept optional languageCode; hoisted LanguageManager to App level; adjusted custom typography to inherit MaterialTheme font family ([e21e288](https://github.com/IronManYG/Chirp/commit/e21e288))
+- Multilingual support framework with RTL handling for English and Arabic ([9ab3532](https://github.com/IronManYG/Chirp/commit/9ab3532))
+  - `LanguageManager` for centralized language state management
+  - Platform-specific language switching via expect/actual pattern
+  - RTL layout support with automatic `LayoutDirection` switching
+  - String resources for English and Arabic
+  - Demo implementation with `MultilingualExampleDemo`
+- Device configuration utility for adaptive layouts based on screen size and orientation ([53b46c9](https://github.com/IronManYG/Chirp/commit/53b46c9))
+- Kermit logging integration with custom `ChirpLogger` interface ([90b510b](https://github.com/IronManYG/Chirp/commit/90b510b))
+- Ktor HTTP client factory with JSON handling, timeouts, WebSocket support, and logging ([90b510b](https://github.com/IronManYG/Chirp/commit/90b510b))
+- Type-safe HTTP client extension functions for GET, POST, PUT, and DELETE requests ([b8bdd61](https://github.com/IronManYG/Chirp/commit/b8bdd61))
+- Platform-specific error handling for Ktor HTTP client (Android and iOS) ([c9d195d](https://github.com/IronManYG/Chirp/commit/c9d195d))
+- Core theming infrastructure with Material 3 color schemes and extended color palettes ([d93945a](https://github.com/IronManYG/Chirp/commit/d93945a))
+  - Plus Jakarta Sans typography with multiple font weights
+  - `ChirpTheme` composable wrapper
+- `ObserveAsEvents` utility for lifecycle-aware flow observation in Compose ([5c952f5](https://github.com/IronManYG/Chirp/commit/5c952f5))
+- `UiText` utility for handling dynamic and resource-based strings with formatting support ([840d513](https://github.com/IronManYG/Chirp/commit/840d513))
+- Core domain error and result handling utilities with `DataError` and `Result` types ([41f66fd](https://github.com/IronManYG/Chirp/commit/41f66fd))
+
+### Changed
+- Bumped Android Gradle Plugin (AGP) version to 8.13.0 ([01d5dee](https://github.com/IronManYG/Chirp/commit/01d5dee))
+- Updated README for improved clarity and accuracy with refined platform notes and expanded setup instructions ([5af9844](https://github.com/IronManYG/Chirp/commit/5af9844))
+
+[0.3.0]: https://github.com/IronManYG/Chirp/compare/91ad807...e21e288
+
 ## [0.2.0] - 2025-10-16
 
 ### Added
