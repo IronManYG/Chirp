@@ -138,6 +138,37 @@ Build and configuration conventions
 - Plugins are declared via the version catalog in the root build.gradle.kts; modules apply conventions per-need.
 - Reusable convention plugins: build-logic/convention (applied via aliases from the catalog).
 
+## Multilingual Support
+The app includes multilingual support with English and Arabic localization, including RTL layout handling. The implementation is documented in core/MultilingualSupport.md.
+
+Current implementation
+- ✅ Expect/actual pattern for platform-specific language switching (Android, iOS)
+- ✅ LanguageManager class for centralized state management with validation
+- ✅ RTL layout direction support for Arabic
+- ✅ String resources in commonMain/composeResources (values/strings.xml, values-ar/strings.xml)
+- ✅ Demo example in core:presentation (MultilingualExampleDemo)
+
+Pending enhancements (TODO)
+1. **Desktop/JVM support** — Add actual fun changeLanguage() implementation in desktopMain source set
+   - Location: core/presentation/src/desktopMain/kotlin/dev/gaddal/core/presentation/util/Language.desktop.kt
+   - Implementation: Use Locale.setDefault(Locale.of(languageCode)) or Locale(languageCode)
+
+2. **Preference persistence** — Save and load user's language choice across app restarts
+   - Recommended library: Multiplatform Settings (com.russhwolf:multiplatform-settings)
+   - Provides common API backed by SharedPreferences (Android) and NSUserDefaults (iOS)
+   - Store key: "app_language", default: "en"
+   - Integration: Add saveLanguage() and loadLanguage() functions, call from LanguageManager
+
+3. **Initialization logic** — Load saved language on app startup with system locale fallback
+   - Create an initialization function that:
+     - Loads saved language preference (if exists)
+     - Falls back to system locale if no saved preference
+     - Falls back to default language ("en") if system locale not supported
+   - Call from App composable before creating LanguageManager
+   - Example: val initialLang = loadSavedLanguage() ?: getSystemLanguage() ?: "en"
+
+For detailed implementation guidance, see core/MultilingualSupport.md.
+
 ## License
 No LICENSE file found in the repository.
 
