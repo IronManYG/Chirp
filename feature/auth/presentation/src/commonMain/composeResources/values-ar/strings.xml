@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="welcome_to_chirp">مرحباً بك في جيرب!</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="password">كلمة المرور</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="register">تسجيل</string>
+    <string name="username_placeholder">Chirp</string>
+    <string name="email_placeholder">hello@chirp.com</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="username_hint">استخدم بين ٣ و٢٠ حرفاً لاسم المستخدم الخاص بك</string>
+    <string name="password_hint">استخدم ٩+ أحرف، رقم واحد على الأقل وحرف كبير واحد</string>
+    <string name="error_account_exists">حساب بهذا البريد الإلكتروني أو اسم المستخدم موجود بالفعل</string>
+</resources>

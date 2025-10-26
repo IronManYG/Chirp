@@ -49,6 +49,13 @@ class LanguageManager(
     )
         private set
 
+    init {
+        // Ensure platform locale matches the initial/current language at startup.
+        // Without this, the app might use the device's default locale (e.g., Arabic)
+        // even when our app's default is English until the user toggles languages.
+        changeLanguage(currentLanguage)
+    }
+
     /**
      * Changes the app language if the provided code is supported.
      *
