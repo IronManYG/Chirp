@@ -3,19 +3,33 @@ package dev.gaddal.auth.presentation.register
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.error_account_exists
 import chirp.feature.auth.presentation.generated.resources.error_invalid_email
 import chirp.feature.auth.presentation.generated.resources.error_invalid_password
 import chirp.feature.auth.presentation.generated.resources.error_invalid_username
 import dev.gaddal.auth.domain.EmailValidator
+import dev.gaddal.core.domain.auth.AuthService
+import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.onFailure
+import dev.gaddal.core.domain.util.onSuccess
 import dev.gaddal.core.domain.validation.PasswordValidator
 import dev.gaddal.core.presentation.util.UiText
+import dev.gaddal.core.presentation.util.toUiText
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(
+    private val authService: AuthService
+) : ViewModel() {
+
+    private val eventChannel = Channel<RegisterEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     private var hasLoadedInitialData = false
 
@@ -41,8 +55,78 @@ class RegisterViewModel : ViewModel() {
      */
     fun onAction(action: RegisterAction) {
         when (action) {
-            RegisterAction.OnLoginClick -> validateFormInputs() // for test only
+            RegisterAction.OnLoginClick -> Unit
+            RegisterAction.OnRegisterClick -> register()
+            RegisterAction.OnTogglePasswordVisibilityClick -> {
+                _state.update {
+                    it.copy(
+                        isPasswordVisible = !it.isPasswordVisible
+                    )
+                }
+            }
+
             else -> Unit
+        }
+    }
+
+    /**
+     * Handles the user registration process by validating form inputs and communicating with the authentication service.
+     *
+     * This method performs the following steps:
+     * 1. Validates the form inputs (email, username, and password) using the `validateFormInputs` method.
+     *    - If validation fails, it stops further execution.
+     * 2. Launches a coroutine to handle the asynchronous registration process.
+     *    - Updates the current state to indicate that the registration process is in progress.
+     *    - Extracts the email, username, and password values from the `state`.
+     *    - Calls the `register` method of the `authService` with the extracted credentials.
+     * 3. Handles the result of the registration process:
+     *    - On success: Updates the state to reflect that the registration has completed successfully and resets UI-related flags.
+     *    - On failure: Determines the type of error (e.g., conflict due to an existing account) and updates the state with a descriptive error message
+     *  for the user.
+     *
+     * This method ensures that all state updates are performed on the main thread and keeps the UI responsive during the registration process.
+     */
+    private fun register() {
+        if (validateFormInputs()) {
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isRegistering = true
+                )
+            }
+
+            val email = state.value.emailTextState.text.toString()
+            val username = state.value.usernameTextState.text.toString()
+            val password = state.value.passwordTextState.text.toString()
+
+            authService
+                .register(
+                    email = email,
+                    username = username,
+                    password = password
+                )
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isRegistering = false
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    val registrationError = when (error) {
+                        DataError.Remote.CONFLICT -> UiText.Resource(Res.string.error_account_exists)
+                        else -> error.toUiText()
+                    }
+                    _state.update {
+                        it.copy(
+                            isRegistering = false,
+                            registrationError = registrationError
+                        )
+                    }
+                }
         }
     }
 

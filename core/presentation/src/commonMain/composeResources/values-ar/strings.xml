@@ -4,4 +4,18 @@
     <string name="ar">العربية</string>
     <string name="app_language">لغة التطبيق: %1$s</string>
     <string name="change_lang">تغيير اللغة</string>
+    <string name="error_disk_full">عذراً، يبدو أن مساحة التخزين ممتلئة!</string>
+    <string name="error_not_found">لم يتم العثور على العنصر المطلوب</string>
+    <string name="error_unknown">حدث خطأ غير معروف</string>
+    <string name="error_bad_request">طلب غير صالح</string>
+    <string name="error_request_timeout">انتهت مهلة الطلب</string>
+    <string name="error_unauthorized">بيانات اعتماد غير صالحة</string>
+    <string name="error_forbidden">غير مسموح لك بالقيام بذلك</string>
+    <string name="error_conflict">حدث تعارض</string>
+    <string name="error_too_many_requests">لقد تجاوزت الحد المسموح به من الطلبات</string>
+    <string name="error_no_internet">تعذر الاتصال. يرجى التحقق من اتصال الإنترنت.</string>
+    <string name="error_payload_too_large">الملف المرفق كبير جداً</string>
+    <string name="error_server">عذراً، حدث خطأ في الخادم</string>
+    <string name="error_service_unavailable">الخدمة غير متوفرة، يرجى المحاولة لاحقاً</string>
+    <string name="error_serialization">خطأ في التسلسل</string>
 </resources>

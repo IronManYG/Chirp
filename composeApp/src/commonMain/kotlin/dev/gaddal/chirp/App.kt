@@ -25,7 +25,9 @@ fun App() {
     ) {
         // Provide language state to the composition tree
         ProvideMultilingualSupport(languageManager.currentLanguage) {
-            RegisterRoot()
+            RegisterRoot(
+                onRegisterSuccess = {}
+            )
         }
     }
 }
