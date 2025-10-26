@@ -1,5 +1,6 @@
 package dev.gaddal.auth.presentation.register
 
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chirp.feature.auth.presentation.generated.resources.Res
@@ -18,6 +19,10 @@ import dev.gaddal.core.presentation.util.toUiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -37,7 +42,7 @@ class RegisterViewModel(
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
-                /** Load initial data here **/
+                observeValidationStates()
                 hasLoadedInitialData = true
             }
         }
@@ -46,6 +51,47 @@ class RegisterViewModel(
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = RegisterState()
         )
+
+    private val isEmailValidFlow = snapshotFlow { state.value.emailTextState.text.toString() }
+        .map { email -> EmailValidator.validate(email) }
+        .distinctUntilChanged()
+
+    private val isUsernameValidFlow = snapshotFlow { state.value.usernameTextState.text.toString() }
+        .map { username -> username.length in 3..20 }
+        .distinctUntilChanged()
+
+    private val isPasswordValidFlow = snapshotFlow { state.value.passwordTextState.text.toString() }
+        .map { password -> PasswordValidator.validate(password).isValidPassword }
+        .distinctUntilChanged()
+
+    /**
+     * Observes the validation states of the email, username, and password fields.
+     *
+     * This method combines the validation flows of the email, username, and password inputs to determine
+     * whether all fields are valid. It updates the `canRegister` state based on this validation result
+     * and whether the registration process is currently in progress.
+     *
+     * The validation check follows these rules:
+     * - All fields must be valid for registration to be possible.
+     * - The form can only be submitted (i.e., `canRegister` is true) if the registration process is not ongoing.
+     *
+     * The combined validation result is observed within the ViewModel's `viewModelScope` to ensure that
+     * updates are handled appropriately within the lifecycle of the ViewModel.
+     */
+    private fun observeValidationStates() {
+        combine(
+            isEmailValidFlow,
+            isUsernameValidFlow,
+            isPasswordValidFlow
+        ) { isEmailValid, isUsernameValid, isPasswordValid ->
+            val allValid = isEmailValid && isUsernameValid && isPasswordValid
+            _state.update {
+                it.copy(
+                    canRegister = !it.isRegistering && allValid
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
 
     /**
      * Handles user actions performed on the registration screen by triggering appropriate logic
