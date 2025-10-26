@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.4.0] - 2025-10-26
+
+### Added
+- Design System: `ChirpSnackbarScaffold` component ([0b3416b](https://github.com/IronManYG/Chirp/commit/0b3416b))
+- Design System: success layout and icon components ([1d28ba7](https://github.com/IronManYG/Chirp/commit/1d28ba7))
+- Design System: `ChirpAdaptiveResultLayout` component ([4c83151](https://github.com/IronManYG/Chirp/commit/4c83151))
+- Design System: Adaptive authentication form layout ([9c321b8](https://github.com/IronManYG/Chirp/commit/9c321b8))
+- Design System: `ChirpSurface` layout component ([a4b4eda](https://github.com/IronManYG/Chirp/commit/a4b4eda))
+- Design System: `ChirpTextField` composable ([b1b067e](https://github.com/IronManYG/Chirp/commit/b1b067e))
+- Design System: `ChirpFloatingActionButton` ([0c59db9](https://github.com/IronManYG/Chirp/commit/0c59db9))
+- Design System: `ChirpIconButton` composable ([e5c5e88](https://github.com/IronManYG/Chirp/commit/e5c5e88))
+- Design System: `ChirpButton` composable and styles ([d35545f](https://github.com/IronManYG/Chirp/commit/d35545f))
+
+### Changed
+- Design System: Refactor text fields and add icons ([a332a78](https://github.com/IronManYG/Chirp/commit/a332a78))
+
+[0.4.0]: https://github.com/IronManYG/Chirp/compare/e21e288...0b3416b
+
 ## [0.3.0] - 2025-10-21
 
 ### Added
