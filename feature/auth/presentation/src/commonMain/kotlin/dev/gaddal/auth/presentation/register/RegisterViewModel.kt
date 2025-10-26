@@ -2,10 +2,18 @@ package dev.gaddal.auth.presentation.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.error_invalid_email
+import chirp.feature.auth.presentation.generated.resources.error_invalid_password
+import chirp.feature.auth.presentation.generated.resources.error_invalid_username
+import dev.gaddal.auth.domain.EmailValidator
+import dev.gaddal.core.domain.validation.PasswordValidator
+import dev.gaddal.core.presentation.util.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 class RegisterViewModel : ViewModel() {
 
@@ -25,10 +33,78 @@ class RegisterViewModel : ViewModel() {
             initialValue = RegisterState()
         )
 
+    /**
+     * Handles user actions performed on the registration screen by triggering appropriate logic
+     * based on the provided `RegisterAction`.
+     *
+     * @param action The user action to be processed, represented as a `RegisterAction`.
+     */
     fun onAction(action: RegisterAction) {
         when (action) {
+            RegisterAction.OnLoginClick -> validateFormInputs() // for test only
             else -> Unit
         }
     }
 
+    /**
+     * Clears all error states for text fields in the registration form.
+     *
+     * This method sets the error properties (`emailError`, `usernameError`, `passwordError`, and `registrationError`)
+     * in the current state to `null`, effectively removing any displayed error messages for these fields.
+     */
+    private fun clearAllTextFieldErrors() {
+        _state.update {
+            it.copy(
+                emailError = null,
+                usernameError = null,
+                passwordError = null,
+                registrationError = null
+            )
+        }
+    }
+
+    /**
+     * Validates the current form inputs for email, username, and password fields.
+     * This method checks the validity of each input field against predefined criteria:
+     * - Validates email using `EmailValidator`.
+     * - Validates password using `PasswordValidator`.
+     * - Checks if the username length is within the allowed range (3 to 20 characters).
+     *
+     * Any errors found during validation are updated in the state's corresponding error properties,
+     * and are displayed to the user.
+     *
+     * @return `true` if all inputs are valid (email, username, password); `false` otherwise.
+     */
+    private fun validateFormInputs(): Boolean {
+        clearAllTextFieldErrors()
+
+        val currentState = state.value
+        val email = currentState.emailTextState.text.toString()
+        val username = currentState.usernameTextState.text.toString()
+        val password = currentState.passwordTextState.text.toString()
+
+        val isEmailValid = EmailValidator.validate(email)
+        val passwordValidationState = PasswordValidator.validate(password)
+        val isUsernameValid = username.length in 3..20
+
+        val emailError = if (!isEmailValid) {
+            UiText.Resource(Res.string.error_invalid_email)
+        } else null
+        val usernameError = if (!isUsernameValid) {
+            UiText.Resource(Res.string.error_invalid_username)
+        } else null
+        val passwordError = if (!passwordValidationState.isValidPassword) {
+            UiText.Resource(Res.string.error_invalid_password)
+        } else null
+
+        _state.update {
+            it.copy(
+                emailError = emailError,
+                usernameError = usernameError,
+                passwordError = passwordError
+            )
+        }
+
+        return isUsernameValid && isEmailValid && passwordValidationState.isValidPassword
+    }
 }

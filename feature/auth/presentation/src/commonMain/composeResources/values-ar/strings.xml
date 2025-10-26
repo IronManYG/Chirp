@@ -11,4 +11,7 @@
     <string name="username_hint">استخدم بين ٣ و٢٠ حرفاً لاسم المستخدم الخاص بك</string>
     <string name="password_hint">استخدم ٩+ أحرف، رقم واحد على الأقل وحرف كبير واحد</string>
     <string name="error_account_exists">حساب بهذا البريد الإلكتروني أو اسم المستخدم موجود بالفعل</string>
+    <string name="error_invalid_password">يجب أن تتكون كلمة المرور من ٩ أحرف على الأقل وتتضمن رقماً واحداً وحرفاً كبيراً واحداً</string>
+    <string name="error_invalid_email">هذا البريد الإلكتروني غير صالح</string>
+    <string name="error_invalid_username">يجب أن يكون اسم المستخدم بين ٣ و٢٠ حرفاً</string>
 </resources>
