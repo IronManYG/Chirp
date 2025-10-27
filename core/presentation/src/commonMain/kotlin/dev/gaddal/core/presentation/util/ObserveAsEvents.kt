@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,14 +16,14 @@ import kotlinx.coroutines.withContext
  * @param flow The [Flow] of events to observe.
  * @param key1 An optional key used to determine recomposition. Default is null.
  * @param key2 An optional key used to determine recomposition. Default is null.
- * @param onEvent A callback function invoked with each emitted value from the flow.
+ * @param onEvent A suspend function that defines the action to be performed on each collected event.
  */
 @Composable
 fun <T> ObserveAsEvents(
     flow: Flow<T>,
     key1: Any? = null,
     key2: Any? = null,
-    onEvent: (T) -> Unit
+    onEvent: suspend (T) -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner, key1, key2) {

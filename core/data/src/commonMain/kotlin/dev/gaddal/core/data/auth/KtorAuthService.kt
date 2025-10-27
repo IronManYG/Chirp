@@ -1,5 +1,6 @@
 package dev.gaddal.core.data.auth
 
+import dev.gaddal.core.data.dto.requests.EmailRequest
 import dev.gaddal.core.data.dto.requests.RegisterRequest
 import dev.gaddal.core.data.networking.post
 import dev.gaddal.core.domain.auth.AuthService
@@ -43,6 +44,20 @@ class KtorAuthService(
                 username = username,
                 password = password
             )
+        )
+    }
+
+    /**
+     * Resends the verification email to the specified email address.
+     *
+     * @param email The email address to which the verification email will be sent.
+     * @return An `EmptyResult` indicating the success or failure of the operation,
+     *         with a potential `DataError.Remote` detailing any error that occurred.
+     */
+    override suspend fun resendVerificationEmail(email: String): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "/auth/resend-verification",
+            body = EmailRequest(email),
         )
     }
 }
