@@ -64,6 +64,10 @@ class RegisterViewModel(
         .map { password -> PasswordValidator.validate(password).isValidPassword }
         .distinctUntilChanged()
 
+    private val isRegisteringFlow = state
+        .map { it.isRegistering }
+        .distinctUntilChanged()
+
     /**
      * Observes the validation states of the email, username, and password fields.
      *
@@ -82,12 +86,13 @@ class RegisterViewModel(
         combine(
             isEmailValidFlow,
             isUsernameValidFlow,
-            isPasswordValidFlow
-        ) { isEmailValid, isUsernameValid, isPasswordValid ->
+            isPasswordValidFlow,
+            isRegisteringFlow
+        ) { isEmailValid, isUsernameValid, isPasswordValid, isRegistering ->
             val allValid = isEmailValid && isUsernameValid && isPasswordValid
             _state.update {
                 it.copy(
-                    canRegister = !it.isRegistering && allValid
+                    canRegister = !isRegistering && allValid
                 )
             }
         }.launchIn(viewModelScope)
@@ -133,14 +138,14 @@ class RegisterViewModel(
      * This method ensures that all state updates are performed on the main thread and keeps the UI responsive during the registration process.
      */
     private fun register() {
-        if (validateFormInputs()) {
+        if (!validateFormInputs()) {
             return
         }
 
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    isRegistering = true
+                    isRegistering = true,
                 )
             }
 
@@ -157,7 +162,7 @@ class RegisterViewModel(
                 .onSuccess {
                     _state.update {
                         it.copy(
-                            isRegistering = false
+                            isRegistering = false,
                         )
                     }
                 }
@@ -169,7 +174,7 @@ class RegisterViewModel(
                     _state.update {
                         it.copy(
                             isRegistering = false,
-                            registrationError = registrationError
+                            registrationError = registrationError,
                         )
                     }
                 }
