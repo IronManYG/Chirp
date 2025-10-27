@@ -1,23 +1,24 @@
 package dev.gaddal.auth.presentation.di
 
+import dev.gaddal.auth.presentation.email_verification.EmailVerificationViewModel
 import dev.gaddal.auth.presentation.register.RegisterViewModel
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
- * The Koin module responsible for providing dependencies needed in the authentication presentation layer.
+ * Dependency injection module for managing the dependency tree of ViewModels used in the authentication presentation layer.
  *
- * This module includes definitions for the ViewModels used in features related to authentication, such
- * as `RegisterViewModel`, which handles the registration screen logic. It sets up the bindings to allow
- * Koin to resolve these ViewModels when requested in components tied to the UI layer.
+ * This module provides the following ViewModels:
+ * - `RegisterViewModel`: Handles user interactions and state management for the registration screen.
+ * - `RegisterSuccessViewModel`: Manages the presentation state for the registration success flow.
+ * - `EmailVerificationViewModel`: Manages the state and logic for email verification processes.
  *
- * Example use case:
- * This module is typically added to the `modules` list during Koin initialization to make the associated
- * ViewModels and other dependencies available in the dependency graph. This ensures that the UI layer can
- * rely on properly configured dependencies for handling authentication workflow.
+ * These ViewModels are registered with the dependency container, allowing them to be injected as needed
+ * throughout the application using Koin.
  */
 val authPresentationModule = module {
     viewModelOf(::RegisterViewModel)
     viewModelOf(::RegisterSuccessViewModel)
+    viewModelOf(::EmailVerificationViewModel)
 }

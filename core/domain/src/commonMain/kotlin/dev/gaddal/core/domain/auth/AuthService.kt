@@ -43,4 +43,16 @@ interface AuthService {
     suspend fun resendVerificationEmail(
         email: String
     ): EmptyResult<DataError.Remote>
+
+    /**
+     * Attempts to verify a user's email using the provided token.
+     *
+     * This function interacts with the authentication service to validate the
+     * email verification token. A successful operation indicates that the
+     * email is verified, while an error result specifies the failure type.
+     *
+     * @param token The email verification token to be validated.
+     * @return An `EmptyResult` encapsulating either success or a `DataError.Remote` describing the error type.
+     */
+    suspend fun verifyEmail(token: String): EmptyResult<DataError.Remote>
 }

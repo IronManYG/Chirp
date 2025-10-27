@@ -2,6 +2,7 @@ package dev.gaddal.core.data.auth
 
 import dev.gaddal.core.data.dto.requests.EmailRequest
 import dev.gaddal.core.data.dto.requests.RegisterRequest
+import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.data.networking.post
 import dev.gaddal.core.domain.auth.AuthService
 import dev.gaddal.core.domain.util.DataError
@@ -58,6 +59,20 @@ class KtorAuthService(
         return httpClient.post(
             route = "/auth/resend-verification",
             body = EmailRequest(email),
+        )
+    }
+
+    /**
+     * Verifies an email using the provided token.
+     *
+     * @param token The verification token associated with the email.
+     * @return An `EmptyResult` indicating the outcome of the verification process,
+     *         with potential for a `DataError.Remote` in case of errors.
+     */
+    override suspend fun verifyEmail(token: String): EmptyResult<DataError.Remote> {
+        return httpClient.get(
+            route = "/auth/verify",
+            queryParams = mapOf("token" to token)
         )
     }
 }

@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import chirp.feature.auth.presentation.generated.resources.Res
 import chirp.feature.auth.presentation.generated.resources.close
 import chirp.feature.auth.presentation.generated.resources.email_verified_failed
@@ -36,10 +35,11 @@ import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun EmailVerificationRoot(
-    viewModel: EmailVerificationViewModel = viewModel()
+    viewModel: EmailVerificationViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -62,6 +62,7 @@ fun EmailVerificationScreen(
                         .fillMaxWidth()
                 )
             }
+
             state.isVerified -> {
                 ChirpSimpleResultLayout(
                     title = stringResource(Res.string.email_verified_successfully),
@@ -80,6 +81,7 @@ fun EmailVerificationScreen(
                     }
                 )
             }
+
             else -> {
                 ChirpSimpleResultLayout(
                     title = stringResource(Res.string.email_verified_failed),
