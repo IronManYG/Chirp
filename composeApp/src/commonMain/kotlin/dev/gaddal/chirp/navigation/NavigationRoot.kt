@@ -1,25 +1,28 @@
 package dev.gaddal.chirp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import dev.gaddal.auth.presentation.navigation.AuthGraphRoutes
 import dev.gaddal.auth.presentation.navigation.authGraph
 
 /**
  * Represents the composable root for the navigation graph in the application.
  *
- * This function initializes a navigation controller and sets up a `NavHost` with the provided
- * navigation graph configuration. It defines the navigation flow starting from the authentication
- * graph's entry point. The `authGraph` extension method is invoked to add the authentication-related
- * navigation destinations to the graph.
+ * This function initializes a [NavHost] with the provided [navController] as the navigation controller.
+ * It serves as the entry point for the application's navigation system, defining the navigation flow
+ * starting from the authentication graph ([AuthGraphRoutes.Graph]).
  *
- * The root navigation specifically starts from the `AuthGraphRoutes.Graph` route,
- * allowing seamless integration of authentication and potential navigation extensions.
+ * The [authGraph] extension is used to set up all authentication-related navigation destinations,
+ * including registration, login, and email verification flows. Deep linking support is configured
+ * within the auth graph for handling external navigation requests.
+ *
+ * @param navController The navigation controller that manages the app navigation.
+ * @see AuthGraphRoutes
+ * @see authGraph
  */
 @Composable
-fun NavigationRoot() {
-    val navController = rememberNavController()
+fun NavigationRoot(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = AuthGraphRoutes.Graph
