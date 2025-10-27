@@ -2,7 +2,7 @@ package dev.gaddal.chirp
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import dev.gaddal.auth.presentation.register_success.RegisterSuccessRoot
+import dev.gaddal.chirp.navigation.NavigationRoot
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.presentation.util.LanguageManager
 import dev.gaddal.core.presentation.util.ProvideMultilingualSupport
@@ -25,7 +25,7 @@ fun App() {
     ) {
         // Provide language state to the composition tree
         ProvideMultilingualSupport(languageManager.currentLanguage) {
-            RegisterSuccessRoot()
+            NavigationRoot()
         }
     }
 }
