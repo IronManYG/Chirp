@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="welcome_to_chirp">مرحباً بك في جيرب!</string>
+    <string name="account_successfully_created">تم إنشاء حساب جيرب بنجاح!</string>
+    <string name="verification_email_sent_to_x">لقد أرسلنا بريدًا إلكترونيًا للتحقق إلى %1$s</string>
+    <string name="resend_verification_email">إعادة إرسال بريد التحقق الإلكتروني</string>
     <string name="username">اسم المستخدم</string>
     <string name="password">كلمة المرور</string>
     <string name="email">البريد الإلكتروني</string>
