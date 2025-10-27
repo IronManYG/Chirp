@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.5.0] - 2025-10-27
+
+### Added
+- Authentication: Registration screen UI and logic ([8014789](https://github.com/IronManYG/Chirp/commit/8014789))
+- Authentication: Input validation for registration form ([605c23c](https://github.com/IronManYG/Chirp/commit/605c23c))
+- Authentication: User registration service ([3e26873](https://github.com/IronManYG/Chirp/commit/3e26873))
+- Authentication: Registration flow and error handling ([ca9c7ac](https://github.com/IronManYG/Chirp/commit/ca9c7ac))
+- Dependency Injection: Integrate Koin across modules ([776de34](https://github.com/IronManYG/Chirp/commit/776de34))
+- Authentication: Registration success screen ([0be7f64](https://github.com/IronManYG/Chirp/commit/0be7f64))
+- Authentication: Integrate navigation for authentication flow ([800426b](https://github.com/IronManYG/Chirp/commit/800426b))
+- Authentication: Email verification screen ([de34a7e](https://github.com/IronManYG/Chirp/commit/de34a7e))
+- Authentication: Email verification flow ([12e9eb7](https://github.com/IronManYG/Chirp/commit/12e9eb7))
+- Authentication: Resend verification email functionality ([08d1b42](https://github.com/IronManYG/Chirp/commit/08d1b42))
+- Authentication: Deep linking for email verification ([7cc00e7](https://github.com/IronManYG/Chirp/commit/7cc00e7))
+
+### Fixed
+- Authentication: Registration button state and conflict error handling ([e6f1b60](https://github.com/IronManYG/Chirp/commit/e6f1b60))
+
+[0.5.0]: https://github.com/IronManYG/Chirp/compare/0b3416b...7cc00e7
+
 ## [0.4.0] - 2025-10-26
 
 ### Added
