@@ -3,11 +3,11 @@ Chirp – Advanced Developer Guidelines (Project-Specific)
 Scope
 - Audience: experienced Kotlin/KMP/Compose developers.
 - Focus: only project-specific details that are non-obvious or easy to forget.
-- Validated on Windows with JDK 11 using Gradle 8.14.3 on 2025‑10‑16.
+- Validated on Windows with JDK 17 using Gradle 8.14.3 on 2025‑10‑16.
 
 1) Build and Configuration
 Toolchain and versions
-- JDK: Java 11. Ensure your IDE and Gradle toolchain use JDK 11.
+- JDK: Java 17. Ensure your IDE and Gradle toolchain use JDK 17.
 - Kotlin: 2.2.0 (gradle/libs.versions.toml -> versions.kotlin).
 - AGP: 8.11.1.
 - Compose Multiplatform: 1.9.0‑beta01. Compose BOM: 2025.07.00.
