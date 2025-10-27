@@ -1,11 +1,13 @@
 package dev.gaddal.core.designsystem.components.layouts
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.gaddal.core.designsystem.components.brand.ChirpFailureIcon
 import dev.gaddal.core.designsystem.components.brand.ChirpSuccessIcon
 import dev.gaddal.core.designsystem.components.buttons.ChirpButton
 import dev.gaddal.core.designsystem.components.buttons.ChirpButtonStyle
@@ -31,10 +34,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * @param modifier A [Modifier] to be applied to the layout. Defaults to an empty modifier.
  */
 @Composable
-fun ChirpSimpleSuccessLayout(
+fun ChirpSimpleResultLayout(
     title: String,
     description: String,
-    icon: @Composable () -> Unit,
+    icon: @Composable ColumnScope.() -> Unit,
     primaryButton: @Composable () -> Unit,
     secondaryButton: @Composable (() -> Unit)? = null,
     secondaryError: String? = null,
@@ -94,7 +97,7 @@ fun ChirpSimpleSuccessLayout(
 @Preview
 fun ChirpSimpleSuccessLayoutPreview() {
     ChirpTheme(darkTheme = true) {
-        ChirpSimpleSuccessLayout(
+        ChirpSimpleResultLayout(
             title = "Hello world!",
             description = "Test description",
             icon = {
@@ -117,6 +120,43 @@ fun ChirpSimpleSuccessLayoutPreview() {
                         .fillMaxWidth()
                 )
             }
+        )
+    }
+}
+
+@Composable
+@Preview
+fun ChirpSimpleErrorLayoutPreview() {
+    ChirpTheme(darkTheme = true) {
+        ChirpSimpleResultLayout(
+            title = "Hello world!",
+            description = "Test description",
+            icon = {
+                Spacer(modifier = Modifier.height(32.dp))
+                ChirpFailureIcon(
+                    modifier = Modifier
+                        .size(80.dp)
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+            },
+            primaryButton = {
+                ChirpButton(
+                    text = "Log In",
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            },
+            secondaryButton = {
+                ChirpButton(
+                    text = "Resend verification email",
+                    onClick = {},
+                    style = ChirpButtonStyle.SECONDARY,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            },
+            secondaryError = "Invalid email address"
         )
     }
 }

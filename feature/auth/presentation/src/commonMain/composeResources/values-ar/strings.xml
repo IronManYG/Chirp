@@ -5,6 +5,12 @@
     <string name="verification_email_sent_to_x">لقد أرسلنا بريدًا إلكترونيًا للتحقق إلى %1$s</string>
     <string name="resend_verification_email">إعادة إرسال بريد التحقق الإلكتروني</string>
     <string name="resent_verification_email">تم إعادة إرسال رسالة التحقق بنجاح</string>
+    <string name="verifying_account">جاري التحقق من الحساب...</string>
+    <string name="email_verified_successfully">تم التحقق من البريد الإلكتروني بنجاح!</string>
+    <string name="email_verified_failed">فشل في التحقق من بريدك الإلكتروني</string>
+    <string name="email_verified_successfully_desc">تم التحقق من بريدك الإلكتروني. يمكنك الآن تسجيل الدخول باستخدام بيانات اعتمادك.</string>
+    <string name="email_verified_failed_desc">تعذر التحقق من بريدك الإلكتروني. ربما يكون الرابط غير صالح أو انتهت صلاحيته.</string>
+    <string name="close">إغلاق</string>
     <string name="username">اسم المستخدم</string>
     <string name="password">كلمة المرور</string>
     <string name="email">البريد الإلكتروني</string>
