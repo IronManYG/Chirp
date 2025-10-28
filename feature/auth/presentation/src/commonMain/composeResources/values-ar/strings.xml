@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="welcome_to_chirp">مرحباً بك في جيرب!</string>
+    <string name="welcome_back">مرحباً بعودتك!</string>
     <string name="account_successfully_created">تم إنشاء حساب جيرب بنجاح!</string>
     <string name="verification_email_sent_to_x">لقد أرسلنا بريدًا إلكترونيًا للتحقق إلى %1$s</string>
     <string name="resend_verification_email">إعادة إرسال بريد التحقق الإلكتروني</string>
@@ -12,6 +13,8 @@
     <string name="email_verified_failed_desc">تعذر التحقق من بريدك الإلكتروني. ربما يكون الرابط غير صالح أو انتهت صلاحيته.</string>
     <string name="close">إغلاق</string>
     <string name="username">اسم المستخدم</string>
+    <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="create_account">إنشاء حساب</string>
     <string name="password">كلمة المرور</string>
     <string name="email">البريد الإلكتروني</string>
     <string name="register">تسجيل</string>

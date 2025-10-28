@@ -18,14 +18,15 @@ import androidx.compose.ui.unit.dp
  * A composable function that provides a scaffold structure with a customizable content area and a snackbar host.
  * This function is useful for layouts where you need to display content with an integrated snackbar.
  *
- * @param snackbarHostState An instance of [SnackbarHostState] used to control and display the snackbar.
+ * @param snackbarHostState An optional [SnackbarHostState] to manage the state of snackbar messages.
+ * Defaults to null if no snackbar functionality is required.
  * @param modifier A [Modifier] to be applied to the scaffold. Defaults to an empty modifier.
  * @param content A composable lambda to define the main content within the scaffold.
  *                This parameter is mandatory and does not have a default value.
  */
 @Composable
 fun ChirpSnackbarScaffold(
-    snackbarHostState: SnackbarHostState,
+    snackbarHostState: SnackbarHostState? = null,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -35,11 +36,13 @@ fun ChirpSnackbarScaffold(
             .union(WindowInsets.displayCutout)
             .union(WindowInsets.ime),
         snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
-            )
+            snackbarHostState?.let {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .padding(bottom = 24.dp)
+                )
+            }
         }
     ) { innerPadding ->
         Box(
