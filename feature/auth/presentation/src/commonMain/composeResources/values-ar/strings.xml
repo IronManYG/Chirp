@@ -27,4 +27,5 @@
     <string name="error_invalid_password">يجب أن تتكون كلمة المرور من ٩ أحرف على الأقل وتتضمن رقماً واحداً وحرفاً كبيراً واحداً</string>
     <string name="error_invalid_email">هذا البريد الإلكتروني غير صالح</string>
     <string name="error_invalid_username">يجب أن يكون اسم المستخدم بين ٣ و٢٠ حرفاً</string>
+    <string name="error_email_not_verified">تعذر تسجيل الدخول لأن بريدك الإلكتروني غير موثق</string>
 </resources>

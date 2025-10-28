@@ -2,17 +2,40 @@ package dev.gaddal.core.domain.auth
 
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
+import dev.gaddal.core.domain.util.Result
 
 /**
- * Defines an interface for authentication services, providing methods for user registration
- * and email verification processes.
+ * Defines an interface for authentication and authorization services, providing methods for user
+ * authentication, registration, and account verification processes.
  *
- * This service is responsible for interacting with a backend or remote authentication system
- * to handle user-related actions such as registering new users and managing account verification
- * workflows. The operations within this interface are asynchronous and rely on the `EmptyResult` type
- * to encapsulate the result of each operation, which may be a success or a `DataError.Remote` failure.
+ * This service is responsible for:
+ * - User authentication through login credentials
+ * - Managing authentication tokens (access and refresh tokens)
+ * - User registration and account creation
+ * - Email verification workflows
+ * - Handling secure communication with the authentication backend
+ *
+ * All operations within this interface are asynchronous and return either a successful result
+ * (with authentication data where applicable) or a [DataError.Remote] describing any failures
+ * that occurred during the authentication process.
  */
 interface AuthService {
+    /**
+     * Attempts to authenticate a user using the provided email and password.
+     *
+     * This function communicates with the authentication service to validate the
+     * provided credentials. The operation may return either a successful result
+     * containing authentication information or an error detailing the issue.
+     *
+     * @param email The email address of the user attempting to log in.
+     * @param password The password associated with the user's account.
+     * @return A `Result` instance containing either `AuthInfo` on success or `DataError.Remote` on failure.
+     */
+    suspend fun login(
+        email: String,
+        password: String
+    ): Result<AuthInfo, DataError.Remote>
+
     /**
      * Attempts to register a new user with the specified email, username, and password.
      *

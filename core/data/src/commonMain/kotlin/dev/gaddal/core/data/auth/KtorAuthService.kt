@@ -1,12 +1,18 @@
 package dev.gaddal.core.data.auth
 
+import dev.gaddal.core.data.dto.AuthInfoSerializable
 import dev.gaddal.core.data.dto.requests.EmailRequest
+import dev.gaddal.core.data.dto.requests.LoginRequest
 import dev.gaddal.core.data.dto.requests.RegisterRequest
+import dev.gaddal.core.data.mappers.toDomain
 import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.data.networking.post
+import dev.gaddal.core.domain.auth.AuthInfo
 import dev.gaddal.core.domain.auth.AuthService
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
+import dev.gaddal.core.domain.util.Result
+import dev.gaddal.core.domain.util.map
 import io.ktor.client.HttpClient
 
 /**
@@ -23,6 +29,28 @@ import io.ktor.client.HttpClient
 class KtorAuthService(
     private val httpClient: HttpClient
 ) : AuthService {
+    /**
+     * Authenticates a user with the provided email and password.
+     *
+     * @param email The email address of the user attempting to authenticate.
+     * @param password The corresponding password of the user.
+     * @return A `Result` containing either `AuthInfo` upon successful authentication
+     *         or `DataError.Remote` in case of a failure during the authentication process.
+     */
+    override suspend fun login(
+        email: String,
+        password: String
+    ): Result<AuthInfo, DataError.Remote> {
+        return httpClient.post<LoginRequest, AuthInfoSerializable>(
+            route = "/auth/login",
+            body = LoginRequest(
+                email = email,
+                password = password
+            )
+        ).map { authInfoSerializable ->
+            authInfoSerializable.toDomain()
+        }
+    }
 
     /**
      * Registers a new user with the provided email, username, and password.

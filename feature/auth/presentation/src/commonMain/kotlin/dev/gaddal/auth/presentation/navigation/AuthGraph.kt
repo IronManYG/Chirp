@@ -51,14 +51,22 @@ fun NavGraphBuilder.authGraph(
                             inclusive = true
                             saveState = true
                         }
-                        restoreState = true
                         launchSingleTop = true
+                        restoreState = true
                     }
                 }
             )
         }
         composable<AuthGraphRoutes.RegisterSuccess> {
-            RegisterSuccessRoot()
+            RegisterSuccessRoot(
+                onLoginClick = {
+                    navController.navigate(AuthGraphRoutes.Login) {
+                        popUpTo<AuthGraphRoutes.RegisterSuccess> {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
         composable<AuthGraphRoutes.EmailVerification>(
             deepLinks = listOf(
@@ -70,7 +78,22 @@ fun NavGraphBuilder.authGraph(
                 },
             )
         ) {
-            EmailVerificationRoot()
+            EmailVerificationRoot(
+                onLoginClick = {
+                    navController.navigate(AuthGraphRoutes.Login) {
+                        popUpTo<AuthGraphRoutes.EmailVerification> {
+                            inclusive = true
+                        }
+                    }
+                },
+                onCloseClick = {
+                    navController.navigate(AuthGraphRoutes.Login) {
+                        popUpTo<AuthGraphRoutes.EmailVerification> {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
     }
 }

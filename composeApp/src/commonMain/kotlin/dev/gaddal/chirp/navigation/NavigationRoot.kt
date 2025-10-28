@@ -3,8 +3,11 @@ package dev.gaddal.chirp.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import dev.gaddal.auth.presentation.navigation.AuthGraphRoutes
 import dev.gaddal.auth.presentation.navigation.authGraph
+import dev.gaddal.chat.presentation.chat_list.ChatListRoute
+import dev.gaddal.chat.presentation.chat_list.ChatListScreenRoot
 
 /**
  * Represents the composable root for the navigation graph in the application.
@@ -30,8 +33,15 @@ fun NavigationRoot(navController: NavHostController) {
         authGraph(
             navController = navController,
             onLoginSuccess = {
-
+                navController.navigate(ChatListRoute) {
+                    popUpTo(AuthGraphRoutes.Graph) {
+                        inclusive = true
+                    }
+                }
             }
         )
+        composable<ChatListRoute> {
+            ChatListScreenRoot()
+        }
     }
 }
