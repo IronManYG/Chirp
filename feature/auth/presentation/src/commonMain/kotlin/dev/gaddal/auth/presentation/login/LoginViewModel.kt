@@ -8,6 +8,7 @@ import chirp.feature.auth.presentation.generated.resources.error_email_not_verif
 import chirp.feature.auth.presentation.generated.resources.error_invalid_credentials
 import dev.gaddal.auth.domain.EmailValidator
 import dev.gaddal.core.domain.auth.AuthService
+import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.onFailure
 import dev.gaddal.core.domain.util.onSuccess
@@ -27,7 +28,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
     private val eventChannel = Channel<LoginEvent>()
@@ -128,6 +130,7 @@ class LoginViewModel(
      * 2. Fetches the values of the email and password from the state.
      * 3. Calls the `authService.login` method to attempt authentication using the obtained credentials.
      * 4. On successful authentication:
+     *    - Stores the auth info in session storage
      *    - Updates the state to indicate the login process has ended.
      *    - Sends a `LoginEvent.Success` event to notify subscribers of the successful login.
      * 5. On failure:
@@ -158,6 +161,8 @@ class LoginViewModel(
                     password = password
                 )
                 .onSuccess { authInfo ->
+                    sessionStorage.set(authInfo)
+
                     _state.update {
                         it.copy(
                             isLoggingIn = false

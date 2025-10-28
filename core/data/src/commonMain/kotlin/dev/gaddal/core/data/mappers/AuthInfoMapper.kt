@@ -39,3 +39,39 @@ fun UserSerializable.toDomain(): User {
         profilePictureUrl = profilePictureUrl
     )
 }
+
+/**
+ * Converts the current `User` object into a `UserSerializable` instance.
+ *
+ * This method maps the properties of the `User` domain model to their corresponding
+ * fields in the `UserSerializable` data transfer object, enabling serialization
+ * for external communication or storage purposes.
+ *
+ * @return A `UserSerializable` instance containing the same data as the current `User`.
+ */
+fun User.toSerializable(): UserSerializable {
+    return UserSerializable(
+        id = id,
+        email = email,
+        username = username,
+        hasVerifiedEmail = hasVerifiedEmail,
+        profilePictureUrl = profilePictureUrl
+    )
+}
+
+/**
+ * Converts the current instance of `AuthInfo` into an `AuthInfoSerializable` object.
+ *
+ * This method maps the properties of the `AuthInfo` domain model to corresponding fields
+ * in the `AuthInfoSerializable` data transfer object for serialization purposes.
+ *
+ * @return An `AuthInfoSerializable` object containing the serialized representation
+ *         of the current `AuthInfo` instance.
+ */
+fun AuthInfo.toSerializable(): AuthInfoSerializable {
+    return AuthInfoSerializable(
+        accessToken = accessToken,
+        refreshToken = refreshToken,
+        user = user.toSerializable()
+    )
+}
