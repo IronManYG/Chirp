@@ -1,11 +1,11 @@
 package dev.gaddal.core.data.di
 
 import dev.gaddal.core.data.auth.DataStoreSessionStorage
-import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.data.auth.KtorAuthService
 import dev.gaddal.core.data.logging.KermitLogger
 import dev.gaddal.core.data.networking.HttpClientFactory
 import dev.gaddal.core.domain.auth.AuthService
+import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.logging.ChirpLogger
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -36,7 +36,7 @@ val coreDataModule = module {
     includes(platformCoreDataModule)
     single<ChirpLogger> { KermitLogger }
     single {
-        HttpClientFactory(get()).create(get())
+        HttpClientFactory(get(), get()).create(get())
     }
     singleOf(::KtorAuthService) bind AuthService::class
     singleOf(::DataStoreSessionStorage) bind SessionStorage::class
