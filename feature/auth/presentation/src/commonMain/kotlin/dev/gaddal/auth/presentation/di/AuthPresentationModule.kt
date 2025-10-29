@@ -5,21 +5,12 @@ import dev.gaddal.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.gaddal.auth.presentation.login.LoginViewModel
 import dev.gaddal.auth.presentation.register.RegisterViewModel
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessViewModel
+import dev.gaddal.auth.presentation.reset_password.ResetPasswordViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
  * Dependency injection module that provides presentation-layer dependencies for authentication-related screens.
- *
- * This module includes the following ViewModels:
- * - `RegisterViewModel`: Manages the state and actions related to the user registration screen,
- *   including form validation, handling user inputs, and coordinating with the authentication service.
- * - `RegisterSuccessViewModel`: Handles the state for the registration success screen.
- * - `EmailVerificationViewModel`: Manages the logic for email verification workflows,
- *   such as tracking verification status.
- * - `LoginViewModel`: Handles the state and actions for the login screen, including user authentication logic.
- * - `ForgotPasswordViewModel`: Manages the state and actions for the password reset flow,
- *   including form validation and coordinating password recovery requests.
  *
  * The ViewModels are registered using the dependency injection framework, making them available
  * for use within the application wherever needed.
@@ -30,4 +21,5 @@ val authPresentationModule = module {
     viewModelOf(::EmailVerificationViewModel)
     viewModelOf(::LoginViewModel)
     viewModelOf(::ForgotPasswordViewModel)
+    viewModelOf(::ResetPasswordViewModel)
 }

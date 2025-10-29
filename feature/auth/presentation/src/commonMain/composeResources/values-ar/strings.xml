@@ -15,6 +15,8 @@
     <string name="submit">إرسال</string>
     <string name="username">اسم المستخدم</string>
     <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="set_new_password">Set a new password</string>
+    <string name="new_password">New password</string>
     <string name="create_account">إنشاء حساب</string>
     <string name="password">كلمة المرور</string>
     <string name="email">البريد الإلكتروني</string>
@@ -29,5 +31,7 @@
     <string name="error_invalid_email">هذا البريد الإلكتروني غير صالح</string>
     <string name="error_invalid_username">يجب أن يكون اسم المستخدم بين ٣ و٢٠ حرفاً</string>
     <string name="error_email_not_verified">تعذر تسجيل الدخول لأن بريدك الإلكتروني غير موثق</string>
+    <string name="error_reset_password_token_invalid">يبدو أن رابط إعادة تعيين كلمة المرور غير صالح أو انتهت صلاحيته. يرجى طلب بريد إلكتروني جديد.</string>
     <string name="forgot_password_email_sent_successfully">لقد أرسلنا إليك بنجاح بريداً إلكترونياً يحتوي على رابط لإعادة تعيين كلمة المرور</string>
+    <string name="reset_password_successfully">تم تغيير كلمة المرور الخاصة بك بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.</string>
 </resources>
