@@ -90,4 +90,19 @@ interface AuthService {
      * @return An `EmptyResult` indicating either a successful password reset initiation or a `DataError.Remote` detailing the failure.
      */
     suspend fun forgotPassword(email: String): EmptyResult<DataError.Remote>
+
+    /**
+     * Resets the user's password using the specified new password and token.
+     *
+     * This function interacts with the authentication service to apply a new password
+     * to the user's account. The operation's success or failure is encoded in the return result.
+     *
+     * @param newPassword The new password to be set for the user's account.
+     * @param token The token provided to authorize the password reset.
+     * @return An `EmptyResult` encapsulating either success or a `DataError.Remote` describing the failure type.
+     */
+    suspend fun resetPassword(
+        newPassword: String,
+        token: String
+    ): EmptyResult<DataError.Remote>
 }

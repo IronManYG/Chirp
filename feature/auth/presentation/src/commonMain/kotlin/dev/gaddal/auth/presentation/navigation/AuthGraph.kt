@@ -10,6 +10,7 @@ import dev.gaddal.auth.presentation.forgot_password.ForgotPasswordRoot
 import dev.gaddal.auth.presentation.login.LoginRoot
 import dev.gaddal.auth.presentation.register.RegisterRoot
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessRoot
+import dev.gaddal.auth.presentation.reset_password.ResetPasswordRoot
 
 /**
  * Configures the navigation graph for the authentication flow within the application.
@@ -98,6 +99,20 @@ fun NavGraphBuilder.authGraph(
         }
         composable<AuthGraphRoutes.ForgotPassword> {
             ForgotPasswordRoot()
+        }
+        composable<AuthGraphRoutes.ResetPassword>(
+            deepLinks = listOf(
+                navDeepLink {
+                    this.uriPattern =
+                        "https://chirp.pl-coding.com/api/auth/reset-password?token={token}"
+                },
+                navDeepLink {
+                    this.uriPattern =
+                        "chirp://chirp.pl-coding.com/api/auth/reset-password?token={token}"
+                },
+            )
+        ) {
+            ResetPasswordRoot()
         }
     }
 }

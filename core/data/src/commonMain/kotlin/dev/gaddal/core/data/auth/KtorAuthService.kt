@@ -4,6 +4,7 @@ import dev.gaddal.core.data.dto.AuthInfoSerializable
 import dev.gaddal.core.data.dto.requests.EmailRequest
 import dev.gaddal.core.data.dto.requests.LoginRequest
 import dev.gaddal.core.data.dto.requests.RegisterRequest
+import dev.gaddal.core.data.dto.requests.ResetPasswordRequest
 import dev.gaddal.core.data.mappers.toDomain
 import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.data.networking.post
@@ -115,6 +116,27 @@ class KtorAuthService(
         return httpClient.post<EmailRequest, Unit>(
             route = "/auth/forgot-password",
             body = EmailRequest(email)
+        )
+    }
+
+    /**
+     * Resets the password for the account associated with the provided token.
+     *
+     * @param newPassword The new password to set for the account.
+     * @param token The token used to authorize the password reset operation.
+     * @return An `EmptyResult` indicating the outcome of the password reset operation,
+     *         with a potential `DataError.Remote` if an error occurs during the process.
+     */
+    override suspend fun resetPassword(
+        newPassword: String,
+        token: String
+    ): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "/auth/reset-password",
+            body = ResetPasswordRequest(
+                newPassword = newPassword,
+                token = token
+            )
         )
     }
 }
