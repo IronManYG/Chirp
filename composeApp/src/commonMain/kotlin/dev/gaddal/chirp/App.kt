@@ -12,6 +12,7 @@ import dev.gaddal.chirp.navigation.DeepLinkListener
 import dev.gaddal.chirp.navigation.NavigationRoot
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.presentation.util.LanguageManager
+import dev.gaddal.core.presentation.util.ObserveAsEvents
 import dev.gaddal.core.presentation.util.ProvideMultilingualSupport
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -36,6 +37,18 @@ fun App(
     LaunchedEffect(state.isCheckingAuth) {
         if (!state.isCheckingAuth) {
             onAuthenticationChecked()
+        }
+    }
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is MainEvent.OnSessionExpired -> {
+                navController.navigate(AuthGraphRoutes.Graph) {
+                    popUpTo(AuthGraphRoutes.Graph) {
+                        inclusive = false
+                    }
+                }
+            }
         }
     }
 
