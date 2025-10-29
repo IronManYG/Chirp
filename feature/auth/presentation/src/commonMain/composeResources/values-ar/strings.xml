@@ -12,6 +12,7 @@
     <string name="email_verified_successfully_desc">تم التحقق من بريدك الإلكتروني. يمكنك الآن تسجيل الدخول باستخدام بيانات اعتمادك.</string>
     <string name="email_verified_failed_desc">تعذر التحقق من بريدك الإلكتروني. ربما يكون الرابط غير صالح أو انتهت صلاحيته.</string>
     <string name="close">إغلاق</string>
+    <string name="submit">إرسال</string>
     <string name="username">اسم المستخدم</string>
     <string name="forgot_password">نسيت كلمة المرور؟</string>
     <string name="create_account">إنشاء حساب</string>
@@ -28,4 +29,5 @@
     <string name="error_invalid_email">هذا البريد الإلكتروني غير صالح</string>
     <string name="error_invalid_username">يجب أن يكون اسم المستخدم بين ٣ و٢٠ حرفاً</string>
     <string name="error_email_not_verified">تعذر تسجيل الدخول لأن بريدك الإلكتروني غير موثق</string>
+    <string name="forgot_password_email_sent_successfully">لقد أرسلنا إليك بنجاح بريداً إلكترونياً يحتوي على رابط لإعادة تعيين كلمة المرور</string>
 </resources>
