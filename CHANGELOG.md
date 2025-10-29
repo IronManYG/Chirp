@@ -4,6 +4,73 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.7.0] - 2025-10-29
+
+### Added
+- Authentication: Forgot password flow ([5da744c](https://github.com/IronManYG/Chirp/commit/5da744c))
+- Authentication: Reset password screen structure ([4ffa703](https://github.com/IronManYG/Chirp/commit/4ffa703))
+- Authentication: Implement reset password flow ([58455fb](https://github.com/IronManYG/Chirp/commit/58455fb))
+- UX: Clear focus on tap utility ([026bf00](https://github.com/IronManYG/Chirp/commit/026bf00))
+
+### Fixed
+- Authentication: Fix window insets by wrapping auth screens with `ChirpSnackbarScaffold` ([627e3d0](https://github.com/IronManYG/Chirp/commit/627e3d0))
+
+[0.7.0]: https://github.com/IronManYG/Chirp/compare/1253e0e...627e3d0
+
+## [0.6.0] - 2025-10-29
+
+### Added
+- Authentication: Login screen and navigation ([b627c86](https://github.com/IronManYG/Chirp/commit/b627c86))
+- Authentication: Login flow and navigation ([47a7d0b](https://github.com/IronManYG/Chirp/commit/47a7d0b))
+- Authentication: Session storage using DataStore ([dcebb67](https://github.com/IronManYG/Chirp/commit/dcebb67))
+- Authentication: Automatic token refresh logic ([12544bc](https://github.com/IronManYG/Chirp/commit/12544bc))
+- Authentication: Session expiration handling and Chat ViewModel updates ([1253e0e](https://github.com/IronManYG/Chirp/commit/1253e0e))
+- Application: Authentication check on app startup ([0137a28](https://github.com/IronManYG/Chirp/commit/0137a28))
+- Android: Splash screen and updated launcher icons ([b811e92](https://github.com/IronManYG/Chirp/commit/b811e92))
+
+### Changed
+- iOS: Configure launch screen and update app icon ([ac90ddb](https://github.com/IronManYG/Chirp/commit/ac90ddb))
+
+[0.6.0]: https://github.com/IronManYG/Chirp/compare/7cc00e7...1253e0e
+
+## [0.5.0] - 2025-10-27
+
+### Added
+- Authentication: Registration screen UI and logic ([8014789](https://github.com/IronManYG/Chirp/commit/8014789))
+- Authentication: Input validation for registration form ([605c23c](https://github.com/IronManYG/Chirp/commit/605c23c))
+- Authentication: User registration service ([3e26873](https://github.com/IronManYG/Chirp/commit/3e26873))
+- Authentication: Registration flow and error handling ([ca9c7ac](https://github.com/IronManYG/Chirp/commit/ca9c7ac))
+- Dependency Injection: Integrate Koin across modules ([776de34](https://github.com/IronManYG/Chirp/commit/776de34))
+- Authentication: Registration success screen ([0be7f64](https://github.com/IronManYG/Chirp/commit/0be7f64))
+- Authentication: Integrate navigation for authentication flow ([800426b](https://github.com/IronManYG/Chirp/commit/800426b))
+- Authentication: Email verification screen ([de34a7e](https://github.com/IronManYG/Chirp/commit/de34a7e))
+- Authentication: Email verification flow ([12e9eb7](https://github.com/IronManYG/Chirp/commit/12e9eb7))
+- Authentication: Resend verification email functionality ([08d1b42](https://github.com/IronManYG/Chirp/commit/08d1b42))
+- Authentication: Deep linking for email verification ([7cc00e7](https://github.com/IronManYG/Chirp/commit/7cc00e7))
+
+### Fixed
+- Authentication: Registration button state and conflict error handling ([e6f1b60](https://github.com/IronManYG/Chirp/commit/e6f1b60))
+
+[0.5.0]: https://github.com/IronManYG/Chirp/compare/0b3416b...7cc00e7
+
+## [0.4.0] - 2025-10-26
+
+### Added
+- Design System: `ChirpSnackbarScaffold` component ([0b3416b](https://github.com/IronManYG/Chirp/commit/0b3416b))
+- Design System: success layout and icon components ([1d28ba7](https://github.com/IronManYG/Chirp/commit/1d28ba7))
+- Design System: `ChirpAdaptiveResultLayout` component ([4c83151](https://github.com/IronManYG/Chirp/commit/4c83151))
+- Design System: Adaptive authentication form layout ([9c321b8](https://github.com/IronManYG/Chirp/commit/9c321b8))
+- Design System: `ChirpSurface` layout component ([a4b4eda](https://github.com/IronManYG/Chirp/commit/a4b4eda))
+- Design System: `ChirpTextField` composable ([b1b067e](https://github.com/IronManYG/Chirp/commit/b1b067e))
+- Design System: `ChirpFloatingActionButton` ([0c59db9](https://github.com/IronManYG/Chirp/commit/0c59db9))
+- Design System: `ChirpIconButton` composable ([e5c5e88](https://github.com/IronManYG/Chirp/commit/e5c5e88))
+- Design System: `ChirpButton` composable and styles ([d35545f](https://github.com/IronManYG/Chirp/commit/d35545f))
+
+### Changed
+- Design System: Refactor text fields and add icons ([a332a78](https://github.com/IronManYG/Chirp/commit/a332a78))
+
+[0.4.0]: https://github.com/IronManYG/Chirp/compare/e21e288...0b3416b
+
 ## [0.3.0] - 2025-10-21
 
 ### Added

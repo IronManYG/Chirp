@@ -40,16 +40,16 @@ expect suspend fun <T> platformSafeCall(
  * @param Response The type of the response expected from the server.
  * Must inherit from `Any` and is determined at runtime using reified type parameters.
  * @param route The endpoint or route where the HTTP POST request should be sent.
- * @param queryParams A map of query parameters that will be appended to the URL. Defaults to an empty map.
  * @param body The payload of type `Request` to be included in the POST request body.
+ * @param queryParams A map of query parameters that will be appended to the URL. Defaults to an empty map.
  * @param builder A lambda function that allows additional configuration of the `HttpRequestBuilder`.
  * @return A `Result` wrapper which contains the response of type `Response` on success
  * or a `DataError.Remote` on failure.
  */
 suspend inline fun <reified Request, reified Response : Any> HttpClient.post(
     route: String,
-    queryParams: Map<String, Any> = mapOf(),
     body: Request,
+    queryParams: Map<String, Any> = mapOf(),
     crossinline builder: HttpRequestBuilder.() -> Unit = {}
 ): Result<Response, DataError.Remote> {
     return safeCall {
@@ -192,6 +192,7 @@ suspend inline fun <reified T> responseToResult(response: HttpResponse): Result<
         403 -> Result.Failure(DataError.Remote.FORBIDDEN)
         404 -> Result.Failure(DataError.Remote.NOT_FOUND)
         408 -> Result.Failure(DataError.Remote.REQUEST_TIMEOUT)
+        409 -> Result.Failure(DataError.Remote.CONFLICT)
         413 -> Result.Failure(DataError.Remote.PAYLOAD_TOO_LARGE)
         429 -> Result.Failure(DataError.Remote.TOO_MANY_REQUESTS)
         500 -> Result.Failure(DataError.Remote.SERVER_ERROR)

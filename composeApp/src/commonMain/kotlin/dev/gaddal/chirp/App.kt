@@ -1,34 +1,57 @@
 package dev.gaddal.chirp
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import chirp.composeapp.generated.resources.Res
-import chirp.composeapp.generated.resources.compose_multiplatform
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
+import dev.gaddal.auth.presentation.navigation.AuthGraphRoutes
+import dev.gaddal.chat.presentation.chat_list.ChatListRoute
+import dev.gaddal.chirp.navigation.DeepLinkListener
+import dev.gaddal.chirp.navigation.NavigationRoot
 import dev.gaddal.core.designsystem.theme.ChirpTheme
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import dev.gaddal.core.presentation.example.MultilingualExampleDemo
 import dev.gaddal.core.presentation.util.LanguageManager
+import dev.gaddal.core.presentation.util.ObserveAsEvents
+import dev.gaddal.core.presentation.util.ProvideMultilingualSupport
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * Root composable function for the application. It sets up navigation, theme, and language support.
+ *
+ * @param onAuthenticationChecked A callback invoked when authentication checking is complete.
+ * @param viewModel The main view model that provides the application state and handles business logic.
+ */
 @Composable
 @Preview
-fun App() {
-    
+fun App(
+    onAuthenticationChecked: () -> Unit = {},
+    viewModel: MainViewModel = koinViewModel()
+) {
+    val navController = rememberNavController()
+    DeepLinkListener(navController)
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.isCheckingAuth) {
+        if (!state.isCheckingAuth) {
+            onAuthenticationChecked()
+        }
+    }
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is MainEvent.OnSessionExpired -> {
+                navController.navigate(AuthGraphRoutes.Graph) {
+                    popUpTo(AuthGraphRoutes.Graph) {
+                        inclusive = false
+                    }
+                }
+            }
+        }
+    }
+
     val languageManager = remember {
         LanguageManager(
             supportedLanguages = setOf("en", "ar"),
@@ -40,29 +63,17 @@ fun App() {
     ChirpTheme(
         languageCode = languageManager.currentLanguage
     ) {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+        if (!state.isCheckingAuth) {
+            ProvideMultilingualSupport(languageManager.currentLanguage) {
+                NavigationRoot(
+                    navController = navController,
+                    startDestination = if (state.isLoggedIn) {
+                        ChatListRoute
+                    } else {
+                        AuthGraphRoutes.Graph
+                    }
+                )
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-
-            MultilingualExampleDemo(languageManager)
         }
     }
 }
