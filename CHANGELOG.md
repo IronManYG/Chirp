@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.6.0] - 2025-10-29
+
+### Added
+- Authentication: Login screen and navigation ([b627c86](https://github.com/IronManYG/Chirp/commit/b627c86))
+- Authentication: Login flow and navigation ([47a7d0b](https://github.com/IronManYG/Chirp/commit/47a7d0b))
+- Authentication: Session storage using DataStore ([dcebb67](https://github.com/IronManYG/Chirp/commit/dcebb67))
+- Authentication: Automatic token refresh logic ([12544bc](https://github.com/IronManYG/Chirp/commit/12544bc))
+- Authentication: Session expiration handling and Chat ViewModel updates ([1253e0e](https://github.com/IronManYG/Chirp/commit/1253e0e))
+- Application: Authentication check on app startup ([0137a28](https://github.com/IronManYG/Chirp/commit/0137a28))
+- Android: Splash screen and updated launcher icons ([b811e92](https://github.com/IronManYG/Chirp/commit/b811e92))
+
+### Changed
+- iOS: Configure launch screen and update app icon ([ac90ddb](https://github.com/IronManYG/Chirp/commit/ac90ddb))
+
+[0.6.0]: https://github.com/IronManYG/Chirp/compare/7cc00e7...1253e0e
+
 ## [0.5.0] - 2025-10-27
 
 ### Added
