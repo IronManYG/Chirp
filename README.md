@@ -23,13 +23,19 @@ Key toolchain versions (from `gradle/libs.versions.toml`):
 - KSP: 2.2.0-2.0.2
 - Room: 2.7.2; SQLite bundle: 2.5.2
 - Min SDK: 26, Target/Compile SDK: 36
+- Java toolchain: 17
 
 ## Requirements
 - JDK: Java 17. Ensure your IDE and Gradle toolchain use JDK 17.
 - Gradle Wrapper (included)
-  - On Windows use `.\gradlew.bat`; on macOS/Linux use `./gradlew`.
+  - Windows: `.\gradlew.bat`
+  - macOS/Linux: `./gradlew`
 - Android Studio with Android SDK Platform 36 and matching build tools
 - Xcode (for building/running iOS on macOS)
+
+### Package manager and build tooling
+- Build system: Gradle 8.x (wrapper checked in), Kotlin DSL with a version catalog (`gradle/libs.versions.toml`).
+- Plugins and dependency versions are controlled via the catalog and custom convention plugins under `build-logic/convention`.
 
 Notes
 - On non‑macOS machines, iOS Kotlin/Native targets will be disabled during configuration. This is expected and harmless for Android work.
@@ -44,7 +50,7 @@ Notes
 ## Entry points
 - Android: `composeApp/src/androidMain/kotlin/dev/gaddal/chirp/MainActivity.kt` hosts the `App()` composable.
 - Shared UI root: `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/App.kt`.
-- iOS: Kotlin frameworks are produced from `composeApp`; the `iosApp` Xcode project wraps and launches the UI.
+- iOS: `composeApp/src/iosMain/kotlin/dev/gaddal/chirp/MainViewController.kt` provides the view controller; frameworks are produced from `composeApp` and the `iosApp` Xcode project wraps and launches the UI.
 
 ## Run / Build
 The application module is `:composeApp`.
@@ -55,7 +61,15 @@ Android (assemble debug APK)
 
 Android (install/run on connected device or emulator)
 - Windows: `.\gradlew.bat :composeApp:installDebug`
+- macOS/Linux: `./gradlew :composeApp:installDebug`
 - Then launch from the device/emulator apps list.
+
+Android (release builds)
+- Assemble: `.\gradlew.bat :composeApp:assembleRelease` (configure signing locally)
+- Bundle AAB: `.\gradlew.bat :composeApp:bundleRelease`
+
+List tasks
+- Per-module: `.\gradlew.bat :composeApp:tasks`
 
 iOS
 - Open `iosApp` in Xcode and run on Simulator or device. Frameworks are produced from `composeApp` iOS targets.
@@ -77,6 +91,7 @@ Root/common tasks
 composeApp
 - `:composeApp:assembleDebug` — builds Android debug APK
 - `:composeApp:assembleRelease` — builds Android release APK (signing must be configured locally)
+- `:composeApp:lint` / `:composeApp:lintFix` — run Android lint and attempt automatic fixes
 
 Testing tasks (see Tests section for details)
 - `:<module>:testDebugUnitTest` — Android JVM unit tests (debug variant)
@@ -182,6 +197,18 @@ Current implementation
 TODO
 - Add developer documentation for multilingual support (e.g., `core/MultilingualSupport.md`) and link it here.
 - Persist user language preference across app restarts (e.g., Multiplatform Settings), then update this section with details.
+
+## Authentication and Deep Links
+
+- Flows (see CHANGELOG 0.5.0–0.7.0): Register → Register Success → Email Verification (deep link), Login (session persistence), Forgot Password, Reset Password (deep link). Session uses DataStore with auto refresh/expiration.
+- Navigation: Auth graph starts at `AuthGraphRoutes.Login`; on successful login, navigate to `ChatListRoute` and clear the auth back stack.
+- Deep links handled in `authGraph`:
+  - Verify: `https://chirp.pl-coding.com/api/auth/verify?token={token}` and `chirp://chirp.pl-coding.com/api/auth/verify?token={token}`
+  - Reset: `https://chirp.pl-coding.com/api/auth/reset-password?token={token}` and `chirp://chirp.pl-coding.com/api/auth/reset-password?token={token}`
+- Platform setup:
+  - Android: `MainActivity` intent filters for HTTPS (App Links, `android:autoVerify="true"`) and `chirp://` scheme; host `chirp.pl-coding.com`, paths `/api/auth/verify` and `/api/auth/reset-password`.
+  - iOS: custom URL scheme `chirp` present in Info.plist; Universal Links for HTTPS are TODO (Associated Domains + AASA).
+- References: `feature/auth/presentation/.../AuthGraph.kt`, `composeApp/.../NavigationRoot.kt`, `CHANGELOG.md`.
 
 ## License
 No LICENSE file found in the repository.
