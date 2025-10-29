@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import dev.gaddal.core.data.dto.AuthInfoSerializable
+import dev.gaddal.core.data.mappers.toDomain
 import dev.gaddal.core.data.mappers.toSerializable
 import dev.gaddal.core.domain.auth.AuthInfo
 import dev.gaddal.core.domain.auth.SessionStorage
@@ -22,7 +24,7 @@ import kotlinx.serialization.json.Json
  */
 class DataStoreSessionStorage(
     private val dataStore: DataStore<Preferences>
-): SessionStorage {
+) : SessionStorage {
 
     /**
      * Key used for accessing and storing authentication information in the preferences data store.
@@ -60,7 +62,7 @@ class DataStoreSessionStorage(
         return dataStore.data.map { preferences ->
             val serializedJson = preferences[authInfoKey]
             serializedJson?.let {
-                json.decodeFromString(it)
+                json.decodeFromString<AuthInfoSerializable>(it).toDomain()
             }
         }
     }
@@ -75,7 +77,7 @@ class DataStoreSessionStorage(
      * @param info The authentication information to be saved or `null` to clear the stored authentication data.
      */
     override suspend fun set(info: AuthInfo?) {
-        if(info == null) {
+        if (info == null) {
             dataStore.edit {
                 it.remove(authInfoKey)
             }
