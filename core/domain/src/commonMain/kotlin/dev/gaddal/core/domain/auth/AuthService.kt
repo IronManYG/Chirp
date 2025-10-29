@@ -14,6 +14,7 @@ import dev.gaddal.core.domain.util.Result
  * - User registration and account creation
  * - Email verification workflows
  * - Handling secure communication with the authentication backend
+ * - Password reset functionality
  *
  * All operations within this interface are asynchronous and return either a successful result
  * (with authentication data where applicable) or a [DataError.Remote] describing any failures
@@ -78,4 +79,15 @@ interface AuthService {
      * @return An `EmptyResult` encapsulating either success or a `DataError.Remote` describing the error type.
      */
     suspend fun verifyEmail(token: String): EmptyResult<DataError.Remote>
+
+    /**
+     * Initiates the process for resetting a user's password using the provided email address.
+     *
+     * This method communicates with the authentication service to handle password recovery.
+     * The operation may result in either success or a `DataError.Remote` specifying the failure type.
+     *
+     * @param email The email address associated with the user's account for which the password needs to be reset.
+     * @return An `EmptyResult` indicating either a successful password reset initiation or a `DataError.Remote` detailing the failure.
+     */
+    suspend fun forgotPassword(email: String): EmptyResult<DataError.Remote>
 }

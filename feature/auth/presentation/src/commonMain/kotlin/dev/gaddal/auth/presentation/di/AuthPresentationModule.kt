@@ -1,6 +1,7 @@
 package dev.gaddal.auth.presentation.di
 
 import dev.gaddal.auth.presentation.email_verification.EmailVerificationViewModel
+import dev.gaddal.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.gaddal.auth.presentation.login.LoginViewModel
 import dev.gaddal.auth.presentation.register.RegisterViewModel
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessViewModel
@@ -17,6 +18,8 @@ import org.koin.dsl.module
  * - `EmailVerificationViewModel`: Manages the logic for email verification workflows,
  *   such as tracking verification status.
  * - `LoginViewModel`: Handles the state and actions for the login screen, including user authentication logic.
+ * - `ForgotPasswordViewModel`: Manages the state and actions for the password reset flow,
+ *   including form validation and coordinating password recovery requests.
  *
  * The ViewModels are registered using the dependency injection framework, making them available
  * for use within the application wherever needed.
@@ -26,4 +29,5 @@ val authPresentationModule = module {
     viewModelOf(::RegisterSuccessViewModel)
     viewModelOf(::EmailVerificationViewModel)
     viewModelOf(::LoginViewModel)
+    viewModelOf(::ForgotPasswordViewModel)
 }

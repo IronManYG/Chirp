@@ -103,4 +103,18 @@ class KtorAuthService(
             queryParams = mapOf("token" to token)
         )
     }
+
+    /**
+     * Initiates the process of resetting the password for an account associated with the provided email.
+     *
+     * @param email The email address of the account for which the password reset process is being requested.
+     * @return An `EmptyResult` indicating the success or failure of the operation,
+     *         with a potential `DataError.Remote` detailing any error that occurred.
+     */
+    override suspend fun forgotPassword(email: String): EmptyResult<DataError.Remote> {
+        return httpClient.post<EmailRequest, Unit>(
+            route = "/auth/forgot-password",
+            body = EmailRequest(email)
+        )
+    }
 }

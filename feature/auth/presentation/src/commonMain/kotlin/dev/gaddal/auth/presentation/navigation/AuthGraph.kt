@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import dev.gaddal.auth.presentation.email_verification.EmailVerificationRoot
+import dev.gaddal.auth.presentation.forgot_password.ForgotPasswordRoot
 import dev.gaddal.auth.presentation.login.LoginRoot
 import dev.gaddal.auth.presentation.register.RegisterRoot
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessRoot
@@ -14,7 +15,7 @@ import dev.gaddal.auth.presentation.register_success.RegisterSuccessRoot
  * Configures the navigation graph for the authentication flow within the application.
  * Establishes routes and their corresponding UI components, handling navigation
  * and transitions between authentication-related destinations such as login, registration,
- * forgot password, and email verification screens.
+ * forgot password, email verification, and reset password screens.
  *
  * @param navController The NavController used to manage navigation within the app.
  * @param onLoginSuccess A callback that is invoked when the user successfully logs in.
@@ -94,6 +95,9 @@ fun NavGraphBuilder.authGraph(
                     }
                 }
             )
+        }
+        composable<AuthGraphRoutes.ForgotPassword> {
+            ForgotPasswordRoot()
         }
     }
 }
