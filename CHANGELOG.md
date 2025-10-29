@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.7.0] - 2025-10-29
+
+### Added
+- Authentication: Forgot password flow ([5da744c](https://github.com/IronManYG/Chirp/commit/5da744c))
+- Authentication: Reset password screen structure ([4ffa703](https://github.com/IronManYG/Chirp/commit/4ffa703))
+- Authentication: Implement reset password flow ([58455fb](https://github.com/IronManYG/Chirp/commit/58455fb))
+- UX: Clear focus on tap utility ([026bf00](https://github.com/IronManYG/Chirp/commit/026bf00))
+
+### Fixed
+- Authentication: Fix window insets by wrapping auth screens with `ChirpSnackbarScaffold` ([627e3d0](https://github.com/IronManYG/Chirp/commit/627e3d0))
+
+[0.7.0]: https://github.com/IronManYG/Chirp/compare/1253e0e...627e3d0
+
 ## [0.6.0] - 2025-10-29
 
 ### Added
