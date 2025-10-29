@@ -30,6 +30,7 @@ import dev.gaddal.core.designsystem.components.brand.ChirpBrandLogo
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.designsystem.theme.extended
 import dev.gaddal.core.presentation.util.DeviceConfiguration
+import dev.gaddal.core.presentation.util.clearFocusOnTap
 import dev.gaddal.core.presentation.util.currentDeviceConfiguration
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -63,6 +64,7 @@ fun ChirpAdaptiveFormLayout(
         DeviceConfiguration.MOBILE_PORTRAIT -> {
             ChirpSurface(
                 modifier = modifier
+                    .clearFocusOnTap()
                     .consumeWindowInsets(WindowInsets.navigationBars)
                     .consumeWindowInsets(WindowInsets.displayCutout),
                 header = {
