@@ -4,9 +4,11 @@ import dev.gaddal.core.data.auth.DataStoreSessionStorage
 import dev.gaddal.core.data.auth.KtorAuthService
 import dev.gaddal.core.data.logging.KermitLogger
 import dev.gaddal.core.data.networking.HttpClientFactory
+import dev.gaddal.core.data.settings.DataStoreSettingsStorage
 import dev.gaddal.core.domain.auth.AuthService
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.logging.ChirpLogger
+import dev.gaddal.core.domain.settings.SettingsStorage
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -29,6 +31,7 @@ expect val platformCoreDataModule: Module
  * - An `HttpClient` instance created by [HttpClientFactory].
  * - An [AuthService] implementation using [KtorAuthService].
  * - A [SessionStorage] implementation using [DataStoreSessionStorage].
+ * - A [SettingsStorage] implementation using [DataStoreSettingsStorage].
  *
  * It serves as a central point for defining dependencies required by the data components of the application.
  */
@@ -40,4 +43,5 @@ val coreDataModule = module {
     }
     singleOf(::KtorAuthService) bind AuthService::class
     singleOf(::DataStoreSessionStorage) bind SessionStorage::class
+    singleOf(::DataStoreSettingsStorage) bind SettingsStorage::class
 }

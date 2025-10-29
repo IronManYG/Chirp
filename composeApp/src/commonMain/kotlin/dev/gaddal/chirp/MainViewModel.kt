@@ -3,6 +3,8 @@ package dev.gaddal.chirp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gaddal.core.domain.auth.SessionStorage
+import dev.gaddal.core.domain.settings.SettingsStorage
+import dev.gaddal.core.presentation.util.LanguageManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val settingsStorage: SettingsStorage,
+    private val languageManager: LanguageManager
 ) : ViewModel() {
 
     private val eventChannel = Channel<MainEvent>()
@@ -41,6 +45,7 @@ class MainViewModel(
     private var previousRefreshToken: String? = null
 
     init {
+        // Load initial auth state
         viewModelScope.launch {
             val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
             _state.update {
@@ -48,6 +53,36 @@ class MainViewModel(
                     isCheckingAuth = false,
                     isLoggedIn = authInfo != null
                 )
+            }
+        }
+
+        // Load and apply initial language from settings
+        viewModelScope.launch {
+            val initial = settingsStorage.observeSettings().firstOrNull()?.languageCode
+            val initCode = initial ?: languageManager.getSupportedLanguages().first()
+            languageManager.setLanguage(initCode)
+            _state.update { it.copy(
+                isCheckingLanguage = false,
+                currentLanguage = languageManager.currentLanguage
+            ) }
+        }
+    }
+
+    /**
+     * Changes the application's language based on the provided language code.
+     *
+     * The method updates the storage with the new language code, attempts to change
+     * the language through the language manager, and if successful, updates the
+     * application's state with the current language.
+     *
+     * @param code The language code to switch to (e.g., "en" for English, "ar" for Arabic).
+     */
+    fun changeLanguage(code: String) {
+        viewModelScope.launch {
+            settingsStorage.setLanguage(code)
+            val ok = languageManager.setLanguage(code)
+            if (ok) {
+                _state.update { it.copy(currentLanguage = languageManager.currentLanguage) }
             }
         }
     }
