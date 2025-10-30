@@ -18,6 +18,7 @@ import dev.gaddal.core.designsystem.components.brand.ChirpBrandLogo
 import dev.gaddal.core.designsystem.components.buttons.ChirpButton
 import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -49,7 +50,14 @@ fun LanguageSelectionScreen(
     state: LanguageSelectionState,
     onAction: (LanguageSelectionAction) -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    ChirpSnackbarScaffold(
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = "",
+                onChangeLanguageClick = {},
+            )
+        }
+    ) {
         ChirpAdaptiveFormLayout(
             headerText = stringResource(Res.string.language_select_title),
             logo = { ChirpBrandLogo() },

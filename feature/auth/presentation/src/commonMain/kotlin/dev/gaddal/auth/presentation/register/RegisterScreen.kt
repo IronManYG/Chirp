@@ -12,6 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.change_language
 import chirp.feature.auth.presentation.generated.resources.email
 import chirp.feature.auth.presentation.generated.resources.email_placeholder
 import chirp.feature.auth.presentation.generated.resources.login
@@ -29,6 +30,7 @@ import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import dev.gaddal.core.designsystem.components.textfields.ChirpPasswordTextField
 import dev.gaddal.core.designsystem.components.textfields.ChirpTextField
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
@@ -39,7 +41,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RegisterRoot(
     viewModel: RegisterViewModel = koinViewModel(),
     onRegisterSuccess: (String) -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    onChangeLanguageClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -62,7 +65,8 @@ fun RegisterRoot(
             }
             viewModel.onAction(action)
         },
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onChangeLanguageClick = onChangeLanguageClick
     )
 }
 
@@ -70,10 +74,17 @@ fun RegisterRoot(
 fun RegisterScreen(
     state: RegisterState,
     onAction: (RegisterAction) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    onChangeLanguageClick: () -> Unit
 ) {
     ChirpSnackbarScaffold(
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = stringResource(Res.string.change_language),
+                onChangeLanguageClick = onChangeLanguageClick,
+            )
+        }
     ) {
         ChirpAdaptiveFormLayout(
             headerText = stringResource(Res.string.welcome_to_chirp),
@@ -152,7 +163,8 @@ private fun Preview() {
         RegisterScreen(
             state = RegisterState(),
             onAction = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
+            onChangeLanguageClick = {}
         )
     }
 }

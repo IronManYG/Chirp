@@ -40,4 +40,5 @@
     <string name="language_applying">جارٍ التطبيق…</string>
     <string name="language_label_en">English (en)</string>
     <string name="language_label_ar">العربية (ar)</string>
+    <string name="change_language">تغيير اللغة</string>
 </resources>

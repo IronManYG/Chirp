@@ -7,6 +7,7 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import dev.gaddal.auth.presentation.email_verification.EmailVerificationRoot
 import dev.gaddal.auth.presentation.forgot_password.ForgotPasswordRoot
+import dev.gaddal.auth.presentation.language.LanguageSelectionRoot
 import dev.gaddal.auth.presentation.login.LoginRoot
 import dev.gaddal.auth.presentation.register.RegisterRoot
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessRoot
@@ -31,7 +32,7 @@ fun NavGraphBuilder.authGraph(
         startDestination = if (startAtLanguageSelection) AuthGraphRoutes.LanguageSelection else AuthGraphRoutes.Login
     ) {
         composable<AuthGraphRoutes.LanguageSelection> {
-            dev.gaddal.auth.presentation.language.LanguageSelectionRoot(
+            LanguageSelectionRoot(
                 onCompleted = {
                     navController.navigate(AuthGraphRoutes.Login) {
                         popUpTo<AuthGraphRoutes.LanguageSelection> {
@@ -53,6 +54,11 @@ fun NavGraphBuilder.authGraph(
                         restoreState = true
                         launchSingleTop = true
                     }
+                },
+                onChangeLanguageClick = {
+                    navController.navigate(AuthGraphRoutes.LanguageSelection) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -70,6 +76,11 @@ fun NavGraphBuilder.authGraph(
                         launchSingleTop = true
                         restoreState = true
                     }
+                },
+                onChangeLanguageClick = {
+                    navController.navigate(AuthGraphRoutes.LanguageSelection) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -80,6 +91,11 @@ fun NavGraphBuilder.authGraph(
                         popUpTo<AuthGraphRoutes.RegisterSuccess> {
                             inclusive = true
                         }
+                    }
+                },
+                onChangeLanguageClick = {
+                    navController.navigate(AuthGraphRoutes.LanguageSelection) {
+                        launchSingleTop = true
                     }
                 }
             )
@@ -108,11 +124,22 @@ fun NavGraphBuilder.authGraph(
                             inclusive = true
                         }
                     }
+                },
+                onChangeLanguageClick = {
+                    navController.navigate(AuthGraphRoutes.LanguageSelection) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
         composable<AuthGraphRoutes.ForgotPassword> {
-            ForgotPasswordRoot()
+            ForgotPasswordRoot(
+                onChangeLanguageClick = {
+                    navController.navigate(AuthGraphRoutes.LanguageSelection) {
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         composable<AuthGraphRoutes.ResetPassword>(
             deepLinks = listOf(
@@ -126,7 +153,13 @@ fun NavGraphBuilder.authGraph(
                 },
             )
         ) {
-            ResetPasswordRoot()
+            ResetPasswordRoot(
+                onChangeLanguageClick = {
+                    navController.navigate(AuthGraphRoutes.LanguageSelection) {
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
     }
 }

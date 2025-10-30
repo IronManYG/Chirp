@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.change_language
 import chirp.feature.auth.presentation.generated.resources.close
 import chirp.feature.auth.presentation.generated.resources.email_verified_failed
 import chirp.feature.auth.presentation.generated.resources.email_verified_failed_desc
@@ -32,6 +33,7 @@ import dev.gaddal.core.designsystem.components.buttons.ChirpButtonStyle
 import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveResultLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSimpleResultLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
@@ -43,6 +45,7 @@ fun EmailVerificationRoot(
     viewModel: EmailVerificationViewModel = koinViewModel(),
     onLoginClick: () -> Unit,
     onCloseClick: () -> Unit,
+    onChangeLanguageClick: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -54,7 +57,8 @@ fun EmailVerificationRoot(
                 EmailVerificationAction.OnLoginClick -> onLoginClick()
             }
             viewModel.onAction(action)
-        }
+        },
+        onChangeLanguageClick = onChangeLanguageClick
     )
 }
 
@@ -62,8 +66,16 @@ fun EmailVerificationRoot(
 fun EmailVerificationScreen(
     state: EmailVerificationState,
     onAction: (EmailVerificationAction) -> Unit,
+    onChangeLanguageClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    ChirpSnackbarScaffold(
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = stringResource(Res.string.change_language),
+                onChangeLanguageClick = onChangeLanguageClick,
+            )
+        }
+    ) {
         ChirpAdaptiveResultLayout {
             when {
                 state.isVerifying -> {
@@ -152,7 +164,8 @@ private fun EmailVerificationErrorPreview() {
     ChirpTheme {
         EmailVerificationScreen(
             state = EmailVerificationState(),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }
@@ -165,7 +178,8 @@ private fun EmailVerificationVerifyingPreview() {
             state = EmailVerificationState(
                 isVerifying = true
             ),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }
@@ -178,7 +192,8 @@ private fun EmailVerificationSuccessPreview() {
             state = EmailVerificationState(
                 isVerified = true
             ),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }
