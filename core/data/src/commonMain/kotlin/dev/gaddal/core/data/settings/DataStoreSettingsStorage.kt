@@ -28,7 +28,7 @@ class DataStoreSettingsStorage(
     override fun observeSettings(): Flow<AppSettings> =
         dataStore.data.map { prefs ->
             AppSettings(
-                languageCode = prefs[keyLanguage] ?: "en"
+                languageCode = prefs[keyLanguage] // null means not chosen yet
             )
         }
 
@@ -42,8 +42,14 @@ class DataStoreSettingsStorage(
         val current = observeSettings().firstOrNull() ?: AppSettings()
         val next = transform(current)
         dataStore.edit { prefs ->
-            if (next.languageCode != current.languageCode) {
-                prefs[keyLanguage] = next.languageCode
+            val lang = next.languageCode
+            val curr = current.languageCode
+            if (lang != curr) {
+                if (lang == null) {
+                    prefs.remove(keyLanguage)
+                } else {
+                    prefs[keyLanguage] = lang
+                }
             }
         }
     }

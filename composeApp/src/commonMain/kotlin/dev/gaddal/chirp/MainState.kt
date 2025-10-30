@@ -8,5 +8,6 @@ data class MainState(
     val isLoggedIn: Boolean = false,
     val isCheckingAuth: Boolean = true,
     val isCheckingLanguage: Boolean = true,
-    val currentLanguage: String = "en"
+    val currentLanguage: String = "en",
+    val hasChosenLanguage: Boolean = false
 )

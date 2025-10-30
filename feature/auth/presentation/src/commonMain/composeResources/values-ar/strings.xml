@@ -35,4 +35,9 @@
     <string name="error_reset_password_token_invalid">يبدو أن رابط إعادة تعيين كلمة المرور غير صالح أو انتهت صلاحيته. يرجى طلب بريد إلكتروني جديد.</string>
     <string name="forgot_password_email_sent_successfully">لقد أرسلنا إليك بنجاح بريداً إلكترونياً يحتوي على رابط لإعادة تعيين كلمة المرور</string>
     <string name="reset_password_successfully">تم تغيير كلمة المرور الخاصة بك بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.</string>
+    <string name="language_select_title">اختر لغتك</string>
+    <string name="language_continue">متابعة</string>
+    <string name="language_applying">جارٍ التطبيق…</string>
+    <string name="language_label_en">English (en)</string>
+    <string name="language_label_ar">العربية (ar)</string>
 </resources>

@@ -20,14 +20,28 @@ import dev.gaddal.auth.presentation.reset_password.ResetPasswordRoot
  *
  * @param navController The NavController used to manage navigation within the app.
  * @param onLoginSuccess A callback that is invoked when the user successfully logs in.
+ * @param startAtLanguageSelection Whether to start at language selection screen instead of login, defaults to false.
  */
 fun NavGraphBuilder.authGraph(
     navController: NavController,
     onLoginSuccess: () -> Unit,
+    startAtLanguageSelection: Boolean = false,
 ) {
     navigation<AuthGraphRoutes.Graph>(
-        startDestination = AuthGraphRoutes.Login
+        startDestination = if (startAtLanguageSelection) AuthGraphRoutes.LanguageSelection else AuthGraphRoutes.Login
     ) {
+        composable<AuthGraphRoutes.LanguageSelection> {
+            dev.gaddal.auth.presentation.language.LanguageSelectionRoot(
+                onCompleted = {
+                    navController.navigate(AuthGraphRoutes.Login) {
+                        popUpTo<AuthGraphRoutes.LanguageSelection> {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
         composable<AuthGraphRoutes.Login> {
             LoginRoot(
                 onLoginSuccess = onLoginSuccess,

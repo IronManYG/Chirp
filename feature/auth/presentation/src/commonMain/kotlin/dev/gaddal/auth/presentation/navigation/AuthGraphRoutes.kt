@@ -19,6 +19,13 @@ sealed interface AuthGraphRoutes {
     data object Graph : AuthGraphRoutes
 
     /**
+     * First-run language selection entry within the authentication graph.
+     * Navigate here when the user has not chosen a language yet.
+     */
+    @Serializable
+    data object LanguageSelection : AuthGraphRoutes
+
+    /**
      * Represents the route for the login feature in the authentication navigation graph.
      * This route is used to navigate to the login screen within the application's authentication flow.
      */

@@ -65,7 +65,8 @@ fun App(
                         ChatListRoute
                     } else {
                         AuthGraphRoutes.Graph
-                    }
+                    },
+                    startAtLanguageSelection = !state.hasChosenLanguage
                 )
             }
         }

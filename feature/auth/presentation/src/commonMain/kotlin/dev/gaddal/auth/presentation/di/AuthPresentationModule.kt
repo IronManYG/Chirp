@@ -2,6 +2,7 @@ package dev.gaddal.auth.presentation.di
 
 import dev.gaddal.auth.presentation.email_verification.EmailVerificationViewModel
 import dev.gaddal.auth.presentation.forgot_password.ForgotPasswordViewModel
+import dev.gaddal.auth.presentation.language.LanguageSelectionViewModel
 import dev.gaddal.auth.presentation.login.LoginViewModel
 import dev.gaddal.auth.presentation.register.RegisterViewModel
 import dev.gaddal.auth.presentation.register_success.RegisterSuccessViewModel
@@ -22,4 +23,5 @@ val authPresentationModule = module {
     viewModelOf(::LoginViewModel)
     viewModelOf(::ForgotPasswordViewModel)
     viewModelOf(::ResetPasswordViewModel)
+    viewModelOf(::LanguageSelectionViewModel)
 }
