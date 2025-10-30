@@ -185,18 +185,59 @@ Build and configuration conventions
 - Reusable convention plugins: `build-logic/convention` (applied via aliases from the catalog).
 
 ## Multilingual support
-The app includes multilingual support with English and Arabic localization, including RTL layout handling.
+Chirp ships with multilingual support and right-to-left (RTL) handling. The current, validated locales are English (`en`) and Arabic (`ar`).
 
-Current implementation
-- Expect/actual pattern for platform‑specific language switching (Android, iOS)
-- `LanguageManager` class for centralized state management with validation
-- RTL layout direction support for Arabic
-- String resources in `commonMain/composeResources` (values/strings.xml, values-ar/strings.xml)
-- Example usage in `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/App.kt`
+What’s implemented
+- Centralized language state via `LanguageManager` (validation, normalization, and state): `core/presentation/.../LanguageManager.kt`.
+- Platform application on Android via `actual fun changeLanguage(...)` using `Locale.setDefault(Locale.forLanguageTag(code))`: `core/presentation/.../Language.android.kt`.
+- RTL layout direction via `ProvideMultilingualSupport(languageCode)` which sets `LocalLayoutDirection` based on known RTL languages (`ar`, `fa`, `he`, `ur`): `core/presentation/.../Rtl.kt`.
+- Typography mapping with Arabic-script friendly `Cairo` when language is Arabic-like; `PlusJakartaSans` otherwise: `core/designsystem/.../Type.kt` (`typographyForLanguage`).
+- Language lifecycle: `MainViewModel` loads persisted language on startup and applies it before UI renders; exposes `changeLanguage(code)`.
+- Resource parity maintained across modules that own UI strings (e.g., `core/presentation`, `feature/auth/presentation`).
 
-TODO
-- Add developer documentation for multilingual support (e.g., `core/MultilingualSupport.md`) and link it here.
-- Persist user language preference across app restarts (e.g., Multiplatform Settings), then update this section with details.
+Where strings live (Compose Multiplatform resources)
+- Per module, under `src/commonMain/composeResources/values/strings.xml`.
+- Localized variants go under `values-<lang>` (e.g., `values-ar/strings.xml`).
+- Example:
+  - `core/presentation/src/commonMain/composeResources/values/strings.xml`
+  - `core/presentation/src/commonMain/composeResources/values-ar/strings.xml`
+  - `feature/auth/presentation/src/commonMain/composeResources/values/strings.xml`
+  - `feature/auth/presentation/src/commonMain/composeResources/values-ar/strings.xml`
+
+How to add a new locale
+1) Mirror base strings in each module that owns UI strings: create `values-<lang>` and copy keys 1:1, translating values.
+2) Keep plurals/arrays in parity across locales.
+3) If the new locale is RTL (e.g., `fa`, `he`, `ur`), ensure `isRtlLanguage` includes its primary language code.
+4) If the locale uses Arabic script, typography will already switch to `Cairo` via `typographyForLanguage`.
+5) Add the language label(s) to any selection UI (e.g., `feature/auth/presentation` language picker).
+
+How language is applied at runtime
+- On app start, `MainViewModel` reads `SettingsStorage` and calls `LanguageManager.setLanguage(initCode)`, which in turn calls platform `changeLanguage` and updates state.
+- Root UI is wrapped with `ChirpTheme(languageCode)` and `ProvideMultilingualSupport(languageCode)` so fonts and layout direction reflect the current language.
+- In-app switching calls `MainViewModel.changeLanguage(code)` which persists the choice and applies it immediately.
+
+Supported locales today
+- `en` (default)
+- `ar`
+
+Android 13+ per‑app locales (optional nicety)
+- Not implemented by design yet. Future work: use `LocaleManager.setApplicationLocales(...)` on API 33+ while retaining `Locale.setDefault` as a fallback. See `docs/i18n-implementation-plan.md` item 7.
+
+Troubleshooting
+- Layout direction doesn’t flip: ensure `ProvideMultilingualSupport(languageCode)` wraps your root and that the `languageCode` is the normalized primary tag (e.g., `ar`).
+- Fonts look off for Arabic: verify `typographyForLanguage(languageCode)` is used by your theme and Cairo fonts are present in generated resources.
+- Strings don’t change after switching: confirm `LanguageManager.setLanguage(code)` returns `true` (supported), and `SettingsStorage.setLanguage(code)` is called.
+- Tests show unresolved opt-ins for coroutines: add appropriate kotlinx-coroutines test deps or remove unused opt-ins (harmless for simple unit tests).
+
+Quick validation (manual)
+- First run with no saved language: gate to Language Selection → pick `ar` → Continue → no pre-content flicker.
+- Relaunch persists `ar`, RTL direction is applied, Cairo typography visible.
+- Switch back to `en` in-app; changes apply instantly and persist.
+- Auth screens show localized strings; representative error messages are localized.
+
+Build/run tips (Windows)
+- Build all: `.\\gradlew.bat build`
+- Run Android debug APK: `.\\gradlew.bat :composeApp:assembleDebug`
 
 ## Authentication and Deep Links
 
