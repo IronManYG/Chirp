@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.change_language
 import chirp.feature.auth.presentation.generated.resources.password
 import chirp.feature.auth.presentation.generated.resources.password_hint
 import chirp.feature.auth.presentation.generated.resources.reset_password_successfully
@@ -22,6 +23,7 @@ import dev.gaddal.core.designsystem.components.buttons.ChirpButton
 import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import dev.gaddal.core.designsystem.components.textfields.ChirpPasswordTextField
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
@@ -30,13 +32,15 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ResetPasswordRoot(
-    viewModel: ResetPasswordViewModel = koinViewModel()
+    viewModel: ResetPasswordViewModel = koinViewModel(),
+    onChangeLanguageClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ResetPasswordScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onChangeLanguageClick = onChangeLanguageClick
     )
 }
 
@@ -44,8 +48,16 @@ fun ResetPasswordRoot(
 fun ResetPasswordScreen(
     state: ResetPasswordState,
     onAction: (ResetPasswordAction) -> Unit,
+    onChangeLanguageClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    ChirpSnackbarScaffold(
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = stringResource(Res.string.change_language),
+                onChangeLanguageClick = onChangeLanguageClick,
+            )
+        }
+    ) {
         ChirpAdaptiveFormLayout(
             headerText = stringResource(Res.string.set_new_password),
             errorText = state.errorText?.asString(),
@@ -96,7 +108,8 @@ private fun Preview() {
     ChirpTheme {
         ResetPasswordScreen(
             state = ResetPasswordState(),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }

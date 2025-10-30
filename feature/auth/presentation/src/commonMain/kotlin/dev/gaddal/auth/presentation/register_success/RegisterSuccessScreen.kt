@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
 import chirp.feature.auth.presentation.generated.resources.account_successfully_created
+import chirp.feature.auth.presentation.generated.resources.change_language
 import chirp.feature.auth.presentation.generated.resources.login
 import chirp.feature.auth.presentation.generated.resources.resend_verification_email
 import chirp.feature.auth.presentation.generated.resources.resent_verification_email
@@ -19,6 +20,7 @@ import dev.gaddal.core.designsystem.components.buttons.ChirpButtonStyle
 import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveResultLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSimpleResultLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.getString
@@ -29,7 +31,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun RegisterSuccessRoot(
     viewModel: RegisterSuccessViewModel = koinViewModel(),
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    onChangeLanguageClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -50,13 +53,14 @@ fun RegisterSuccessRoot(
     RegisterSuccessScreen(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 is RegisterSuccessAction.OnLoginClick -> onLoginClick()
                 else -> Unit
             }
             viewModel.onAction(action)
         },
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onChangeLanguageClick = onChangeLanguageClick
     )
 }
 
@@ -64,10 +68,17 @@ fun RegisterSuccessRoot(
 fun RegisterSuccessScreen(
     state: RegisterSuccessState,
     onAction: (RegisterSuccessAction) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    onChangeLanguageClick: () -> Unit
 ) {
     ChirpSnackbarScaffold(
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = stringResource(Res.string.change_language),
+                onChangeLanguageClick = onChangeLanguageClick,
+            )
+        }
     ) {
         ChirpAdaptiveResultLayout {
             ChirpSimpleResultLayout(
@@ -117,7 +128,8 @@ private fun Preview() {
                 registeredEmail = "test@preview.com"
             ),
             onAction = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
+            onChangeLanguageClick = {}
         )
     }
 }

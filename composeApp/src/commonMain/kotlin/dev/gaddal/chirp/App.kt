@@ -3,7 +3,6 @@ package dev.gaddal.chirp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dev.gaddal.auth.presentation.navigation.AuthGraphRoutes
@@ -15,6 +14,7 @@ import dev.gaddal.core.presentation.util.LanguageManager
 import dev.gaddal.core.presentation.util.ObserveAsEvents
 import dev.gaddal.core.presentation.util.ProvideMultilingualSupport
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -52,18 +52,12 @@ fun App(
         }
     }
 
-    val languageManager = remember {
-        LanguageManager(
-            supportedLanguages = setOf("en", "ar"),
-            defaultLanguage = "en",
-            initialLanguage = null // In production: load from saved preferences
-        )
-    }
+    val languageManager: LanguageManager = koinInject()
 
     ChirpTheme(
         languageCode = languageManager.currentLanguage
     ) {
-        if (!state.isCheckingAuth) {
+        if (!state.isCheckingAuth && !state.isCheckingLanguage) {
             ProvideMultilingualSupport(languageManager.currentLanguage) {
                 NavigationRoot(
                     navController = navController,
@@ -71,7 +65,8 @@ fun App(
                         ChatListRoute
                     } else {
                         AuthGraphRoutes.Graph
-                    }
+                    },
+                    startAtLanguageSelection = !state.hasChosenLanguage
                 )
             }
         }

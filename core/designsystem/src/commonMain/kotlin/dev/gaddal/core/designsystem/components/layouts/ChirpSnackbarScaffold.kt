@@ -15,19 +15,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 /**
- * A composable function that provides a scaffold structure with a customizable content area and a snackbar host.
- * This function is useful for layouts where you need to display content with an integrated snackbar.
+ * A composable function that provides a scaffold structure with optional topBar and a snackbar host.
  *
  * @param snackbarHostState An optional [SnackbarHostState] to manage the state of snackbar messages.
- * Defaults to null if no snackbar functionality is required.
- * @param modifier A [Modifier] to be applied to the scaffold. Defaults to an empty modifier.
- * @param content A composable lambda to define the main content within the scaffold.
- *                This parameter is mandatory and does not have a default value.
+ * @param modifier A [Modifier] to be applied to the scaffold.
+ * @param topBar Optional top bar content displayed at the top of the screen.
+ * @param content Main content within the scaffold.
  */
 @Composable
 fun ChirpSnackbarScaffold(
     snackbarHostState: SnackbarHostState? = null,
     modifier: Modifier = Modifier,
+    topBar: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Scaffold(
@@ -35,6 +34,7 @@ fun ChirpSnackbarScaffold(
         contentWindowInsets = WindowInsets.statusBars
             .union(WindowInsets.displayCutout)
             .union(WindowInsets.ime),
+        topBar = { topBar?.invoke() },
         snackbarHost = {
             snackbarHostState?.let {
                 SnackbarHost(

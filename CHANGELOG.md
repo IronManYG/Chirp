@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.8.0] - 2025-10-30
+
+### Added
+- Settings: Implement language persistence and global language management via `LanguageManager` ([2ac5406](https://github.com/IronManYG/Chirp/commit/2ac5406))
+- Authentication: First-run language selection screen and navigation integration ([a0b0063](https://github.com/IronManYG/Chirp/commit/a0b0063))
+- Authentication: Change language option across auth screens (top bar, navigation updates, new strings) ([9393fe1](https://github.com/IronManYG/Chirp/commit/9393fe1))
+- i18n: Arabic translations for password-related strings ([6e02294](https://github.com/IronManYG/Chirp/commit/6e02294))
+
+### Changed
+- Documentation: Add/expand internationalization (i18n) guides and implementation plan ([4b72f04](https://github.com/IronManYG/Chirp/commit/4b72f04), [24baf1f](https://github.com/IronManYG/Chirp/commit/24baf1f), [886166a](https://github.com/IronManYG/Chirp/commit/886166a), [76aabdc](https://github.com/IronManYG/Chirp/commit/76aabdc))
+
+[0.8.0]: https://github.com/IronManYG/Chirp/compare/627e3d0...76aabdc
+
 ## [0.7.0] - 2025-10-29
 
 ### Added

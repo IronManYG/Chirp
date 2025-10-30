@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.change_language
 import chirp.feature.auth.presentation.generated.resources.create_account
 import chirp.feature.auth.presentation.generated.resources.email
 import chirp.feature.auth.presentation.generated.resources.email_placeholder
@@ -29,6 +30,7 @@ import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import dev.gaddal.core.designsystem.components.textfields.ChirpPasswordTextField
 import dev.gaddal.core.designsystem.components.textfields.ChirpTextField
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
@@ -40,12 +42,13 @@ fun LoginRoot(
     viewModel: LoginViewModel = koinViewModel(),
     onLoginSuccess: () -> Unit,
     onForgotPasswordClick: () -> Unit,
-    onCreateAccountClick: () -> Unit
+    onCreateAccountClick: () -> Unit,
+    onChangeLanguageClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
+        when (event) {
             LoginEvent.Success -> onLoginSuccess()
         }
     }
@@ -59,7 +62,8 @@ fun LoginRoot(
                 else -> Unit
             }
             viewModel.onAction(action)
-        }
+        },
+        onChangeLanguageClick = onChangeLanguageClick
     )
 }
 
@@ -67,8 +71,16 @@ fun LoginRoot(
 fun LoginScreen(
     state: LoginState,
     onAction: (LoginAction) -> Unit,
+    onChangeLanguageClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    ChirpSnackbarScaffold(
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = stringResource(Res.string.change_language),
+                onChangeLanguageClick = onChangeLanguageClick,
+            )
+        }
+    ) {
         ChirpAdaptiveFormLayout(
             headerText = stringResource(Res.string.welcome_back),
             errorText = state.error?.asString(),
@@ -142,7 +154,8 @@ private fun LightThemePreview() {
     ChirpTheme {
         LoginScreen(
             state = LoginState(),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }
@@ -153,7 +166,8 @@ private fun DarkThemePreview() {
     ChirpTheme(darkTheme = true) {
         LoginScreen(
             state = LoginState(),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }

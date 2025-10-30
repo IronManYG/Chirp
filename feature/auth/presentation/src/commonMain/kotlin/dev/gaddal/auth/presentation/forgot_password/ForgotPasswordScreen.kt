@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
+import chirp.feature.auth.presentation.generated.resources.change_language
 import chirp.feature.auth.presentation.generated.resources.email
 import chirp.feature.auth.presentation.generated.resources.email_placeholder
 import chirp.feature.auth.presentation.generated.resources.forgot_password
@@ -24,6 +25,7 @@ import dev.gaddal.core.designsystem.components.buttons.ChirpButton
 import dev.gaddal.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
 import dev.gaddal.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import dev.gaddal.core.designsystem.components.textfields.ChirpTextField
+import dev.gaddal.core.designsystem.components.topBars.ChirpChangeLanguageTopBar
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
@@ -32,13 +34,15 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ForgotPasswordRoot(
-    viewModel: ForgotPasswordViewModel = koinViewModel()
+    viewModel: ForgotPasswordViewModel = koinViewModel(),
+    onChangeLanguageClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ForgotPasswordScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onChangeLanguageClick = onChangeLanguageClick
     )
 }
 
@@ -46,8 +50,16 @@ fun ForgotPasswordRoot(
 fun ForgotPasswordScreen(
     state: ForgotPasswordState,
     onAction: (ForgotPasswordAction) -> Unit,
+    onChangeLanguageClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    ChirpSnackbarScaffold(
+        topBar = {
+            ChirpChangeLanguageTopBar(
+                title = stringResource(Res.string.change_language),
+                onChangeLanguageClick = onChangeLanguageClick,
+            )
+        }
+    ) {
         ChirpAdaptiveFormLayout(
             headerText = stringResource(Res.string.forgot_password),
             errorText = state.errorText?.asString(),
@@ -98,7 +110,8 @@ private fun Preview() {
     ChirpTheme {
         ForgotPasswordScreen(
             state = ForgotPasswordState(),
-            onAction = {}
+            onAction = {},
+            onChangeLanguageClick = {}
         )
     }
 }

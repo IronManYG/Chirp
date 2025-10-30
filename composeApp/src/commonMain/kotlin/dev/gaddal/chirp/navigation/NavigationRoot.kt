@@ -17,18 +17,23 @@ import dev.gaddal.chat.presentation.chat_list.ChatListScreenRoot
  * starting from the provided [startDestination].
  *
  * The [authGraph] extension is used to set up all authentication-related navigation destinations,
- * including registration, login, and email verification flows. Deep linking support is configured
- * within the auth graph for handling external navigation requests.
+ * including language selection, registration, login, and email verification flows. Deep linking support
+ * is configured within the auth graph for handling external navigation requests.
+ *
+ * After successful login, the user is navigated to the chat list screen with the auth graph cleared
+ * from the back stack.
  *
  * @param navController The navigation controller that manages the app navigation.
  * @param startDestination The initial route that serves as the start destination.
+ * @param startAtLanguageSelection Whether to start at language selection screen instead of login.
  * @see AuthGraphRoutes
  * @see authGraph
  */
 @Composable
 fun NavigationRoot(
     navController: NavHostController,
-    startDestination: Any
+    startDestination: Any,
+    startAtLanguageSelection: Boolean = false
 ) {
     NavHost(
         navController = navController,
@@ -42,7 +47,8 @@ fun NavigationRoot(
                         inclusive = true
                     }
                 }
-            }
+            },
+            startAtLanguageSelection = startAtLanguageSelection
         )
         composable<ChatListRoute> {
             ChatListScreenRoot()
