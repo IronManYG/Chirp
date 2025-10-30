@@ -15,8 +15,8 @@
     <string name="submit">إرسال</string>
     <string name="username">اسم المستخدم</string>
     <string name="forgot_password">نسيت كلمة المرور؟</string>
-    <string name="set_new_password">Set a new password</string>
-    <string name="new_password">New password</string>
+    <string name="set_new_password">تعيين كلمة مرور جديدة</string>
+    <string name="new_password">كلمة المرور الجديدة</string>
     <string name="create_account">إنشاء حساب</string>
     <string name="password">كلمة المرور</string>
     <string name="email">البريد الإلكتروني</string>
