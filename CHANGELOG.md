@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.9.0] - 2025-11-01
+
+### Added
+- Design System: `ChirpAvatarPhoto` component ([69877e5](https://github.com/IronManYG/Chirp/commit/69877e5))
+- Design System: `ChirpStackedAvatars` component ([6d78ff9](https://github.com/IronManYG/Chirp/commit/6d78ff9))
+- Design System: `DestructiveConfirmationDialog` ([0508039](https://github.com/IronManYG/Chirp/commit/0508039))
+- Design System: `ChirpBottomSheet` component ([7dc6d6c](https://github.com/IronManYG/Chirp/commit/7dc6d6c))
+- Design System: `ChirpDialogContent` component ([07b0d78](https://github.com/IronManYG/Chirp/commit/07b0d78))
+- Design System: `ChirpAdaptiveDialogSheetLayout` ([34d46ad](https://github.com/IronManYG/Chirp/commit/34d46ad))
+
+[0.9.0]: https://github.com/IronManYG/Chirp/compare/76aabdc...34d46ad
+
 ## [0.8.0] - 2025-10-30
 
 ### Added
