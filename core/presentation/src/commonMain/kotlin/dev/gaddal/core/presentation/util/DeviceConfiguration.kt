@@ -73,6 +73,16 @@ enum class DeviceConfiguration {
     DESKTOP;
 
     /**
+     * Indicates whether the current device configuration corresponds to a mobile device.
+     *
+     * The result is determined based on the orientation and size classifications of the device.
+     * It returns `true` if the configuration matches either a mobile portrait (MOBILE_PORTRAIT)
+     * or a mobile landscape (MOBILE_LANDSCAPE) orientation, and `false` otherwise.
+     */
+    val isMobile: Boolean
+        get() = this in listOf(MOBILE_PORTRAIT, MOBILE_LANDSCAPE)
+
+    /**
      * Provides a companion object for the `DeviceConfiguration` enum class.
      * This object includes utility functions related to device configuration determination.
      */
