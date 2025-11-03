@@ -9,7 +9,7 @@ package dev.gaddal.core.designsystem.components.avatar
  * @property initials Initials displayed for the user if no image is available.
  * @property imageUrl An optional URL for the avatar image. If `null`, initials are displayed instead.
  */
-data class AvatarUi(
+data class ChatParticipantUi(
     val id: String,
     val username: String,
     val initials: String,

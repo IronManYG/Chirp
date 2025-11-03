@@ -2,6 +2,7 @@ package dev.gaddal.chat.presentation.di
 
 import dev.gaddal.chat.presentation.chat_list.ChatListViewModel
 import dev.gaddal.chat.presentation.chat_list_detail.ChatListDetailViewModel
+import dev.gaddal.chat.presentation.create_chat.CreateChatViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -14,4 +15,5 @@ import org.koin.dsl.module
 val chatPresentationModule = module {
     viewModelOf(::ChatListViewModel)
     viewModelOf(::ChatListDetailViewModel)
+    viewModelOf(::CreateChatViewModel)
 }
