@@ -1,6 +1,7 @@
 package dev.gaddal.chirp.di
 
 import dev.gaddal.auth.presentation.di.authPresentationModule
+import dev.gaddal.chat.data.di.chatDataModule
 import dev.gaddal.chat.presentation.di.chatPresentationModule
 import dev.gaddal.core.data.di.coreDataModule
 import dev.gaddal.core.presentation.di.corePresentationModule
@@ -21,7 +22,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             authPresentationModule,
             appModule,
             chatPresentationModule,
-            corePresentationModule
+            corePresentationModule,
+            chatDataModule
         )
     }
 }
