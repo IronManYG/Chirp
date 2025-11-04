@@ -1,7 +1,9 @@
 package dev.gaddal.chat.data.di
 
 import dev.gaddal.chat.data.chat.KtorChatParticipantService
+import dev.gaddal.chat.data.chat.KtorChatService
 import dev.gaddal.chat.domain.chat.ChatParticipantService
+import dev.gaddal.chat.domain.chat.ChatService
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -13,4 +15,5 @@ import org.koin.dsl.module
  */
 val chatDataModule = module {
     singleOf(::KtorChatParticipantService) bind ChatParticipantService::class
+    singleOf(::KtorChatService) bind ChatService::class
 }

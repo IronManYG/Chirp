@@ -19,6 +19,7 @@ import dev.gaddal.core.presentation.util.UiText
  * @property currentSearchResult Holds the current search result for a chat participant. It will be null if no result is found.
  * @property searchError Represents any error that occurs during the search for a participant.
  * @property isCreatingChat Indicates whether the chat creation process is currently in progress.
+ * @property createChatError Represents any error that occurs during the creation of the chat.
  */
 data class CreateChatState(
     val queryTextState: TextFieldState = TextFieldState(),
@@ -28,4 +29,5 @@ data class CreateChatState(
     val currentSearchResult: ChatParticipantUi? = null,
     val searchError: UiText? = null,
     val isCreatingChat: Boolean = false,
+    val createChatError: UiText? = null
 )
