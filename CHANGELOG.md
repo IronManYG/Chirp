@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.12.0] - 2025-11-16
+
+### Added
+
+- Chat: Implement ChatDetail screen structure — entry screen UI, state wiring, and back
+  navigation within the adaptive two‑pane
+  layout ([5064d28](https://github.com/IronManYG/Chirp/commit/5064d28))
+- Chat: MessageBox component with connection status handling
+  ([4b78038](https://github.com/IronManYG/Chirp/commit/4b78038))
+- Chat: DateChip component for day separators in message lists
+  ([6206dff](https://github.com/IronManYG/Chirp/commit/6206dff))
+- Chat: Message display components (bubbles, list item visuals)
+  ([0889fb5](https://github.com/IronManYG/Chirp/commit/0889fb5))
+
+### Changed
+
+- Chat: Replace custom dropdowns with `ChirpDropDownMenu` for consistency across UI
+  ([b890357](https://github.com/IronManYG/Chirp/commit/b890357))
+- Chat: Extract generic `EmptyListSection` and `MessageList` components to improve reuse and
+  maintainability ([0f39904](https://github.com/IronManYG/Chirp/commit/0f39904))
+
+[0.12.0]: https://github.com/IronManYG/Chirp/compare/799e48b...5064d28
+
 ## [0.11.0] - 2025-11-15
 
 ### Added
