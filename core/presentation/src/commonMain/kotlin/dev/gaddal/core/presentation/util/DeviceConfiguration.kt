@@ -83,6 +83,21 @@ enum class DeviceConfiguration {
         get() = this in listOf(MOBILE_PORTRAIT, MOBILE_LANDSCAPE)
 
     /**
+     * Indicates whether the device is configured to operate in a wide-screen layout.
+     *
+     * A wide-screen layout typically applies to device configurations characterized by larger
+     * screen dimensions. It returns `true` for configurations such as:
+     * - `TABLET_LANDSCAPE`: Devices identified as tablets in a landscape orientation.
+     * - `DESKTOP`: Devices that are recognized as desktops or have significantly larger
+     *   screen layouts beyond mobile and tablet dimensions.
+     *
+     * This property is derived by checking the device configuration against predefined
+     * layout types (`TABLET_LANDSCAPE`, `DESKTOP`).
+     */
+    val isWideScreen: Boolean
+        get() = this in listOf(TABLET_LANDSCAPE, DESKTOP)
+
+    /**
      * Provides a companion object for the `DeviceConfiguration` enum class.
      * This object includes utility functions related to device configuration determination.
      */

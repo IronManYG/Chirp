@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.gaddal.chat.domain.models.ChatMessageDeliveryStatus
 import dev.gaddal.chat.presentation.model.MessageUi
+import dev.gaddal.chat.presentation.util.getChatBubbleColorForUser
 import dev.gaddal.core.designsystem.components.avatar.ChatParticipantUi
 import dev.gaddal.core.designsystem.theme.ChirpTheme
 import dev.gaddal.core.designsystem.theme.extended
@@ -52,7 +53,8 @@ fun MessageListItemUi(
 
             is MessageUi.OtherUserMessage -> {
                 OtherUserMessage(
-                    message = messageUi
+                    message = messageUi,
+                    color = getChatBubbleColorForUser(messageUi.sender.id)
                 )
             }
         }
