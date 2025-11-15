@@ -16,6 +16,13 @@
     <string name="chat_members">أعضاء الدردشة</string>
     <string name="leave_chat">انسحاب من الدردشة</string>
     <string name="go_back">العودة</string>
+    <string name="online">متصل</string>
+    <string name="offline">غير متصل</string>
+    <string name="reconnecting">جاري إعادة الاتصال...</string>
+    <string name="network_error">خطأ في الشبكة</string>
+    <string name="unknown_error">خطأ غير معروف</string>
+    <string name="send_a_message">أرسل رسالة</string>
+    <string name="send">إرسال</string>
     <string name="delete_for_everyone">حذف للكل</string>
     <string name="no_messages">لا توجد رسائل</string>
     <string name="no_messages_subtitle">إنشاء محادثة جديدة لبدء المراسلة</string>
