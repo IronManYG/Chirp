@@ -31,9 +31,11 @@ import chirp.feature.chat.presentation.generated.resources.create_chat
 import chirp.feature.chat.presentation.generated.resources.do_you_want_to_logout
 import chirp.feature.chat.presentation.generated.resources.do_you_want_to_logout_desc
 import chirp.feature.chat.presentation.generated.resources.logout
+import chirp.feature.chat.presentation.generated.resources.no_chats
+import chirp.feature.chat.presentation.generated.resources.no_chats_subtitle
 import dev.gaddal.chat.presentation.chat_list.components.ChatListHeader
 import dev.gaddal.chat.presentation.chat_list.components.ChatListItemUi
-import dev.gaddal.chat.presentation.chat_list.components.EmptyChatSection
+import dev.gaddal.chat.presentation.components.EmptyListSection
 import dev.gaddal.chat.presentation.model.ChatUi
 import dev.gaddal.core.designsystem.components.brand.ChirpHorizontalDivider
 import dev.gaddal.core.designsystem.components.buttons.ChirpFloatingActionButton
@@ -128,7 +130,9 @@ fun ChatListScreen(
                 }
 
                 state.chats.isEmpty() -> {
-                    EmptyChatSection(
+                    EmptyListSection(
+                        title = stringResource(Res.string.no_chats),
+                        description = stringResource(Res.string.no_chats_subtitle),
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()

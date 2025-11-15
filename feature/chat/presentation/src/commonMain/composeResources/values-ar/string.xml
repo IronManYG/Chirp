@@ -24,8 +24,10 @@
     <string name="send_a_message">أرسل رسالة</string>
     <string name="send">إرسال</string>
     <string name="delete_for_everyone">حذف للكل</string>
+    <string name="no_chats">لا توجد محادثات</string>
+    <string name="no_chats_subtitle">إنشاء محادثة جديدة لبدء المراسلة</string>
     <string name="no_messages">لا توجد رسائل</string>
-    <string name="no_messages_subtitle">إنشاء محادثة جديدة لبدء المراسلة</string>
+    <string name="no_messages_subtitle">كن أول من يرسل رسالة!</string>
     <string name="do_you_want_to_logout">هل تريد تسجيل الخروج؟</string>
     <string name="do_you_want_to_logout_desc">سيتعين عليك تسجيل الدخول مرة أخرى لاستخدام التطبيق.</string>
     <string name="error_participant_not_found">لم يتم العثور على مستخدم</string>

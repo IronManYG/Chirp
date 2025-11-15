@@ -8,8 +8,10 @@ import dev.gaddal.core.presentation.util.UiText
  * Represents various UI models for displaying messages in a chat interface.
  * This sealed interface allows for different types of chat messages or separators
  * (e.g., user messages and date markers) to be represented in a type-safe and composable way.
+ *
+ * @property id A unique identifier for any type of message element.
  */
-sealed interface MessageUi {
+sealed class MessageUi(open val id: String) {
     /**
      * Represents a message sent by the local user in a chat interface.
      *
@@ -23,12 +25,12 @@ sealed interface MessageUi {
      * @property formattedSentTime The formatted time of when the message was sent, represented as [UiText].
      */
     data class LocalUserMessage(
-        val id: String,
+        override val id: String,
         val content: String,
         val deliveryStatus: ChatMessageDeliveryStatus,
         val isMenuOpen: Boolean,
         val formattedSentTime: UiText
-    ) : MessageUi
+    ) : MessageUi(id)
 
     /**
      * Represents a chat message sent by another user.
@@ -42,11 +44,11 @@ sealed interface MessageUi {
      * @property sender The participant who sent the message, represented as [ChatParticipantUi].
      */
     data class OtherUserMessage(
-        val id: String,
+        override val id: String,
         val content: String,
         val formattedSentTime: UiText,
         val sender: ChatParticipantUi
-    ) : MessageUi
+    ) : MessageUi(id)
 
     /**
      * Represents a date separator item in a chat message list UI.
@@ -58,7 +60,7 @@ sealed interface MessageUi {
      * @property date A [UiText] object representing the date to be displayed in the separator.
      */
     data class DateSeparator(
-        val id: String,
+        override val id: String,
         val date: UiText,
-    ) : MessageUi
+    ) : MessageUi(id)
 }
