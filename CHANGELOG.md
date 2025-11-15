@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.10.0] - 2025-11-15
+
+### Added
+
+- Chat: Adaptive chat list/detail layout with responsive two-pane UI; initial navigation via
+  `chatGraph`; back handling and DI
+  wiring ([becf1a2](https://github.com/IronManYG/Chirp/commit/becf1a2))
+- Chat: Create Chat screen and flow (dialog sheet UI, participant selection,
+  actions) ([0d4cd36](https://github.com/IronManYG/Chirp/commit/0d4cd36))
+- Chat: Participant search when creating a chat (debounced search, selection UX, i18n error
+  messages) ([e3e2f12](https://github.com/IronManYG/Chirp/commit/e3e2f12))
+- Chat: Create chat via API; wires `KtorChatService` and integrates UI navigation to the new chat;
+  error handling and FAB entry point ([5988321](https://github.com/IronManYG/Chirp/commit/5988321))
+- Core: `DialogSheetScopedViewModel` to scope ViewModel lifecycle to dialog
+  visibility ([c1ad089](https://github.com/IronManYG/Chirp/commit/c1ad089))
+- Chat: Domain models for chats, messages, and
+  participants ([bd9925b](https://github.com/IronManYG/Chirp/commit/bd9925b))
+
+### Changed
+
+- Navigation: Replace temporary `ChatListScreen` with structured `chatGraph`
+  routes ([becf1a2](https://github.com/IronManYG/Chirp/commit/becf1a2))
+- Refactor: Rename `AvatarUi` to `ChatParticipantUi` for clarity in chat
+  features ([0d4cd36](https://github.com/IronManYG/Chirp/commit/0d4cd36))
+
+[0.10.0]: https://github.com/IronManYG/Chirp/compare/34d46ad...5988321
+
 ## [0.9.0] - 2025-11-01
 
 ### Added
