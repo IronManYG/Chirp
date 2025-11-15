@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.11.0] - 2025-11-15
+
+### Added
+
+- Chat: Implement ChatList screen UI and state management — adds `ChatListScreen`,
+  `ChatListViewModel`, and `ChatListState`; empty state UI and integration into adaptive
+  layout ([799e48b](https://github.com/IronManYG/Chirp/commit/799e48b))
+- Chat: Add ChatListHeader with user menu — brand header, profile avatar dropdown with
+  Profile/Logout actions, strings and
+  previews ([44672c8](https://github.com/IronManYG/Chirp/commit/44672c8))
+- Chat: Add ChatListItemUi component — item visuals, selection indicator, stacked avatars;
+  introduces `ChatUi` model and `toUi`
+  mapper ([1395925](https://github.com/IronManYG/Chirp/commit/1395925))
+
+[0.11.0]: https://github.com/IronManYG/Chirp/compare/5988321...799e48b
+
 ## [0.10.0] - 2025-11-15
 
 ### Added
