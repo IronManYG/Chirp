@@ -4,5 +4,13 @@
     <string name="add">إضافة</string>
     <string name="cancel">إلغاء</string>
     <string name="email_or_username">البريد الإلكتروني أو اسم المستخدم</string>
+    <string name="group_chat">محادثة جماعية</string>
+    <string name="you">أنت</string>
+    <string name="profile_settings">إعدادات الملف الشخصي</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="no_messages">لا توجد رسائل</string>
+    <string name="no_messages_subtitle">إنشاء محادثة جديدة لبدء المراسلة</string>
+    <string name="do_you_want_to_logout">هل تريد تسجيل الخروج؟</string>
+    <string name="do_you_want_to_logout_desc">سيتعين عليك تسجيل الدخول مرة أخرى لاستخدام التطبيق.</string>
     <string name="error_participant_not_found">لم يتم العثور على مستخدم</string>
 </resources>

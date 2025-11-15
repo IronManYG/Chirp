@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <string name="app_name">جيرب</string>
     <string name="hide_password">إخفاء كلمة المرور</string>
     <string name="show_password">إظهار كلمة المرور</string>
     <string name="dismiss_dialog">إغلاق</string>
