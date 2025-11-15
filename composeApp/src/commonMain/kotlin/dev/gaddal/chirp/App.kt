@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dev.gaddal.auth.presentation.navigation.AuthGraphRoutes
-import dev.gaddal.chat.presentation.chat_list.ChatListRoute
+import dev.gaddal.chat.presentation.navigation.ChatGraphRoutes
 import dev.gaddal.chirp.navigation.DeepLinkListener
 import dev.gaddal.chirp.navigation.NavigationRoot
 import dev.gaddal.core.designsystem.theme.ChirpTheme
@@ -62,7 +62,7 @@ fun App(
                 NavigationRoot(
                     navController = navController,
                     startDestination = if (state.isLoggedIn) {
-                        ChatListRoute
+                        ChatGraphRoutes.Graph
                     } else {
                         AuthGraphRoutes.Graph
                     },
