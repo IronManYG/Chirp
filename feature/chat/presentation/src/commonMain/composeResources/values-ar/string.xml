@@ -8,6 +8,11 @@
     <string name="you">أنت</string>
     <string name="profile_settings">إعدادات الملف الشخصي</string>
     <string name="logout">تسجيل الخروج</string>
+    <string name="sending">إرسال...</string>
+    <string name="sent">تم الإرسال</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="failed">فشل</string>
+    <string name="delete_for_everyone">حذف للكل</string>
     <string name="no_messages">لا توجد رسائل</string>
     <string name="no_messages_subtitle">إنشاء محادثة جديدة لبدء المراسلة</string>
     <string name="do_you_want_to_logout">هل تريد تسجيل الخروج؟</string>
