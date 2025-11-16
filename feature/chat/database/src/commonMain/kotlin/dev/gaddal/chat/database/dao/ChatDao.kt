@@ -85,6 +85,7 @@ interface ChatDao {
      *         and its associated participants.
      */
     @Query("SELECT * FROM chatentity ORDER BY lastActivityAt DESC")
+    @Transaction
     fun getChatsWithParticipants(): Flow<List<ChatWithParticipants>>
 
     /**
@@ -98,6 +99,7 @@ interface ChatDao {
      * or `null` if no chat exists for the provided ID.
      */
     @Query("SELECT * FROM chatentity WHERE chatId = :id")
+    @Transaction
     suspend fun getChatById(id: String): ChatWithParticipants?
 
     /**
@@ -188,6 +190,7 @@ interface ChatDao {
      *         or null if no chat is found with the given ID.
      */
     @Query("SELECT * FROM chatentity WHERE chatId = :chatId")
+    @Transaction
     fun getChatInfoById(chatId: String): Flow<ChatInfoEntity?>
 
 

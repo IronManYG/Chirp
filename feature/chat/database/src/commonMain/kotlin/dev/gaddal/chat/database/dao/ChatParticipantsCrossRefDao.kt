@@ -46,7 +46,7 @@ interface ChatParticipantsCrossRefDao {
      * @param chatId The unique identifier of the chat for which participant IDs are being retrieved.
      * @return A list of participant IDs (as strings) associated with the given chat.
      */
-    @Query("SELECT userId FROM chatparticipantcrossref")
+    @Query("SELECT userId FROM chatparticipantcrossref WHERE chatId = :chatId")
     suspend fun getAllParticipantIdsByChat(chatId: String): List<String>
 
     /**

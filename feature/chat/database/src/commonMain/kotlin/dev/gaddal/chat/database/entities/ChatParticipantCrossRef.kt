@@ -2,6 +2,7 @@ package dev.gaddal.chat.database.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 /**
  * Represents a cross-reference entity for establishing a many-to-many relationship
@@ -41,6 +42,10 @@ import androidx.room.ForeignKey
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         ),
+    ],
+    indices = [
+        Index(value = ["chatId"]),
+        Index(value = ["userId"]),
     ]
 )
 data class ChatParticipantCrossRef(

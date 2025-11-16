@@ -2,6 +2,7 @@ package dev.gaddal.chat.database.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -35,6 +36,10 @@ import androidx.room.PrimaryKey
             childColumns = ["chatId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index("chatId"),
+        Index("timestamp"),
     ]
 )
 data class ChatMessageEntity(
