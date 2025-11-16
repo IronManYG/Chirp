@@ -27,6 +27,27 @@ fun ChatMessageDto.toDomain(): ChatMessage {
 }
 
 /**
+ * Converts the current `ChatMessageEntity` instance to its corresponding domain model `ChatMessage`.
+ *
+ * This function maps the database entity fields, such as message content, sender, timestamp, and
+ * delivery status, to the equivalent properties in the domain model. The `createdAt` field in
+ * the domain model is derived from the `timestamp` field, and the delivery status is set to
+ * `SENT` by default.
+ *
+ * @return The domain model `ChatMessage` instance derived from the current `ChatMessageEntity`.
+ */
+fun ChatMessageEntity.toDomain(): ChatMessage {
+    return ChatMessage(
+        id = chatId,
+        chatId = chatId,
+        content = content,
+        createdAt = Instant.fromEpochMilliseconds(timestamp),
+        senderId = senderId,
+        deliveryStatus = ChatMessageDeliveryStatus.SENT
+    )
+}
+
+/**
  * Converts the `LastMessageView` database view model to its corresponding `ChatMessage` domain model.
  *
  * This function maps the properties of the `LastMessageView`, such as the message ID, chat ID,

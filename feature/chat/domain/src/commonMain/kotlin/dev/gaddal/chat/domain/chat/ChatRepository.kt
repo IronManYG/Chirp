@@ -1,7 +1,9 @@
 package dev.gaddal.chat.domain.chat
 
 import dev.gaddal.chat.domain.models.Chat
+import dev.gaddal.chat.domain.models.ChatInfo
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +29,18 @@ interface ChatRepository {
     fun getChats(): Flow<List<Chat>>
 
     /**
+     * Retrieves detailed information about a specific chat, including the associated messages and participants.
+     *
+     * This method returns a `Flow` emitting updates for the chat specified by the given identifier.
+     * The stream provides real-time updates whenever there are changes to the chat's data,
+     * such as new messages or modifications to the chat participants.
+     *
+     * @param chatId The unique identifier of the chat whose information is to be retrieved.
+     * @return A `Flow` emitting `ChatInfo` objects that contain the chat details and the list of associated messages.
+     */
+    fun getChatInfoById(chatId: String): Flow<ChatInfo>
+
+    /**
      * Fetches an updated list of chats from a remote source.
      *
      * This method performs a network operation to retrieve the latest chat data and may
@@ -37,4 +51,17 @@ interface ChatRepository {
      *         or a failure with a [DataError.Remote] indicating the type of remote data error encountered.
      */
     suspend fun fetchChats(): Result<List<Chat>, DataError.Remote>
+
+    /**
+     * Fetches a specific chat by its unique identifier from a remote source.
+     *
+     * This method performs a network operation to retrieve information about
+     * a chat identified by the given `chatId`. The operation may either succeed,
+     * returning an empty successful result, or fail with an associated remote error.
+     *
+     * @param chatId The unique identifier of the chat to be fetched.
+     * @return An [EmptyResult] indicating either a success with no payload or a failure
+     *         with a [DataError.Remote] describing the error encountered.
+     */
+    suspend fun fetchChatById(chatId: String): EmptyResult<DataError.Remote>
 }

@@ -59,4 +59,22 @@ class KtorChatService(
             chatDtos.map { it.toDomain() }
         }
     }
+
+
+    /**
+     * Retrieves a chat by its unique identifier.
+     *
+     * This method fetches the details of a specific chat using the provided chat ID. It performs
+     * an HTTP GET request to retrieve the chat data, converts the response to the domain
+     * model, and wraps the result in a [Result] object. The result can either contain the
+     * requested [Chat] object on success or a [DataError.Remote] in case of a failure.
+     *
+     * @param chatId The unique identifier of the chat to be retrieved.
+     * @return A [Result] containing the requested [Chat] on success, or a [DataError.Remote] if the operation fails.
+     */
+    override suspend fun getChatById(chatId: String): Result<Chat, DataError.Remote> {
+        return httpClient.get<ChatDto>(
+            route = "/chat/$chatId"
+        ).map { it.toDomain() }
+    }
 }

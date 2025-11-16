@@ -200,17 +200,23 @@ interface ChatDao {
     fun getActiveParticipantsByChatId(chatId: String): Flow<List<ChatParticipantEntity>>
 
     /**
-     * Retrieves information about a specific chat, including its details, participants,
-     * and messages with their corresponding senders, based on the provided chat ID.
+     * Retrieves information about a specific chat.
      *
-     * This method uses a SQL query to fetch data from the `ChatEntity` table and its
-     * associated relationships, returning a `Flow` to observe the data changes over time.
+     * This method uses a SQL query to fetch the chat data from the `ChatEntity` table,
+     * joining with the participants cross-reference table and filtering for active participants.
      *
      * @param chatId The unique identifier of the chat whose information is to be retrieved.
      * @return A Flow emitting a `ChatInfoEntity` object containing detailed chat information,
      *         or null if no chat is found with the given ID.
      */
-    @Query("SELECT * FROM chatentity WHERE chatId = :chatId")
+    @Query(
+        """
+        SELECT c.*
+        FROM chatentity c
+        JOIN chatparticipantcrossref cpcr ON c.chatId = cpcr.chatId
+        WHERE c.chatId = :chatId AND cpcr.isActive = true
+    """
+    )
     @Transaction
     fun getChatInfoById(chatId: String): Flow<ChatInfoEntity?>
 

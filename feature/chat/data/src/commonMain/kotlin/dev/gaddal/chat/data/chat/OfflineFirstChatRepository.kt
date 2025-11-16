@@ -8,10 +8,14 @@ import dev.gaddal.chat.database.entities.ChatWithParticipants
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
 import dev.gaddal.chat.domain.models.Chat
+import dev.gaddal.chat.domain.models.ChatInfo
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
+import dev.gaddal.core.domain.util.asEmptyResult
 import dev.gaddal.core.domain.util.onSuccess
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 /**
@@ -52,6 +56,22 @@ class OfflineFirstChatRepository(
     }
 
     /**
+     * Retrieves detailed information about a specific chat by its unique identifier.
+     *
+     * This method returns a Flow that emits `ChatInfo` objects representing the chat details
+     * and associated messages. The data is retrieved from the local database, transformed into
+     * the domain model, and filtered to ensure non-null values are emitted.
+     *
+     * @param chatId The unique identifier of the chat for which to retrieve information.
+     * @return A Flow emitting `ChatInfo` containing the chat's details and messages.
+     */
+    override fun getChatInfoById(chatId: String): Flow<ChatInfo> {
+        return db.chatDao.getChatInfoById(chatId)
+            .filterNotNull()
+            .map { it.toDomain() }
+    }
+
+    /**
      * Fetches the list of chats and synchronizes them with the local database.
      *
      * This method retrieves the chats from the remote `ChatService` and processes them into the appropriate
@@ -80,5 +100,29 @@ class OfflineFirstChatRepository(
                     messageDao = db.chatMessageDao
                 )
             }
+    }
+
+    /**
+     * Fetches a chat by its unique identifier and updates the local database with the retrieved data.
+     *
+     * This method retrieves the chat details from the remote `ChatService` and stores them in the local database.
+     * It inserts or updates the chat, its participants, and the relationships between them using DAO operations.
+     *
+     * @param chatId The unique identifier of the chat to be fetched.
+     * @return An `EmptyResult` object indicating either a successful completion or a `DataError.Remote`
+     *         in case the fetch operation fails.
+     */
+    override suspend fun fetchChatById(chatId: String): EmptyResult<DataError.Remote> {
+        return chatService
+            .getChatById(chatId)
+            .onSuccess { chat ->
+                db.chatDao.upsertChatWithParticipantsAndCrossRefs(
+                    chat = chat.toEntity(),
+                    participants = chat.participants.map { it.toEntity() },
+                    participantDao = db.chatParticipantDao,
+                    crossRefDao = db.chatParticipantsCrossRefDao
+                )
+            }
+            .asEmptyResult()
     }
 }

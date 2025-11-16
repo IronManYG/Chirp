@@ -5,7 +5,7 @@ import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.Result
 
 /**
- * Defines the contract for interacting with chat functionality, including methods for creating and retrieving chats.
+ * Defines the contract for interacting with chat functionality, including methods for creating, retrieving and updating chats.
  */
 interface ChatService {
     /**
@@ -34,4 +34,16 @@ interface ChatService {
      * indicating an error during the retrieval process.
      */
     suspend fun getChats(): Result<List<Chat>, DataError.Remote>
+
+    /**
+     * Retrieves a specific chat by its unique identifier.
+     *
+     * This method fetches the details of a chat identified by the provided `chatId`.
+     * The result will either be a successful retrieval of the `Chat` object or
+     * a failure represented by a `DataError.Remote` indicating the issue.
+     *
+     * @param chatId The unique identifier of the chat to be retrieved.
+     * @return A `Result` containing either the requested `Chat` object or a `DataError.Remote` in case of an error.
+     */
+    suspend fun getChatById(chatId: String): Result<Chat, DataError.Remote>
 }
