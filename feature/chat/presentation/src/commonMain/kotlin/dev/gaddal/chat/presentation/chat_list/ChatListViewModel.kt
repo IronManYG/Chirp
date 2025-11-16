@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChatListViewModel(
@@ -33,12 +34,13 @@ class ChatListViewModel(
             chats = chats.map { it.toUi(authInfo.user.id) },
             localParticipant = authInfo.user.toUi()
         )
-    }.onStart {
-        if (!hasLoadedInitialData) {
-            loadChats()
-            hasLoadedInitialData = true
-        }
     }
+        .onStart {
+            if (!hasLoadedInitialData) {
+                loadChats()
+                hasLoadedInitialData = true
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -47,6 +49,14 @@ class ChatListViewModel(
 
     fun onAction(action: ChatListAction) {
         when (action) {
+            is ChatListAction.OnChatClick -> {
+                _state.update {
+                    it.copy(
+                        selectedChatId = action.chat.id
+                    )
+                }
+            }
+
             else -> Unit
         }
     }
