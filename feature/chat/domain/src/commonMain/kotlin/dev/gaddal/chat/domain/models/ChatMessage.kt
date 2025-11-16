@@ -11,11 +11,13 @@ import kotlin.time.Instant
  * @property content The textual content of the message.
  * @property createdAt The timestamp indicating when the message was created.
  * @property senderId The unique identifier of the sender who authored the message.
+ * @property deliveryStatus The delivery status of the message.
  */
 data class ChatMessage(
     val id: String,
     val chatId: String,
     val content: String,
     val createdAt: Instant,
-    val senderId: String
+    val senderId: String,
+    val deliveryStatus: ChatMessageDeliveryStatus
 )

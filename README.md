@@ -128,6 +128,9 @@ BuildKonfig (per-module, optional)
 - Some modules apply `dev.gaddal.convention.buildkonfig`. When applied, you MUST define `API_KEY` in `local.properties` at the repo root, or the build will fail.
   - Example entry in `local.properties` (do not commit this file):
     - `API_KEY=your_value_here`
+  - Modules that currently apply this convention (as of 2025-11-16):
+      - `core:data`
+      - `feature:chat:data`
   - Generated package name for BuildKonfig is derived from the module path via `pathToPackageName()`.
 
 Potential future configuration
@@ -179,6 +182,16 @@ Notable source locations
 - `composeApp/src/androidMain` — Android sources and `AndroidManifest.xml`
 - `composeApp/src/iosMain` — iOS Kotlin code and interop
 - `iosApp/` — Swift/SwiftUI wrapper and app entry for iOS
+
+Root directories (repo top-level)
+
+- `build-logic/` — custom Gradle convention plugins
+- `composeApp/` — KMP application sources
+- `core/` — shared core modules (data/domain/designsystem/presentation)
+- `feature/` — feature modules (auth, chat, etc.)
+- `iosApp/` — Xcode wrapper project
+- `docs/` — documentation
+- `gradle/`, `gradlew*`, `settings.gradle.kts`, `build.gradle.kts` — build system
 
 Build and configuration conventions
 - Plugins are declared via the version catalog in the root `build.gradle.kts`; modules apply conventions per need.

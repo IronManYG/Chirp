@@ -6,6 +6,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import dev.gaddal.chat.database.entities.ChatEntity
 import dev.gaddal.chat.database.entities.ChatInfoEntity
+import dev.gaddal.chat.database.entities.ChatMessageEntity
 import dev.gaddal.chat.database.entities.ChatParticipantCrossRef
 import dev.gaddal.chat.database.entities.ChatParticipantEntity
 import dev.gaddal.chat.database.entities.ChatWithParticipants
@@ -87,6 +88,26 @@ interface ChatDao {
     @Query("SELECT * FROM chatentity ORDER BY lastActivityAt DESC")
     @Transaction
     fun getChatsWithParticipants(): Flow<List<ChatWithParticipants>>
+
+    /**
+     * Retrieves a Flow that emits a list of chats with active participants. Only chats where
+     * participants have an active status are included in the result. The chats are sorted
+     * by their last activity timestamp in descending order.
+     *
+     * @return A Flow emitting a list of ChatWithParticipants objects, representing chats with
+     * active participants.
+     */
+    @Query(
+        """
+        SELECT DISTINCT c.*
+        FROM chatentity c
+        JOIN chatparticipantcrossref cpcr ON c.chatId = cpcr.chatId
+         WHERE cpcr.isActive = 1
+         ORDER BY lastActivityAt DESC
+    """
+    )
+    @Transaction
+    fun getChatsWithActiveParticipants(): Flow<List<ChatWithParticipants>>
 
     /**
      * Retrieves a chat along with its associated participants by the given chat ID.
@@ -230,24 +251,45 @@ interface ChatDao {
     /**
      * Inserts or updates a list of chats along with their participants and cross-references in the database.
      *
-     * This method performs a transactional operation to ensure consistency. It first upserts the provided
-     * chats, then handles participants, and finally updates the cross-references connecting the chats and
-     * their participants. The operation includes syncing the cross-references to reflect the latest changes.
-     *
-     * The method ensures that both chat data and its associated participants remain up-to-date and
-     * synchronized in the database.
+     * This method performs a transactional operation to ensure consistency by:
+     * 1. Upserting provided chats
+     * 2. Upserting last messages for each chat if present
+     * 3. Upserting all participants
+     * 4. Creating and syncing cross-references between chats and participants
+     * 5. Deleting stale chats that no longer exist on the server
      *
      * @param chats A list of `ChatWithParticipants` objects, where each object contains a chat and its associated participants.
      * @param participantDao The DAO responsible for handling chat participant operations in the database.
      * @param crossRefDao The DAO responsible for handling cross-references between chats and participants in the database.
+     * @param messageDao The DAO responsible for handling chat message operations.
      */
     @Transaction
     suspend fun upsertChatsWithParticipantsAndCrossRefs(
         chats: List<ChatWithParticipants>,
         participantDao: ChatParticipantDao,
-        crossRefDao: ChatParticipantsCrossRefDao
+        crossRefDao: ChatParticipantsCrossRefDao,
+        messageDao: ChatMessageDao
     ) {
         upsertChats(chats.map { it.chat })
+
+        val serverChatIds = chats.map { it.chat.chatId }
+        val localChatIds = getAllChatIds()
+        val staleChatIds = localChatIds - serverChatIds
+
+        chats.forEach { chat ->
+            chat.lastMessage?.run {
+                messageDao.upsertMessage(
+                    ChatMessageEntity(
+                        messageId = messageId,
+                        chatId = chatId,
+                        senderId = senderId,
+                        content = content,
+                        timestamp = timestamp,
+                        deliveryStatus = deliveryStatus
+                    )
+                )
+            }
+        }
 
         val allParticipants = chats.flatMap { it.participants }
         participantDao.upsertParticipants(allParticipants)
@@ -269,5 +311,7 @@ interface ChatDao {
                 participants = chat.participants
             )
         }
+
+        deleteChatsByIds(staleChatIds)
     }
 }

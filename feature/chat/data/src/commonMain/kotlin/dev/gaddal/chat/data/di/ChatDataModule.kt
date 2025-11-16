@@ -3,8 +3,10 @@ package dev.gaddal.chat.data.di
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import dev.gaddal.chat.data.chat.KtorChatParticipantService
 import dev.gaddal.chat.data.chat.KtorChatService
+import dev.gaddal.chat.data.chat.OfflineFirstChatRepository
 import dev.gaddal.chat.database.DatabaseFactory
 import dev.gaddal.chat.domain.chat.ChatParticipantService
+import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -29,6 +31,7 @@ expect val platformChatDataModule: Module
  * This module serves as the dependency injection configuration point for chat data layer components:
  * - Includes platform-specific chat data dependencies
  * - Provides Ktor-based implementations for chat and participant services
+ * - Provides an OfflineFirstChatRepository implementation for managing chat data
  * - Configures and builds the SQLite database using BundledSQLiteDriver
  */
 val chatDataModule = module {
@@ -36,6 +39,7 @@ val chatDataModule = module {
 
     singleOf(::KtorChatParticipantService) bind ChatParticipantService::class
     singleOf(::KtorChatService) bind ChatService::class
+    singleOf(::OfflineFirstChatRepository) bind ChatRepository::class
     single {
         get<DatabaseFactory>()
             .create()
