@@ -13,7 +13,6 @@ import androidx.room.PrimaryKey
  *
  * Key features of this entity include:
  * - `chatId`: A unique identifier for the chat.
- * - `lastMessage`: The content of the last message in the chat, if any.
  * - `lastActivityAt`: A timestamp indicating the last recorded activity in the chat,
  *   represented in milliseconds since the epoch.
  *
@@ -32,6 +31,5 @@ import androidx.room.PrimaryKey
 data class ChatEntity(
     @PrimaryKey
     val chatId: String,
-    val lastMessage: String?,
     val lastActivityAt: Long
 )

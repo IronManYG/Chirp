@@ -3,6 +3,7 @@ package dev.gaddal.chat.database.entities
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
+import dev.gaddal.chat.database.view.LastMessageView
 
 /**
  * Represents a data structure that combines a chat with its associated participants.
@@ -17,6 +18,8 @@ import androidx.room.Relation
  * - `participants`: A list of chat participant entities associated with the chat. The
  *   relationship is defined through a many-to-many association via the `ChatParticipantCrossRef`
  *   entity, which links chats to their participants.
+ *   This list is ordered by username to facilitate sorting and filtering.
+ * - `lastMessage`: The last message within the chat, along with its sender information.
  *
  * Room Annotations:
  * - `@Embedded`: Used to embed the `ChatEntity` directly into this data structure.
@@ -38,7 +41,13 @@ data class ChatWithParticipants(
         entityColumn = "userId",
         associateBy = Junction(ChatParticipantCrossRef::class)
     )
-    val participants: List<ChatParticipantEntity>
+    val participants: List<ChatParticipantEntity>,
+    @Relation(
+        parentColumn = "chatId",
+        entityColumn = "chatId",
+        entity = LastMessageView::class
+    )
+    val lastMessage: LastMessageView?
 )
 
 /**
