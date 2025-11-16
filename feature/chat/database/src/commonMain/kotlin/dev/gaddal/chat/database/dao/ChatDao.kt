@@ -6,6 +6,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import dev.gaddal.chat.database.entities.ChatEntity
 import dev.gaddal.chat.database.entities.ChatInfoEntity
+import dev.gaddal.chat.database.entities.ChatParticipantCrossRef
 import dev.gaddal.chat.database.entities.ChatParticipantEntity
 import dev.gaddal.chat.database.entities.ChatWithParticipants
 import kotlinx.coroutines.flow.Flow
@@ -188,4 +189,82 @@ interface ChatDao {
      */
     @Query("SELECT * FROM chatentity WHERE chatId = :chatId")
     fun getChatInfoById(chatId: String): Flow<ChatInfoEntity?>
+
+
+    /**
+     * Inserts or updates a chat entity, its participants, and their associated cross-references in the database.
+     *
+     * This method ensures that the chat and its related participants are stored or updated correctly,
+     * maintaining their associations through cross-reference records. It updates the active status
+     * of the cross-references and synchronizes the participants for a given chat.
+     *
+     * @param chat The chat entity to be inserted or updated.
+     * @param participants A list of chat participants associated with the chat to be inserted or updated.
+     * @param participantDao The DAO responsible for handling participant-related operations.
+     * @param crossRefDao The DAO responsible for managing cross-references between chats and participants.
+     */
+    @Transaction
+    suspend fun upsertChatWithParticipantsAndCrossRefs(
+        chat: ChatEntity,
+        participants: List<ChatParticipantEntity>,
+        participantDao: ChatParticipantDao,
+        crossRefDao: ChatParticipantsCrossRefDao
+    ) {
+        upsertChat(chat)
+        participantDao.upsertParticipants(participants)
+
+        val crossRefs = participants.map {
+            ChatParticipantCrossRef(
+                chatId = chat.chatId,
+                userId = it.userId,
+                isActive = true
+            )
+        }
+        crossRefDao.upsertCrossRefs(crossRefs)
+        crossRefDao.syncChatParticipants(chat.chatId, participants)
+    }
+
+    /**
+     * Inserts or updates a list of chats along with their participants and cross-references in the database.
+     *
+     * This method performs a transactional operation to ensure consistency. It first upserts the provided
+     * chats, then handles participants, and finally updates the cross-references connecting the chats and
+     * their participants. The operation includes syncing the cross-references to reflect the latest changes.
+     *
+     * The method ensures that both chat data and its associated participants remain up-to-date and
+     * synchronized in the database.
+     *
+     * @param chats A list of `ChatWithParticipants` objects, where each object contains a chat and its associated participants.
+     * @param participantDao The DAO responsible for handling chat participant operations in the database.
+     * @param crossRefDao The DAO responsible for handling cross-references between chats and participants in the database.
+     */
+    @Transaction
+    suspend fun upsertChatsWithParticipantsAndCrossRefs(
+        chats: List<ChatWithParticipants>,
+        participantDao: ChatParticipantDao,
+        crossRefDao: ChatParticipantsCrossRefDao
+    ) {
+        upsertChats(chats.map { it.chat })
+
+        val allParticipants = chats.flatMap { it.participants }
+        participantDao.upsertParticipants(allParticipants)
+
+        val allCrossRefs = chats.flatMap { chatWithParticipants ->
+            chatWithParticipants.participants.map { participant ->
+                ChatParticipantCrossRef(
+                    chatId = chatWithParticipants.chat.chatId,
+                    userId = participant.userId,
+                    isActive = true
+                )
+            }
+        }
+        crossRefDao.upsertCrossRefs(allCrossRefs)
+
+        chats.forEach { chat ->
+            crossRefDao.syncChatParticipants(
+                chatId = chat.chat.chatId,
+                participants = chat.participants
+            )
+        }
+    }
 }
