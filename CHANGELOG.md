@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.13.0] - 2025-11-16
+
+### Added
+
+- Chat Database: Add Room entities for chats, messages, and participants
+  ([29821a0](https://github.com/IronManYG/Chirp/commit/29821a0))
+- Chat Database: Add `ChatDao` for chat operations
+  ([fcf2995](https://github.com/IronManYG/Chirp/commit/fcf2995))
+- Chat Database: Add `ChatMessageDao` for message operations
+  ([dd5f3c5](https://github.com/IronManYG/Chirp/commit/dd5f3c5))
+- Chat Database: Add `ChatParticipantDao` for participant operations
+  ([b74a708](https://github.com/IronManYG/Chirp/commit/b74a708))
+- Chat Database: Add `ChatParticipantsCrossRefDao` and sync logic
+  ([257f0f4](https://github.com/IronManYG/Chirp/commit/257f0f4))
+- Chat: Add `LastMessageView` for efficient last-message retrieval
+  ([2c33a91](https://github.com/IronManYG/Chirp/commit/2c33a91))
+- Chat: Implement multiplatform Room database and DI wiring (Android/iOS/Shared)
+  ([3de31db](https://github.com/IronManYG/Chirp/commit/3de31db))
+
+[0.13.0]: https://github.com/IronManYG/Chirp/compare/5064d28...3de31db
+
 ## [0.12.0] - 2025-11-16
 
 ### Added
