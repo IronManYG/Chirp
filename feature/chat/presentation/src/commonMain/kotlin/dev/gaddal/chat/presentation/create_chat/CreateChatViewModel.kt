@@ -8,6 +8,8 @@ import chirp.feature.chat.presentation.generated.resources.Res
 import chirp.feature.chat.presentation.generated.resources.error_participant_not_found
 import dev.gaddal.chat.domain.chat.ChatParticipantService
 import dev.gaddal.chat.domain.chat.ChatRepository
+import dev.gaddal.chat.presentation.components.manage_chat.ManageChatAction
+import dev.gaddal.chat.presentation.components.manage_chat.ManageChatState
 import dev.gaddal.chat.presentation.mappers.toUi
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.onFailure
@@ -39,7 +41,7 @@ class CreateChatViewModel(
 
     private var hasLoadedInitialData = false
 
-    private val _state = MutableStateFlow(CreateChatState())
+    private val _state = MutableStateFlow(ManageChatState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -50,7 +52,7 @@ class CreateChatViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = CreateChatState()
+            initialValue = ManageChatState()
         )
 
     private val searchFlow = snapshotFlow { _state.value.queryTextState.text.toString() }
@@ -67,10 +69,10 @@ class CreateChatViewModel(
      *
      * @param action The action performed by the user, represented as a `CreateChatAction`.
      */
-    fun onAction(action: CreateChatAction) {
+    fun onAction(action: ManageChatAction) {
         when (action) {
-            CreateChatAction.OnAddClick -> addParticipant()
-            CreateChatAction.OnCreateChatClick -> createChat()
+            ManageChatAction.OnAddClick -> addParticipant()
+            ManageChatAction.OnPrimaryActionClick -> createChat()
             else -> Unit
         }
     }

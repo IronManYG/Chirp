@@ -4,7 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,15 +20,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.gaddal.core.designsystem.components.avatar.ChatParticipantUi
 import dev.gaddal.core.designsystem.components.avatar.ChirpAvatarPhoto
-import dev.gaddal.core.designsystem.theme.ChirpTheme
+import dev.gaddal.core.designsystem.components.brand.ChirpHorizontalDivider
 import dev.gaddal.core.designsystem.theme.extended
 import dev.gaddal.core.designsystem.theme.titleXSmall
 import dev.gaddal.core.presentation.util.DeviceConfiguration
 import dev.gaddal.core.presentation.util.currentDeviceConfiguration
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ColumnScope.ChatParticipantsSelectionSection(
+    existingParticipants: List<ChatParticipantUi>,
     selectedParticipants: List<ChatParticipantUi>,
     modifier: Modifier = Modifier,
     searchResult: ChatParticipantUi? = null
@@ -56,6 +55,23 @@ fun ColumnScope.ChatParticipantsSelectionSection(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
+            items(
+                items = existingParticipants,
+                key = { "existing_${it.id}" }
+            ) { participant ->
+                ChatParticipantListItem(
+                    participantUi = participant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+
+            if (existingParticipants.isNotEmpty()) {
+                item {
+                    ChirpHorizontalDivider()
+                }
+            }
+
             searchResult?.let {
                 item {
                     ChatParticipantListItem(
@@ -106,26 +122,5 @@ fun ChatParticipantListItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ChatParticipantsSelectionSectionPreview() {
-    val participants = listOf(
-        ChatParticipantUi(id = "1", username = "Philipp", initials = "PH"),
-        ChatParticipantUi(id = "2", username = "John", initials = "JO"),
-        ChatParticipantUi(id = "3", username = "Sabrina", initials = "SA"),
-        ChatParticipantUi(id = "4", username = "Cinderella", initials = "CI"),
-    )
-    ChirpTheme {
-        Column {
-            ChatParticipantsSelectionSection(
-                selectedParticipants = participants,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                searchResult = participants[0]
-            )
-        }
     }
 }
