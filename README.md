@@ -128,6 +128,9 @@ BuildKonfig (per-module, optional)
 - Some modules apply `dev.gaddal.convention.buildkonfig`. When applied, you MUST define `API_KEY` in `local.properties` at the repo root, or the build will fail.
   - Example entry in `local.properties` (do not commit this file):
     - `API_KEY=your_value_here`
+  - Modules that currently apply this convention (as of 2025-11-16):
+      - `core:data`
+      - `feature:chat:data`
   - Generated package name for BuildKonfig is derived from the module path via `pathToPackageName()`.
 
 Potential future configuration
@@ -180,6 +183,16 @@ Notable source locations
 - `composeApp/src/iosMain` — iOS Kotlin code and interop
 - `iosApp/` — Swift/SwiftUI wrapper and app entry for iOS
 
+Root directories (repo top-level)
+
+- `build-logic/` — custom Gradle convention plugins
+- `composeApp/` — KMP application sources
+- `core/` — shared core modules (data/domain/designsystem/presentation)
+- `feature/` — feature modules (auth, chat, etc.)
+- `iosApp/` — Xcode wrapper project
+- `docs/` — documentation
+- `gradle/`, `gradlew*`, `settings.gradle.kts`, `build.gradle.kts` — build system
+
 Build and configuration conventions
 - Plugins are declared via the version catalog in the root `build.gradle.kts`; modules apply conventions per need.
 - Reusable convention plugins: `build-logic/convention` (applied via aliases from the catalog).
@@ -189,11 +202,17 @@ Chirp ships with multilingual support and right-to-left (RTL) handling. The curr
 
 What’s implemented
 - Centralized language state via `LanguageManager` (validation, normalization, and state): `core/presentation/.../LanguageManager.kt`.
-- Platform application on Android via `actual fun changeLanguage(...)` using `Locale.setDefault(Locale.forLanguageTag(code))`: `core/presentation/.../Language.android.kt`.
+- Platform locale application via `LocaleApplier` (expect/actual) injected into `LanguageManager`.
+    - Android: uses `AppCompatDelegate.setApplicationLocales(...)` for per‑app locales on API 33+
+      with a sensible fallback for host JVM/Desktop parity:
+      `core/presentation/.../Language.android.kt`.
+    - iOS: updates `AppleLanguages` in `NSUserDefaults`: `core/presentation/.../Language.ios.kt`.
 - RTL layout direction via `ProvideMultilingualSupport(languageCode)` which sets `LocalLayoutDirection` based on known RTL languages (`ar`, `fa`, `he`, `ur`): `core/presentation/.../Rtl.kt`.
 - Typography mapping with Arabic-script friendly `Cairo` when language is Arabic-like; `PlusJakartaSans` otherwise: `core/designsystem/.../Type.kt` (`typographyForLanguage`).
 - Language lifecycle: `MainViewModel` loads persisted language on startup and applies it before UI renders; exposes `changeLanguage(code)`.
 - Resource parity maintained across modules that own UI strings (e.g., `core/presentation`, `feature/auth/presentation`).
+- Platform DI provides `LocaleApplier` in:
+  `core/presentation/.../di/CorePresentationModule.(android|ios).kt`.
 
 Where strings live (Compose Multiplatform resources)
 - Per module, under `src/commonMain/composeResources/values/strings.xml`.
@@ -212,7 +231,10 @@ How to add a new locale
 5) Add the language label(s) to any selection UI (e.g., `feature/auth/presentation` language picker).
 
 How language is applied at runtime
-- On app start, `MainViewModel` reads `SettingsStorage` and calls `LanguageManager.setLanguage(initCode)`, which in turn calls platform `changeLanguage` and updates state.
+
+- On app start, `MainViewModel` reads `SettingsStorage` and calls
+  `LanguageManager.setLanguage(initCode)`, which in turn delegates to the injected `LocaleApplier`
+  and updates state.
 - Root UI is wrapped with `ChirpTheme(languageCode)` and `ProvideMultilingualSupport(languageCode)` so fonts and layout direction reflect the current language.
 - In-app switching calls `MainViewModel.changeLanguage(code)` which persists the choice and applies it immediately.
 
@@ -220,8 +242,11 @@ Supported locales today
 - `en` (default)
 - `ar`
 
-Android 13+ per‑app locales (optional nicety)
-- Not implemented by design yet. Future work: use `LocaleManager.setApplicationLocales(...)` on API 33+ while retaining `Locale.setDefault` as a fallback. See `docs/i18n-implementation-plan.md` item 7.
+Android per‑app locales
+
+- Implemented via `LocaleApplier` using `AppCompatDelegate.setApplicationLocales(...)` on API 33+
+  with fallback behavior retained for parity. See `docs/i18n.md` and
+  `docs/i18n-implementation-plan.md` task 7.
 
 Troubleshooting
 - Layout direction doesn’t flip: ensure `ProvideMultilingualSupport(languageCode)` wraps your root and that the `languageCode` is the normalized primary tag (e.g., `ar`).

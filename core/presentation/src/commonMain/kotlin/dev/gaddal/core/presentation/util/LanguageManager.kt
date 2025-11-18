@@ -19,10 +19,10 @@ import androidx.compose.runtime.setValue
  *     supportedLanguages = setOf("en", "ar"),
  *     defaultLanguage = "en"
  * )
- * 
+ *
  * // Change language with validation
  * manager.setLanguage("ar") // returns true if successful
- * 
+ *
  * // Access current language
  * val currentLang = manager.currentLanguage
  * ```
@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 class LanguageManager(
     private val supportedLanguages: Set<String>,
     private val defaultLanguage: String,
+    private val localeApplier: LocaleApplier,
     initialLanguage: String? = null
 ) {
     init {
@@ -53,7 +54,7 @@ class LanguageManager(
         // Ensure platform locale matches the initial/current language at startup.
         // Without this, the app might use the device's default locale (e.g., Arabic)
         // even when our app's default is English until the user toggles languages.
-        changeLanguage(currentLanguage)
+        localeApplier.apply(currentLanguage)
     }
 
     /**
@@ -74,8 +75,8 @@ class LanguageManager(
             return true
         }
 
-        // Update platform locale
-        changeLanguage(normalized)
+        // Update platform locale via the injected applier using the NEW language
+        localeApplier.apply(normalized)
 
         // Update state (triggers recomposition)
         currentLanguage = normalized
@@ -97,10 +98,10 @@ class LanguageManager(
 
     /**
      * Validates and normalizes a language code.
-     * 
+     *
      * Normalizes the code to lowercase and extracts the primary language subtag
      * (e.g., "EN" -> "en", "ar-EG" -> "ar").
-     * 
+     *
      * @return normalized code if supported, null otherwise
      */
     private fun validateAndNormalize(languageCode: String?): String? {

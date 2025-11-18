@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import chirp.feature.chat.presentation.generated.resources.Res
 import chirp.feature.chat.presentation.generated.resources.error_participant_not_found
 import dev.gaddal.chat.domain.chat.ChatParticipantService
-import dev.gaddal.chat.domain.chat.ChatService
+import dev.gaddal.chat.domain.chat.ChatRepository
+import dev.gaddal.chat.presentation.components.manage_chat.ManageChatAction
+import dev.gaddal.chat.presentation.components.manage_chat.ManageChatState
 import dev.gaddal.chat.presentation.mappers.toUi
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.onFailure
@@ -31,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(FlowPreview::class)
 class CreateChatViewModel(
     private val chatParticipantService: ChatParticipantService,
-    private val chatService: ChatService
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private val eventChannel = Channel<CreateChatEvent>()
@@ -39,7 +41,7 @@ class CreateChatViewModel(
 
     private var hasLoadedInitialData = false
 
-    private val _state = MutableStateFlow(CreateChatState())
+    private val _state = MutableStateFlow(ManageChatState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -50,7 +52,7 @@ class CreateChatViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = CreateChatState()
+            initialValue = ManageChatState()
         )
 
     private val searchFlow = snapshotFlow { _state.value.queryTextState.text.toString() }
@@ -67,10 +69,10 @@ class CreateChatViewModel(
      *
      * @param action The action performed by the user, represented as a `CreateChatAction`.
      */
-    fun onAction(action: CreateChatAction) {
+    fun onAction(action: ManageChatAction) {
         when (action) {
-            CreateChatAction.OnAddClick -> addParticipant()
-            CreateChatAction.OnCreateChatClick -> createChat()
+            ManageChatAction.OnAddClick -> addParticipant()
+            ManageChatAction.OnPrimaryActionClick -> createChat()
             else -> Unit
         }
     }
@@ -97,17 +99,17 @@ class CreateChatViewModel(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    isCreatingChat = true,
+                    isSubmitting = true,
                     canAddParticipant = false
                 )
             }
 
-            chatService
+            chatRepository
                 .createChat(userIds)
                 .onSuccess { chat ->
                     _state.update {
                         it.copy(
-                            isCreatingChat = false
+                            isSubmitting = false
                         )
                     }
                     eventChannel.send(CreateChatEvent.OnChatCreated(chat))
@@ -115,9 +117,9 @@ class CreateChatViewModel(
                 .onFailure { error ->
                     _state.update {
                         it.copy(
-                            createChatError = error.toUiText(),
+                            submitError = error.toUiText(),
                             canAddParticipant = it.currentSearchResult != null && !it.isSearching,
-                            isCreatingChat = false
+                            isSubmitting = false
                         )
                     }
                 }

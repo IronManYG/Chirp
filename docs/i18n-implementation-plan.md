@@ -6,7 +6,8 @@ This document tracks the rollout of the multilingual (i18n) plan across modules 
 
 #### Scope
 - Cross‑platform (Android, Desktop, iOS where available during config).
-- Compose Multiplatform resources + LanguageManager + SettingsStorage.
+- Compose Multiplatform resources + LanguageManager + LocaleApplier (expect/actual) +
+  SettingsStorage.
 
 ---
 
@@ -28,6 +29,8 @@ This document tracks the rollout of the multilingual (i18n) plan across modules 
 
 3. App gating and provisioning
 - [x] Provide a singleton `LanguageManager` via Koin
+- [x] Provide platform `LocaleApplier` via Koin in
+  `core/presentation/.../di/CorePresentationModule.(android|ios).kt`
 - [x] Gate content until `!isCheckingAuth && !isCheckingLanguage`
 - [x] Wrap with `ChirpTheme(languageCode)` and `ProvideMultilingualSupport(languageCode)`
 
@@ -44,8 +47,10 @@ This document tracks the rollout of the multilingual (i18n) plan across modules 
 - [x] Audit `strings.xml` vs `strings-<lang>.xml` parity in all modules with UI strings
 - [x] Mirror plurals and arrays across locales
 
-7. Platform nicety (optional – Android 13+)
-- [ ] Enhance Android `actual changeLanguage` to set per‑app locales on API 33+ (keep `Locale.setDefault`) // Skip for now
+7. Platform application details (Android 13+)
+
+- [x] Implement `LocaleApplier` on Android using `AppCompatDelegate.setApplicationLocales(...)` (
+  per‑app locales on API 33+) with a sensible fallback for host JVM/Desktop parity
 
 8. Validation & Docs
 - [x] Manual checklist run (first‑run selection → persistence → RTL → deep links)
@@ -56,3 +61,5 @@ This document tracks the rollout of the multilingual (i18n) plan across modules 
 #### Notes
 - Current supported languages: `en`, `ar`. Extend by adding locale files in each module that owns strings.
 - Language is applied before UI renders to avoid flicker and ensure correct RTL and typography.
+- Platform locale changes are funneled through `LocaleApplier` (expect/actual) and provided via
+  platform DI modules.

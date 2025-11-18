@@ -6,6 +6,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import dev.gaddal.chat.database.entities.ChatEntity
 import dev.gaddal.chat.database.entities.ChatInfoEntity
+import dev.gaddal.chat.database.entities.ChatMessageEntity
 import dev.gaddal.chat.database.entities.ChatParticipantCrossRef
 import dev.gaddal.chat.database.entities.ChatParticipantEntity
 import dev.gaddal.chat.database.entities.ChatWithParticipants
@@ -179,17 +180,22 @@ interface ChatDao {
     fun getActiveParticipantsByChatId(chatId: String): Flow<List<ChatParticipantEntity>>
 
     /**
-     * Retrieves information about a specific chat, including its details, participants,
-     * and messages with their corresponding senders, based on the provided chat ID.
+     * Retrieves information about a specific chat.
      *
-     * This method uses a SQL query to fetch data from the `ChatEntity` table and its
-     * associated relationships, returning a `Flow` to observe the data changes over time.
+     * This method queries the database to fetch the details of a specific chat based on its unique identifier.
+     * The result is provided as a Flow that emits updates whenever the corresponding data in the database changes.
+     * If the chat does not exist, the Flow emits `null`.
      *
-     * @param chatId The unique identifier of the chat whose information is to be retrieved.
-     * @return A Flow emitting a `ChatInfoEntity` object containing detailed chat information,
-     *         or null if no chat is found with the given ID.
+     * @param chatId The unique identifier of the chat to be retrieved.
+     * @return A Flow emitting a `ChatInfoEntity` containing the chat details, or `null` if no such chat exists.
      */
-    @Query("SELECT * FROM chatentity WHERE chatId = :chatId")
+    @Query(
+        """
+        SELECT c.*
+        FROM chatentity c
+        WHERE c.chatId = :chatId
+    """
+    )
     @Transaction
     fun getChatInfoById(chatId: String): Flow<ChatInfoEntity?>
 
@@ -230,24 +236,45 @@ interface ChatDao {
     /**
      * Inserts or updates a list of chats along with their participants and cross-references in the database.
      *
-     * This method performs a transactional operation to ensure consistency. It first upserts the provided
-     * chats, then handles participants, and finally updates the cross-references connecting the chats and
-     * their participants. The operation includes syncing the cross-references to reflect the latest changes.
-     *
-     * The method ensures that both chat data and its associated participants remain up-to-date and
-     * synchronized in the database.
+     * This method performs a transactional operation to ensure consistency by:
+     * 1. Upserting provided chats
+     * 2. Upserting last messages for each chat if present
+     * 3. Upserting all participants
+     * 4. Creating and syncing cross-references between chats and participants
+     * 5. Deleting stale chats that no longer exist on the server
      *
      * @param chats A list of `ChatWithParticipants` objects, where each object contains a chat and its associated participants.
      * @param participantDao The DAO responsible for handling chat participant operations in the database.
      * @param crossRefDao The DAO responsible for handling cross-references between chats and participants in the database.
+     * @param messageDao The DAO responsible for handling chat message operations.
      */
     @Transaction
     suspend fun upsertChatsWithParticipantsAndCrossRefs(
         chats: List<ChatWithParticipants>,
         participantDao: ChatParticipantDao,
-        crossRefDao: ChatParticipantsCrossRefDao
+        crossRefDao: ChatParticipantsCrossRefDao,
+        messageDao: ChatMessageDao
     ) {
         upsertChats(chats.map { it.chat })
+
+        val serverChatIds = chats.map { it.chat.chatId }
+        val localChatIds = getAllChatIds()
+        val staleChatIds = localChatIds - serverChatIds
+
+        chats.forEach { chat ->
+            chat.lastMessage?.run {
+                messageDao.upsertMessage(
+                    ChatMessageEntity(
+                        messageId = messageId,
+                        chatId = chatId,
+                        senderId = senderId,
+                        content = content,
+                        timestamp = timestamp,
+                        deliveryStatus = deliveryStatus
+                    )
+                )
+            }
+        }
 
         val allParticipants = chats.flatMap { it.participants }
         participantDao.upsertParticipants(allParticipants)
@@ -269,5 +296,7 @@ interface ChatDao {
                 participants = chat.participants
             )
         }
+
+        deleteChatsByIds(staleChatIds)
     }
 }

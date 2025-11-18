@@ -17,6 +17,7 @@ import androidx.room.DatabaseView
  * - `senderId`: The ID of the participant who sent the message.
  * - `content`: The content of the last message, such as the text or media information.
  * - `timestamp`: The time at which the last message was sent, represented in milliseconds since the epoch.
+ * - `deliveryStatus`: The current delivery status of the message (e.g., sent, delivered, read).
  *
  * Purpose:
  * This view reduces the complexity of retrieving the most recent message for discussions
@@ -44,5 +45,6 @@ data class LastMessageView(
     val chatId: String,
     val senderId: String,
     val content: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val deliveryStatus: String
 )
