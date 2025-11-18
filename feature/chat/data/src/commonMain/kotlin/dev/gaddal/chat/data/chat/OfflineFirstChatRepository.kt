@@ -1,9 +1,9 @@
 package dev.gaddal.chat.data.chat
 
-import dev.gaddal.chat.data.lifecycle.AppLifecycleObserver
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.data.mappers.toEntity
 import dev.gaddal.chat.data.mappers.toLastMessageView
+import dev.gaddal.chat.data.network.ConnectivityObserver
 import dev.gaddal.chat.database.ChirpChatDatabase
 import dev.gaddal.chat.database.entities.ChatInfoEntity
 import dev.gaddal.chat.database.entities.ChatParticipantEntity
@@ -42,17 +42,17 @@ import kotlinx.coroutines.supervisorScope
  *
  * @property chatService The service responsible for handling remote chat operations, such as fetching chats.
  * @property db The local database managing chat entities, participants, messages, and their relationships.
- * @property observer The lifecycle observer used to monitor app lifecycle events.
+ * @property observer The connectivity observer used to monitor network connectivity changes.
  */
 class OfflineFirstChatRepository(
     private val chatService: ChatService,
     private val db: ChirpChatDatabase,
-    private val observer: AppLifecycleObserver
+    private val observer: ConnectivityObserver
 ) : ChatRepository {
 
     init {
-        observer.isInForeground.onEach { isInForeground ->
-            println("Is app in foreground? $isInForeground")
+        observer.isConnected.onEach { isConnected ->
+            println("Is app connected? $isConnected")
         }.launchIn(GlobalScope)
     }
 
