@@ -64,4 +64,18 @@ interface ChatRepository {
      *         with a [DataError.Remote] describing the error encountered.
      */
     suspend fun fetchChatById(chatId: String): EmptyResult<DataError.Remote>
+
+    /**
+     * Creates a new chat with the specified participants.
+     *
+     * This method initiates the creation of a chat involving the current user
+     * and the users identified by the provided list of user IDs. The operation
+     * returns a result encapsulating either the created chat or an error if the
+     * creation process fails.
+     *
+     * @param otherUserIds A list of user IDs representing the participants to include in the new chat.
+     * @return A [Result] containing either a [Chat] object representing the newly created chat
+     *         or a [DataError.Remote] describing the error encountered during the operation.
+     */
+    suspend fun createChat(otherUserIds: List<String>): Result<Chat, DataError.Remote>
 }

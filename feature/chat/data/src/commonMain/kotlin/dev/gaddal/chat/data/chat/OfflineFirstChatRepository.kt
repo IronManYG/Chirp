@@ -125,4 +125,28 @@ class OfflineFirstChatRepository(
             }
             .asEmptyResult()
     }
+
+    /**
+     * Creates a new chat with the specified users and persists it in the local database.
+     *
+     * This method interacts with the remote `ChatService` to create a new chat involving the provided
+     * user identifiers. If successful, the chat and its participants are stored locally, ensuring data
+     * consistency between the remote service and the local database.
+     *
+     * @param otherUserIds A list of user IDs representing the participants to include in the new chat.
+     * @return A `Result` containing the created `Chat` object if the creation is successful, or a
+     *         `DataError.Remote` instance in case of a failure.
+     */
+    override suspend fun createChat(otherUserIds: List<String>): Result<Chat, DataError.Remote> {
+        return chatService
+            .createChat(otherUserIds)
+            .onSuccess { chat ->
+                db.chatDao.upsertChatWithParticipantsAndCrossRefs(
+                    chat = chat.toEntity(),
+                    participants = chat.participants.map { it.toEntity() },
+                    participantDao = db.chatParticipantDao,
+                    crossRefDao = db.chatParticipantsCrossRefDao
+                )
+            }
+    }
 }
