@@ -4,6 +4,8 @@ import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.data.mappers.toEntity
 import dev.gaddal.chat.data.mappers.toLastMessageView
 import dev.gaddal.chat.database.ChirpChatDatabase
+import dev.gaddal.chat.database.entities.ChatInfoEntity
+import dev.gaddal.chat.database.entities.ChatParticipantEntity
 import dev.gaddal.chat.database.entities.ChatWithParticipants
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
@@ -14,9 +16,13 @@ import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import dev.gaddal.core.domain.util.asEmptyResult
 import dev.gaddal.core.domain.util.onSuccess
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.supervisorScope
 
 /**
  * Repository implementation for managing and accessing chat data using an offline-first approach.
@@ -38,36 +44,63 @@ class OfflineFirstChatRepository(
 ) : ChatRepository {
 
     /**
-     * Retrieves a Flow that emits a list of chats.
+     * Retrieves a flow of chats converted into the domain model, each consisting of filtered active participants
+     * and their last message.
      *
-     * This function fetches the chat data from the local database. It maps the retrieved data
-     * to a domain model representation, ensuring that only chats with active participants
-     * are included in the result. The emitted list of chats is automatically updated
-     * whenever the underlying database state changes.
+     * This method accesses the local database to fetch chat data, including participants and last messages,
+     * and processes it asynchronously to include only active participants for each chat. The resulting list of chats
+     * is transformed into the `Chat` domain model.
      *
-     * @return A Flow emitting a list of `Chat` objects, each representing a chat with its participants,
-     * last activity timestamp, and potentially the last message.
+     * @return A Flow emitting a list of `Chat` entities, where each entity represents a chat with filtered active participants
+     *         and its associated last message.
      */
     override fun getChats(): Flow<List<Chat>> {
-        return db.chatDao.getChatsWithActiveParticipants()
-            .map { chatWithParticipantsList ->
-                chatWithParticipantsList.map { it.toDomain() }
+        return db.chatDao.getChatsWithParticipants()
+            .map { allChatsWithParticipants ->
+                supervisorScope {
+                    allChatsWithParticipants
+                        .map { chatWithParticipants ->
+                            async {
+                                ChatWithParticipants(
+                                    chat = chatWithParticipants.chat,
+                                    participants = chatWithParticipants
+                                        .participants
+                                        .onlyActive(chatWithParticipants.chat.chatId),
+                                    lastMessage = chatWithParticipants.lastMessage
+                                )
+                            }
+                        }
+                        .awaitAll()
+                        .map { it.toDomain() }
+                }
             }
     }
 
     /**
-     * Retrieves detailed information about a specific chat by its unique identifier.
+     * Retrieves detailed information about a specific chat.
      *
-     * This method returns a Flow that emits `ChatInfo` objects representing the chat details
-     * and associated messages. The data is retrieved from the local database, transformed into
-     * the domain model, and filtered to ensure non-null values are emitted.
+     * This method fetches and transforms chat data from the database, including the chat's details,
+     * active participants, and associated messages with senders. The data is emitted as a Flow
+     * of `ChatInfo` objects, which reflect the current state of the underlying database.
+     * Only active participants are considered in the result. The transformation involves mapping
+     * local database entities to the application's domain model.
      *
-     * @param chatId The unique identifier of the chat for which to retrieve information.
-     * @return A Flow emitting `ChatInfo` containing the chat's details and messages.
+     * @param chatId The unique identifier of the chat for which information is to be retrieved.
+     * @return A Flow emitting `ChatInfo` objects, each containing the chat's details, active participants,
+     *         and associated messages with senders.
      */
     override fun getChatInfoById(chatId: String): Flow<ChatInfo> {
         return db.chatDao.getChatInfoById(chatId)
             .filterNotNull()
+            .map { chatInfo ->
+                ChatInfoEntity(
+                    chat = chatInfo.chat,
+                    participants = chatInfo
+                        .participants
+                        .onlyActive(chatInfo.chat.chatId),
+                    messagesWithSenders = chatInfo.messagesWithSenders
+                )
+            }
             .map { it.toDomain() }
     }
 
@@ -148,5 +181,44 @@ class OfflineFirstChatRepository(
                     crossRefDao = db.chatParticipantsCrossRefDao
                 )
             }
+    }
+
+    /**
+     * Leaves the specified chat by its unique identifier.
+     *
+     * This method interacts with the remote `ChatService` to leave the given chat.
+     * If the operation is successful, the chat is removed from the local database.
+     *
+     * @param chatId The unique identifier of the chat to be left.
+     * @return An `EmptyResult` object indicating either a successful completion or a `DataError.Remote`
+     *         in case the leave operation fails.
+     */
+    override suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote> {
+        return chatService
+            .leaveChat(chatId)
+            .onSuccess {
+                db.chatDao.deleteChatById(chatId)
+            }
+    }
+
+    /**
+     * Filters the list of chat participants to include only those who are active within a specified chat.
+     *
+     * This method compares the participants in the list against the active participants retrieved
+     * from the database for the given chat ID. It returns a list containing only the participants
+     * whose user IDs are present in the active participants list.
+     *
+     * @param chatId The unique identifier of the chat for which active participants are determined.
+     * @return A list of `ChatParticipantEntity` objects containing only the active participants
+     *         within the specified chat.
+     */
+    private suspend fun List<ChatParticipantEntity>.onlyActive(chatId: String): List<ChatParticipantEntity> {
+        val activeParticipantIds = db
+            .chatDao
+            .getActiveParticipantsByChatId(chatId)
+            .first()
+            .map { it.userId }
+
+        return this.filter { it.userId in activeParticipantIds }
     }
 }

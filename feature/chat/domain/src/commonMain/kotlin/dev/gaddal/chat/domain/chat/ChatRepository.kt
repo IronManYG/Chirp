@@ -78,4 +78,17 @@ interface ChatRepository {
      *         or a [DataError.Remote] describing the error encountered during the operation.
      */
     suspend fun createChat(otherUserIds: List<String>): Result<Chat, DataError.Remote>
+
+    /**
+     * Leaves the chat identified by the given chat ID.
+     *
+     * This method is used to remove the current user from the specified chat.
+     * It performs a remote call to update the chat participant list accordingly.
+     * The result of the operation indicates whether it was successful or failed due to a remote data error.
+     *
+     * @param chatId The unique identifier of the chat to leave.
+     * @return An [EmptyResult] representing either a successful operation with no payload
+     *         or a failure with a [DataError.Remote] describing the remote error encountered.
+     */
+    suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote>
 }

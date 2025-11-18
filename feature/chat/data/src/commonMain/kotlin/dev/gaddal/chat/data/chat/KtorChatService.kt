@@ -5,10 +5,13 @@ import dev.gaddal.chat.data.dto.request.CreateChatRequest
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.domain.chat.ChatService
 import dev.gaddal.chat.domain.models.Chat
+import dev.gaddal.core.data.networking.delete
 import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.data.networking.post
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
+import dev.gaddal.core.domain.util.asEmptyResult
 import dev.gaddal.core.domain.util.map
 import io.ktor.client.HttpClient
 
@@ -76,5 +79,20 @@ class KtorChatService(
         return httpClient.get<ChatDto>(
             route = "/chat/$chatId"
         ).map { it.toDomain() }
+    }
+
+    /**
+     * Leaves the specified chat by its unique identifier.
+     *
+     * This method performs an HTTP DELETE request to leave the chat associated with the provided
+     * chat ID, and returns a result indicating the success or failure of the operation.
+     *
+     * @param chatId The unique identifier of the chat to leave.
+     * @return An [EmptyResult] indicating success, or a [DataError.Remote] in case of failure.
+     */
+    override suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote> {
+        return httpClient.delete<Unit>(
+            route = "/chat/$chatId/leave"
+        ).asEmptyResult()
     }
 }

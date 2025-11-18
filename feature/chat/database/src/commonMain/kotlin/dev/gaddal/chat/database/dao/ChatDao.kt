@@ -90,26 +90,6 @@ interface ChatDao {
     fun getChatsWithParticipants(): Flow<List<ChatWithParticipants>>
 
     /**
-     * Retrieves a Flow that emits a list of chats with active participants. Only chats where
-     * participants have an active status are included in the result. The chats are sorted
-     * by their last activity timestamp in descending order.
-     *
-     * @return A Flow emitting a list of ChatWithParticipants objects, representing chats with
-     * active participants.
-     */
-    @Query(
-        """
-        SELECT DISTINCT c.*
-        FROM chatentity c
-        JOIN chatparticipantcrossref cpcr ON c.chatId = cpcr.chatId
-         WHERE cpcr.isActive = 1
-         ORDER BY lastActivityAt DESC
-    """
-    )
-    @Transaction
-    fun getChatsWithActiveParticipants(): Flow<List<ChatWithParticipants>>
-
-    /**
      * Retrieves a chat along with its associated participants by the given chat ID.
      *
      * The method queries the database to fetch the chat details as well as the list of
@@ -202,19 +182,18 @@ interface ChatDao {
     /**
      * Retrieves information about a specific chat.
      *
-     * This method uses a SQL query to fetch the chat data from the `ChatEntity` table,
-     * joining with the participants cross-reference table and filtering for active participants.
+     * This method queries the database to fetch the details of a specific chat based on its unique identifier.
+     * The result is provided as a Flow that emits updates whenever the corresponding data in the database changes.
+     * If the chat does not exist, the Flow emits `null`.
      *
-     * @param chatId The unique identifier of the chat whose information is to be retrieved.
-     * @return A Flow emitting a `ChatInfoEntity` object containing detailed chat information,
-     *         or null if no chat is found with the given ID.
+     * @param chatId The unique identifier of the chat to be retrieved.
+     * @return A Flow emitting a `ChatInfoEntity` containing the chat details, or `null` if no such chat exists.
      */
     @Query(
         """
         SELECT c.*
         FROM chatentity c
-        JOIN chatparticipantcrossref cpcr ON c.chatId = cpcr.chatId
-        WHERE c.chatId = :chatId AND cpcr.isActive = true
+        WHERE c.chatId = :chatId
     """
     )
     @Transaction

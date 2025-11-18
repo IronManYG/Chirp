@@ -2,6 +2,7 @@ package dev.gaddal.chat.domain.chat
 
 import dev.gaddal.chat.domain.models.Chat
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 
 /**
@@ -46,4 +47,16 @@ interface ChatService {
      * @return A `Result` containing either the requested `Chat` object or a `DataError.Remote` in case of an error.
      */
     suspend fun getChatById(chatId: String): Result<Chat, DataError.Remote>
+
+    /**
+     * Leaves the specified chat for the current user.
+     *
+     * This method allows the current user to exit a chat identified by the given `chatId`.
+     * If the operation is successful, an empty result is returned.
+     * In case of failure, a `DataError.Remote` is returned to indicate the issue.
+     *
+     * @param chatId The unique identifier of the chat to leave.
+     * @return An `EmptyResult` which represents either successful completion or a `DataError.Remote` in case of failure.
+     */
+    suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote>
 }
