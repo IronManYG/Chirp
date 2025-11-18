@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.14.0] - 2025-11-18
+
+### Added
+
+- Chat: Offline‑first chat list with Room schema, repository, and reactive UI
+  ([7c3c123](https://github.com/IronManYG/Chirp/commit/7c3c123))
+- Chat: Fetch and display individual chat details, including messages and participants; new
+  `ChatDetailViewModel`
+  ([3cfebba](https://github.com/IronManYG/Chirp/commit/3cfebba))
+- Chat: "Leave chat" functionality across domain, data, and presentation layers
+  ([5e25c11](https://github.com/IronManYG/Chirp/commit/5e25c11))
+- Chat: Reusable `ManageChat` flow/component to create and edit chats (participants add/remove)
+  ([0f1c1a5](https://github.com/IronManYG/Chirp/commit/0f1c1a5))
+- Chat: Add participants to existing chats (API, repository, VM, and UI wiring)
+  ([27e9268](https://github.com/IronManYG/Chirp/commit/27e9268))
+
+### Changed
+
+- Chat Detail UI polish: improved layout, rounded container styling, and chat selection logic
+  ([1608e40](https://github.com/IronManYG/Chirp/commit/1608e40))
+- Chat Detail: Introduce an empty state when no chat is selected; rename `EmptyListSection` →
+  `EmptySection`
+  ([8163739](https://github.com/IronManYG/Chirp/commit/8163739))
+- Refactor: Decouple `CreateChatViewModel` from data layer by using `ChatRepository`
+  ([475ef2c](https://github.com/IronManYG/Chirp/commit/475ef2c))
+- i18n: Abstract platform locale changes behind `LocaleApplier` and update DI wiring
+  ([4d0112a](https://github.com/IronManYG/Chirp/commit/4d0112a), [ceadfbe](https://github.com/IronManYG/Chirp/commit/ceadfbe))
+
+### Fixed
+
+- Design System: Ensure dropdown menu item text uses `contentColor` for proper theming
+  ([5e25c11](https://github.com/IronManYG/Chirp/commit/5e25c11))
+
+[0.14.0]: https://github.com/IronManYG/Chirp/compare/3de31db...8163739
+
 ## [0.13.0] - 2025-11-16
 
 ### Added
