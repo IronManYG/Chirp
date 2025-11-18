@@ -2,6 +2,7 @@ package dev.gaddal.chat.domain.chat
 
 import dev.gaddal.chat.domain.models.Chat
 import dev.gaddal.chat.domain.models.ChatInfo
+import dev.gaddal.chat.domain.models.ChatParticipant
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
@@ -39,6 +40,17 @@ interface ChatRepository {
      * @return A `Flow` emitting `ChatInfo` objects that contain the chat details and the list of associated messages.
      */
     fun getChatInfoById(chatId: String): Flow<ChatInfo>
+
+    /**
+     * Retrieves a stream of active participants for a specific chat.
+     *
+     * This method emits updates for the list of currently active participants
+     * in the specified chat, enabling real-time monitoring of participant activity.
+     *
+     * @param chatId The unique identifier of the chat for which active participants are to be retrieved.
+     * @return A Flow emitting a list of active ChatParticipant objects in the specified chat.
+     */
+    fun getActiveParticipantsByChatId(chatId: String): Flow<List<ChatParticipant>>
 
     /**
      * Fetches an updated list of chats from a remote source.
@@ -91,4 +103,20 @@ interface ChatRepository {
      *         or a failure with a [DataError.Remote] describing the remote error encountered.
      */
     suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote>
+
+    /**
+     * Adds participants to an existing chat.
+     *
+     * This method allows adding a list of users as participants to a specified chat.
+     * The operation either returns a result containing the updated chat object
+     * or an error if the operation fails.
+     *
+     * @param chatId The unique identifier of the chat to which participants should be added.
+     * @param userIds A list of user IDs representing the participants to add to the chat.
+     * @return A [Result] containing either the updated [Chat] object or a [DataError.Remote] describing the encountered error.
+     */
+    suspend fun addParticipantsToChat(
+        chatId: String,
+        userIds: List<String>
+    ): Result<Chat, DataError.Remote>
 }

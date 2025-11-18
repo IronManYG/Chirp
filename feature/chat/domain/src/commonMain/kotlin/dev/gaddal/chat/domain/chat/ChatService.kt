@@ -59,4 +59,21 @@ interface ChatService {
      * @return An `EmptyResult` which represents either successful completion or a `DataError.Remote` in case of failure.
      */
     suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote>
+
+    /**
+     * Adds participants to an existing chat.
+     *
+     * This method allows adding a list of users, identified by their unique user IDs,
+     * to an existing chat identified by its unique chat ID. If the operation is successful,
+     * the updated `Chat` object will be returned. In case of failure, a `DataError.Remote`
+     * will indicate the issue.
+     *
+     * @param chatId The unique identifier of the chat to which participants will be added.
+     * @param userIds A list of unique user IDs representing the participants to add to the chat.
+     * @return A `Result` containing either the updated `Chat` object or a `DataError.Remote` indicating an error.
+     */
+    suspend fun addParticipantsToChat(
+        chatId: String,
+        userIds: List<String>
+    ): Result<Chat, DataError.Remote>
 }

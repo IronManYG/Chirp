@@ -2,6 +2,7 @@ package dev.gaddal.chat.data.chat
 
 import dev.gaddal.chat.data.dto.ChatDto
 import dev.gaddal.chat.data.dto.request.CreateChatRequest
+import dev.gaddal.chat.data.dto.request.ParticipantsRequest
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.domain.chat.ChatService
 import dev.gaddal.chat.domain.models.Chat
@@ -94,5 +95,27 @@ class KtorChatService(
         return httpClient.delete<Unit>(
             route = "/chat/$chatId/leave"
         ).asEmptyResult()
+    }
+
+    /**
+     * Adds a list of participants to an existing chat.
+     *
+     * This method sends a request to include additional users into the specified chat. The operation
+     * will return the updated chat details if successful or an error if the operation fails.
+     *
+     * @param chatId The unique identifier of the chat to which participants should be added.
+     * @param userIds A list of user IDs representing the participants to be added to the chat.
+     * @return A [Result] containing the updated [Chat] on success, or a [DataError.Remote] in case of failure.
+     */
+    override suspend fun addParticipantsToChat(
+        chatId: String,
+        userIds: List<String>
+    ): Result<Chat, DataError.Remote> {
+        return httpClient.post<ParticipantsRequest, ChatDto>(
+            route = "/chat/$chatId/add",
+            body = ParticipantsRequest(
+                userIds = userIds
+            )
+        ).map { it.toDomain() }
     }
 }

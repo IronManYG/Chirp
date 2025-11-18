@@ -11,6 +11,7 @@ import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
 import dev.gaddal.chat.domain.models.Chat
 import dev.gaddal.chat.domain.models.ChatInfo
+import dev.gaddal.chat.domain.models.ChatParticipant
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
@@ -102,6 +103,25 @@ class OfflineFirstChatRepository(
                 )
             }
             .map { it.toDomain() }
+    }
+
+    /**
+     * Retrieves a flow of active participants for a given chat ID.
+     *
+     * This method queries the local database, fetches the active participants associated
+     * with the specified chat, and converts them into the domain model `ChatParticipant`.
+     * Active participants are determined based on their status in the database and the
+     * results are continuously emitted as a `Flow`.
+     *
+     * @param chatId The unique identifier of the chat whose active participants are to be retrieved.
+     * @return A `Flow` that emits lists of `ChatParticipant`, representing the active participants
+     *         in the specified chat.
+     */
+    override fun getActiveParticipantsByChatId(chatId: String): Flow<List<ChatParticipant>> {
+        return db.chatDao.getActiveParticipantsByChatId(chatId)
+            .map { participants ->
+                participants.map { it.toDomain() }
+            }
     }
 
     /**
@@ -198,6 +218,34 @@ class OfflineFirstChatRepository(
             .leaveChat(chatId)
             .onSuccess {
                 db.chatDao.deleteChatById(chatId)
+            }
+    }
+
+    /**
+     * Adds participants to an existing chat by specifying the chat ID and the list of user IDs to be added.
+     *
+     * This method interacts with the remote `ChatService` to add the specified participants to the chat.
+     * Upon successful completion, the updated chat details, including the new participants, are synchronized
+     * with the local database.
+     *
+     * @param chatId The unique identifier of the chat to which participants are to be added.
+     * @param userIds A list of user IDs representing the participants to be added to the chat.
+     * @return A `Result` containing the updated `Chat` object if the operation is successful,
+     *         or a `DataError.Remote` instance in case of a failure.
+     */
+    override suspend fun addParticipantsToChat(
+        chatId: String,
+        userIds: List<String>
+    ): Result<Chat, DataError.Remote> {
+        return chatService
+            .addParticipantsToChat(chatId, userIds)
+            .onSuccess { chat ->
+                db.chatDao.upsertChatWithParticipantsAndCrossRefs(
+                    chat = chat.toEntity(),
+                    participants = chat.participants.map { it.toEntity() },
+                    participantDao = db.chatParticipantDao,
+                    crossRefDao = db.chatParticipantsCrossRefDao
+                )
             }
     }
 
