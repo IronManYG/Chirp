@@ -1,6 +1,7 @@
 package dev.gaddal.chat.data.mappers
 
 import dev.gaddal.chat.data.dto.ChatMessageDto
+import dev.gaddal.chat.data.dto.websocket.OutgoingWebSocketDto
 import dev.gaddal.chat.database.entities.ChatMessageEntity
 import dev.gaddal.chat.database.view.LastMessageView
 import dev.gaddal.chat.domain.models.ChatMessage
@@ -104,5 +105,23 @@ fun ChatMessage.toLastMessageView(): LastMessageView {
         content = content,
         timestamp = createdAt.toEpochMilliseconds(),
         deliveryStatus = deliveryStatus.name
+    )
+}
+
+/**
+ * Converts the current `ChatMessage` instance into a `OutgoingWebSocketDto.NewMessage` object.
+ *
+ * This function maps the properties of a `ChatMessage` such as its unique message identifier,
+ * associated chat identifier, and content to create a corresponding `NewMessage` object for
+ * WebSocket communication.
+ *
+ * @return An instance of `OutgoingWebSocketDto.NewMessage` containing the mapped properties
+ *         from the current `ChatMessage`.
+ */
+fun ChatMessage.toNewMessage(): OutgoingWebSocketDto.NewMessage {
+    return OutgoingWebSocketDto.NewMessage(
+        messageId = id,
+        chatId = chatId,
+        content = content,
     )
 }
