@@ -39,6 +39,25 @@ interface ChatParticipantDao {
     @Upsert
     suspend fun upsertParticipants(participants: List<ChatParticipantEntity>)
 
+
+    /**
+     * Updates the profile picture URL of a chat participant in the database.
+     *
+     * This method updates the `profilePictureUrl` field for a participant identified by their unique `userId`.
+     * If the `newUrl` is null, it clears the existing profile picture URL.
+     *
+     * @param userId The unique identifier of the user whose profile picture URL is being updated.
+     * @param newUrl The new URL to set as the profile picture, or null to clear the profile picture URL.
+     */
+    @Query(
+        """
+        UPDATE chatparticipantentity
+        SET profilePictureUrl = :newUrl
+        WHERE userId = :userId
+    """
+    )
+    suspend fun updateProfilePictureUrl(userId: String, newUrl: String?)
+
     /**
      * Retrieves all participants from the chat participant database entity.
      *

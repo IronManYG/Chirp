@@ -1,6 +1,7 @@
 package dev.gaddal.chat.data.mappers
 
 import dev.gaddal.chat.data.dto.ChatMessageDto
+import dev.gaddal.chat.data.dto.websocket.IncomingWebSocketDto
 import dev.gaddal.chat.data.dto.websocket.OutgoingWebSocketDto
 import dev.gaddal.chat.database.entities.ChatMessageEntity
 import dev.gaddal.chat.database.view.LastMessageView
@@ -123,5 +124,25 @@ fun ChatMessage.toNewMessage(): OutgoingWebSocketDto.NewMessage {
         messageId = id,
         chatId = chatId,
         content = content,
+    )
+}
+
+/**
+ * Converts an instance of [IncomingWebSocketDto.NewMessageDto] into a [ChatMessageEntity].
+ *
+ * This function maps the properties of [IncomingWebSocketDto.NewMessageDto], such as the unique message ID,
+ * chat ID, sender ID, message content, and creation timestamp to a database entity representation.
+ * It also sets the delivery status of the message to `SENT`.
+ *
+ * @return A [ChatMessageEntity] containing the mapped data fields from [IncomingWebSocketDto.NewMessageDto].
+ */
+fun IncomingWebSocketDto.NewMessageDto.toEntity(): ChatMessageEntity {
+    return ChatMessageEntity(
+        messageId = id,
+        chatId = chatId,
+        senderId = senderId,
+        content = content,
+        timestamp = Instant.parse(createdAt).toEpochMilliseconds(),
+        deliveryStatus = ChatMessageDeliveryStatus.SENT.name
     )
 }
