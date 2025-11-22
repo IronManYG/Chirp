@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Data Access Object (DAO) for managing chat messages in the database.
- * Provides methods for inserting, querying, and deleting chat messages.
+ * Provides methods for inserting, updating, querying, and deleting chat messages.
  */
 @Dao
 interface ChatMessageDao {
@@ -66,4 +66,20 @@ interface ChatMessageDao {
      */
     @Query("SELECT * FROM chatmessageentity WHERE messageId = :messageId")
     suspend fun getMessageById(messageId: String): ChatMessageEntity?
+
+    /**
+     * Updates the delivery status and the associated timestamp of a message in the database.
+     *
+     * @param messageId The unique identifier of the message whose delivery status is to be updated.
+     * @param status The new delivery status to be applied to the message.
+     * @param timestamp The timestamp indicating when the delivery status was updated.
+     */
+    @Query(
+        """
+        UPDATE chatmessageentity
+        SET deliveryStatus = :status, deliveryStatusTimestamp = :timestamp
+        WHERE messageId = :messageId
+    """
+    )
+    suspend fun updateDeliveryStatus(messageId: String, status: String, timestamp: Long)
 }

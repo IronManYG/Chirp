@@ -12,4 +12,11 @@ object UrlConstants {
      */
     // Note: no trailing slash to simplify route concatenation in constructRoute()
     const val BASE_URL_HTTP = "https://chirp.pl-coding.com/api"
+
+    /**
+     * A constant string representing the base WebSocket URL.
+     * This is used as the endpoint to establish a WebSocket connection
+     * for communicating with the server.
+     */
+    const val BASE_URL_WS = "wss://chirp.pl-coding.com/ws"
 }

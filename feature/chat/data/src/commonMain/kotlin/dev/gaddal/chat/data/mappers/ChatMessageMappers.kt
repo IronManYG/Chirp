@@ -1,6 +1,8 @@
 package dev.gaddal.chat.data.mappers
 
 import dev.gaddal.chat.data.dto.ChatMessageDto
+import dev.gaddal.chat.data.dto.websocket.IncomingWebSocketDto
+import dev.gaddal.chat.data.dto.websocket.OutgoingWebSocketDto
 import dev.gaddal.chat.database.entities.ChatMessageEntity
 import dev.gaddal.chat.database.view.LastMessageView
 import dev.gaddal.chat.domain.models.ChatMessage
@@ -104,5 +106,43 @@ fun ChatMessage.toLastMessageView(): LastMessageView {
         content = content,
         timestamp = createdAt.toEpochMilliseconds(),
         deliveryStatus = deliveryStatus.name
+    )
+}
+
+/**
+ * Converts the current `ChatMessage` instance into a `OutgoingWebSocketDto.NewMessage` object.
+ *
+ * This function maps the properties of a `ChatMessage` such as its unique message identifier,
+ * associated chat identifier, and content to create a corresponding `NewMessage` object for
+ * WebSocket communication.
+ *
+ * @return An instance of `OutgoingWebSocketDto.NewMessage` containing the mapped properties
+ *         from the current `ChatMessage`.
+ */
+fun ChatMessage.toNewMessage(): OutgoingWebSocketDto.NewMessage {
+    return OutgoingWebSocketDto.NewMessage(
+        messageId = id,
+        chatId = chatId,
+        content = content,
+    )
+}
+
+/**
+ * Converts an instance of [IncomingWebSocketDto.NewMessageDto] into a [ChatMessageEntity].
+ *
+ * This function maps the properties of [IncomingWebSocketDto.NewMessageDto], such as the unique message ID,
+ * chat ID, sender ID, message content, and creation timestamp to a database entity representation.
+ * It also sets the delivery status of the message to `SENT`.
+ *
+ * @return A [ChatMessageEntity] containing the mapped data fields from [IncomingWebSocketDto.NewMessageDto].
+ */
+fun IncomingWebSocketDto.NewMessageDto.toEntity(): ChatMessageEntity {
+    return ChatMessageEntity(
+        messageId = id,
+        chatId = chatId,
+        senderId = senderId,
+        content = content,
+        timestamp = Instant.parse(createdAt).toEpochMilliseconds(),
+        deliveryStatus = ChatMessageDeliveryStatus.SENT.name
     )
 }

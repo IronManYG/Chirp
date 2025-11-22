@@ -3,6 +3,7 @@ package dev.gaddal.chat.data.chat
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.data.mappers.toEntity
 import dev.gaddal.chat.data.mappers.toLastMessageView
+import dev.gaddal.chat.data.network.ConnectivityObserver
 import dev.gaddal.chat.database.ChirpChatDatabase
 import dev.gaddal.chat.database.entities.ChatInfoEntity
 import dev.gaddal.chat.database.entities.ChatParticipantEntity
@@ -17,12 +18,15 @@ import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import dev.gaddal.core.domain.util.asEmptyResult
 import dev.gaddal.core.domain.util.onSuccess
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.supervisorScope
 
 /**
@@ -38,11 +42,19 @@ import kotlinx.coroutines.supervisorScope
  *
  * @property chatService The service responsible for handling remote chat operations, such as fetching chats.
  * @property db The local database managing chat entities, participants, messages, and their relationships.
+ * @property observer The connectivity observer used to monitor network connectivity changes.
  */
 class OfflineFirstChatRepository(
     private val chatService: ChatService,
-    private val db: ChirpChatDatabase
+    private val db: ChirpChatDatabase,
+    private val observer: ConnectivityObserver
 ) : ChatRepository {
+
+    init {
+        observer.isConnected.onEach { isConnected ->
+            println("Is app connected? $isConnected")
+        }.launchIn(GlobalScope)
+    }
 
     /**
      * Retrieves a flow of chats converted into the domain model, each consisting of filtered active participants

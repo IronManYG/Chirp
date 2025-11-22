@@ -2,6 +2,9 @@ package dev.gaddal.chirp.di
 
 import dev.gaddal.chirp.MainViewModel
 import dev.gaddal.core.presentation.util.LanguageManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -16,6 +19,9 @@ import org.koin.dsl.module
  *   - Initializes the default language to "en" unless overridden during startup by the `MainViewModel`.
  *
  * - Registers the `MainViewModel` to be used within the app's view layer.
+ *
+ * - Provides a singleton `CoroutineScope` with a `SupervisorJob` and `Dispatchers.Default` for
+ *   handling background operations throughout the app.
  */
 val appModule = module {
     // Single language manager shared across the app
@@ -30,4 +36,7 @@ val appModule = module {
 
     // MainViewModel
     viewModelOf(::MainViewModel)
+    single {
+        CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    }
 }

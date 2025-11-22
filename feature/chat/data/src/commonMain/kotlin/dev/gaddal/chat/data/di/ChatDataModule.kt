@@ -4,10 +4,16 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import dev.gaddal.chat.data.chat.KtorChatParticipantService
 import dev.gaddal.chat.data.chat.KtorChatService
 import dev.gaddal.chat.data.chat.OfflineFirstChatRepository
+import dev.gaddal.chat.data.chat.WebSocketChatConnectionClient
+import dev.gaddal.chat.data.message.OfflineFirstMessageRepository
+import dev.gaddal.chat.data.network.KtorWebSocketConnector
 import dev.gaddal.chat.database.DatabaseFactory
+import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatParticipantService
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
+import dev.gaddal.chat.domain.message.MessageRepository
+import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -31,7 +37,9 @@ expect val platformChatDataModule: Module
  * This module serves as the dependency injection configuration point for chat data layer components:
  * - Includes platform-specific chat data dependencies
  * - Provides Ktor-based implementations for chat and participant services
- * - Provides an OfflineFirstChatRepository implementation for managing chat data
+ * - Provides implementations for chat and message repositories with offline-first capabilities
+ * - Configures a WebSocket client for real-time chat functionality
+ * - Sets up JSON serialization configuration
  * - Configures and builds the SQLite database using BundledSQLiteDriver
  */
 val chatDataModule = module {
@@ -40,6 +48,14 @@ val chatDataModule = module {
     singleOf(::KtorChatParticipantService) bind ChatParticipantService::class
     singleOf(::KtorChatService) bind ChatService::class
     singleOf(::OfflineFirstChatRepository) bind ChatRepository::class
+    singleOf(::OfflineFirstMessageRepository) bind MessageRepository::class
+    singleOf(::WebSocketChatConnectionClient) bind ChatConnectionClient::class
+    singleOf(::KtorWebSocketConnector)
+    single {
+        Json {
+            ignoreUnknownKeys = true
+        }
+    }
     single {
         get<DatabaseFactory>()
             .create()

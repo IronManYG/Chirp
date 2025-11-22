@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.15.0] - 2025-11-22
+
+### Added
+
+- Chat: Implement WebSocket client for real-time messaging
+  ([0c4eba3](https://github.com/IronManYG/Chirp/commit/0c4eba3))
+- Chat: Implement WebSocket message sending and delivery status
+  ([b9b62a5](https://github.com/IronManYG/Chirp/commit/b9b62a5))
+- Chat: Implement WebSocket connector and DTOs
+  ([31f7490](https://github.com/IronManYG/Chirp/commit/31f7490))
+- Chat: Add `ConnectionRetryHandler` for exponential backoff
+  ([45a348d](https://github.com/IronManYG/Chirp/commit/45a348d))
+- Chat: Add KMM `ConnectionErrorHandler`
+  ([2454f69](https://github.com/IronManYG/Chirp/commit/2454f69))
+- Data: Add multiplatform network connectivity observer
+  ([c786e25](https://github.com/IronManYG/Chirp/commit/c786e25))
+- Chat: Implement multiplatform app lifecycle observer
+  ([e4d07b8](https://github.com/IronManYG/Chirp/commit/e4d07b8))
+
+[0.15.0]: https://github.com/IronManYG/Chirp/compare/8163739...0c4eba3
+
 ## [0.14.0] - 2025-11-18
 
 ### Added
