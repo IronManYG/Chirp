@@ -5,7 +5,10 @@ package dev.gaddal.chat.presentation.chat_detail
 import androidx.compose.foundation.text.input.clearText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatRepository
+import dev.gaddal.chat.domain.message.MessageRepository
+import dev.gaddal.chat.domain.models.ConnectionState
 import dev.gaddal.chat.presentation.mappers.toUi
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.onFailure
@@ -16,8 +19,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -27,6 +34,8 @@ import kotlinx.coroutines.launch
 class ChatDetailViewModel(
     private val chatRepository: ChatRepository,
     private val sessionStorage: SessionStorage,
+    private val messageRepository: MessageRepository,
+    private val connectionClient: ChatConnectionClient
 ) : ViewModel() {
     private val eventChannel = Channel<ChatDetailEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -68,7 +77,8 @@ class ChatDetailViewModel(
         }
         .onStart {
             if (!hasLoadedInitialData) {
-                /** Load initial data here **/
+                observeConnectionState()
+                observeChatMessages()
                 hasLoadedInitialData = true
             }
         }
@@ -94,6 +104,97 @@ class ChatDetailViewModel(
             ChatDetailAction.OnSendMessageClick -> {}
             else -> Unit
         }
+    }
+
+    /**
+     * Observes chat messages and integrates them into the application's state and event system.
+     *
+     * This method performs the following operations:
+     * - Tracks the current list of messages from the application's state and ensures updates only occur
+     *   when the message list changes.
+     * - Observes a flow of new messages for the current chat using the `messageRepository`.
+     * - Combines new messages with authentication information to transform the messages into UI models,
+     *   and updates the application state with these transformed messages.
+     * - Monitors whether the user is near the bottom of the chat view to handle new message notifications appropriately.
+     * - Combines the current messages, new messages, and the "is near bottom" flag to determine if a new message
+     *   notification event should be emitted. If the user is near the bottom of the chat and there are new messages,
+     *   a `ChatDetailEvent.OnNewMessage` event is sent to the event channel.
+     *
+     * This method uses Kotlin Flows to handle real-time updates and ensure reactivity in the chat interface.
+     * The operations are scoped to the `viewModelScope` to manage coroutine lifecycle.
+     */
+    private fun observeChatMessages() {
+        val currentMessages = state
+            .map { it.messages }
+            .distinctUntilChanged()
+
+        val newMessages = _chatId.flatMapLatest { chatId ->
+            if (chatId != null) {
+                messageRepository.getMessagesForChat(chatId)
+            } else emptyFlow()
+        }
+            .combine(sessionStorage.observeAuthInfo()) { messages, authInfo ->
+                if (authInfo == null) {
+                    return@combine messages
+                }
+                _state.update {
+                    it.copy(
+                        messages = messages.map { it.toUi(authInfo.user.id) }
+                    )
+                }
+                messages
+            }
+
+        val isNearBottom = state.map { it.isNearBottom }.distinctUntilChanged()
+
+        combine(
+            currentMessages,
+            newMessages,
+            isNearBottom
+        ) { currentMessages, newMessages, isNearBottom ->
+            val lastNewId = newMessages.lastOrNull()?.message?.id
+            val lastCurrentId = currentMessages.lastOrNull()?.id
+
+            if (lastNewId != lastCurrentId && isNearBottom) {
+                eventChannel.send(ChatDetailEvent.OnNewMessage)
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    /**
+     * Observes the connection state of the chat and updates the `ChatDetailState` accordingly.
+     *
+     * This method listens to changes in the connection state emitted by `connectionClient.connectionState`.
+     * When the connection transitions to `ConnectionState.CONNECTED`, it attempts to fetch the messages
+     * for the current chat by invoking `messageRepository.fetchMessages`. Additionally, it updates the `_state`
+     * to reflect the latest connection state.
+     *
+     * Behavior:
+     * - If the connection state is `CONNECTED`, the method fetches messages for the current chat ID.
+     *   The operation only proceeds if `_chatId` contains a valid chat ID.
+     * - Updates the `ChatDetailState.connectionState` property with the current connection state.
+     *
+     * Side effects:
+     * - Initiates a message fetch from `messageRepository` upon connection establishment.
+     * - Updates the `_state` with the new connection state, triggering any observers on the state.
+     */
+    private fun observeConnectionState() {
+        connectionClient
+            .connectionState
+            .onEach { connectionState ->
+                if (connectionState == ConnectionState.CONNECTED) {
+                    _chatId.value?.let {
+                        messageRepository.fetchMessages(it, before = null)
+                    }
+                }
+
+                _state.update {
+                    it.copy(
+                        connectionState = connectionState
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     /**

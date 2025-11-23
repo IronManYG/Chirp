@@ -5,13 +5,16 @@ import dev.gaddal.chat.data.chat.KtorChatParticipantService
 import dev.gaddal.chat.data.chat.KtorChatService
 import dev.gaddal.chat.data.chat.OfflineFirstChatRepository
 import dev.gaddal.chat.data.chat.WebSocketChatConnectionClient
+import dev.gaddal.chat.data.message.KtorChatMessageService
 import dev.gaddal.chat.data.message.OfflineFirstMessageRepository
+import dev.gaddal.chat.data.network.ConnectionRetryHandler
 import dev.gaddal.chat.data.network.KtorWebSocketConnector
 import dev.gaddal.chat.database.DatabaseFactory
 import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatParticipantService
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
+import dev.gaddal.chat.domain.message.ChatMessageService
 import dev.gaddal.chat.domain.message.MessageRepository
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
@@ -39,6 +42,8 @@ expect val platformChatDataModule: Module
  * - Provides Ktor-based implementations for chat and participant services
  * - Provides implementations for chat and message repositories with offline-first capabilities
  * - Configures a WebSocket client for real-time chat functionality
+ * - Handles connection errors and retries
+ * - Provides a Ktor-based implementation for chat message service
  * - Sets up JSON serialization configuration
  * - Configures and builds the SQLite database using BundledSQLiteDriver
  */
@@ -50,7 +55,9 @@ val chatDataModule = module {
     singleOf(::OfflineFirstChatRepository) bind ChatRepository::class
     singleOf(::OfflineFirstMessageRepository) bind MessageRepository::class
     singleOf(::WebSocketChatConnectionClient) bind ChatConnectionClient::class
+    singleOf(::ConnectionRetryHandler)
     singleOf(::KtorWebSocketConnector)
+    singleOf(::KtorChatMessageService) bind ChatMessageService::class
     single {
         Json {
             ignoreUnknownKeys = true

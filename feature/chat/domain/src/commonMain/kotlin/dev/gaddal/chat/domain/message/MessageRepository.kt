@@ -1,8 +1,12 @@
 package dev.gaddal.chat.domain.message
 
+import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ChatMessageDeliveryStatus
+import dev.gaddal.chat.domain.models.MessageWithSender
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
+import dev.gaddal.core.domain.util.Result
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Defines a repository interface for managing chat messages, particularly for handling their delivery statuses.
@@ -28,4 +32,45 @@ interface MessageRepository {
         messageId: String,
         status: ChatMessageDeliveryStatus
     ): EmptyResult<DataError.Local>
+
+    /**
+     * Fetches messages associated with a specific chat, optionally filtering messages
+     * created before a given timestamp.
+     *
+     * Pagination deletion-sync compromise:
+     * - When before == null (i.e., fetching the latest "first page"), the implementation
+     *   should enable a deletion reconciliation pass in the DAO
+     *   (e.g., call upsertMessagesAndSyncIfNecessary with shouldSync = true and the same page size
+     *   as used by the network request).
+     * - For older pages (before != null), we do NOT attempt deletion detection client-side due to cost.
+     *   Robust support here would require server-provided deletion info (IDs/tombstones).
+     *
+     * @param chatId The unique identifier of the chat whose messages are to be fetched.
+     * @param before An optional timestamp to filter messages created before this time.
+     *               If null, messages are fetched without any time-based filtering and
+     *               the first-page deletion sync should be considered.
+     * @return A `Result` containing a list of `ChatMessage` on success, or a `DataError`
+     *         on failure.
+     *
+     * TODO(server): Add explicit deletion propagation (e.g., tombstones or a "deletedIds" field)
+     *               so we can reconcile deletions across all pages.
+     * TODO(client): Ensure the DAO pageSize used for sync matches the network page size for before == null,
+     *               otherwise the deletion window may not align.
+     */
+    suspend fun fetchMessages(
+        chatId: String,
+        before: String? = null
+    ): Result<List<ChatMessage>, DataError>
+
+    /**
+     * Retrieves a flow of messages for a specific chat identified by its unique identifier.
+     *
+     * This method continuously provides a stream of updates containing the list of messages
+     * and their associated senders for a given chat. It is particularly useful for observing
+     * real-time updates in a chat conversation, such as new message arrivals or updates to message states.
+     *
+     * @param chatId The unique identifier of the chat for which messages are to be retrieved.
+     * @return A flow emitting lists of messages, each paired with their respective sender details.
+     */
+    fun getMessagesForChat(chatId: String): Flow<List<MessageWithSender>>
 }

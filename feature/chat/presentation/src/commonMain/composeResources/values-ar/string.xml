@@ -13,6 +13,8 @@
     <string name="retry">إعادة المحاولة</string>
     <string name="failed">فشل</string>
     <string name="save">حفظ</string>
+    <string name="today">اليوم</string>
+    <string name="yesterday">أمس</string>
     <string name="no_chat_selected">لا يوجد محادثة محددة</string>
     <string name="select_a_chat">اختر محادثة لبدء الدردشة!</string>
     <string name="open_chat_options_menu">فتح قائمة الخيارات للدردشة</string>
