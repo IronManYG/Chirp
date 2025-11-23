@@ -3,6 +3,7 @@ package dev.gaddal.chat.domain.message
 import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ChatMessageDeliveryStatus
 import dev.gaddal.chat.domain.models.MessageWithSender
+import dev.gaddal.chat.domain.models.OutgoingNewMessage
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
@@ -61,6 +62,20 @@ interface MessageRepository {
         chatId: String,
         before: String? = null
     ): Result<List<ChatMessage>, DataError>
+
+    /**
+     * Sends a new message in a chat.
+     *
+     * This method is responsible for handling the process of sending a new message
+     * to a specified chat. It performs the necessary operations to deliver the message,
+     * including interacting with the underlying data source and notifying the recipient(s).
+     *
+     * @param message The new outgoing message to be sent. Contains details such as the chat ID,
+     *                message ID, and content of the message.
+     * @return An `EmptyResult` indicating the success or failure of the operation. If the operation
+     *         fails, a `DataError` provides details about the specific error encountered.
+     */
+    suspend fun sendMessage(message: OutgoingNewMessage): EmptyResult<DataError>
 
     /**
      * Retrieves a flow of messages for a specific chat identified by its unique identifier.

@@ -7,6 +7,8 @@ import dev.gaddal.chat.database.entities.ChatMessageEntity
 import dev.gaddal.chat.database.view.LastMessageView
 import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ChatMessageDeliveryStatus
+import dev.gaddal.chat.domain.models.OutgoingNewMessage
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 /**
@@ -144,5 +146,46 @@ fun IncomingWebSocketDto.NewMessageDto.toEntity(): ChatMessageEntity {
         content = content,
         timestamp = Instant.parse(createdAt).toEpochMilliseconds(),
         deliveryStatus = ChatMessageDeliveryStatus.SENT.name
+    )
+}
+
+
+/**
+ * Converts the current `OutgoingNewMessage` instance into a `OutgoingWebSocketDto.NewMessage`.
+ *
+ * This function maps the properties of the `OutgoingNewMessage` such as `chatId`, `messageId`,
+ * and `content` to the corresponding fields in the `OutgoingWebSocketDto.NewMessage`.
+ *
+ * @return The `OutgoingWebSocketDto.NewMessage` representation derived from the current `OutgoingNewMessage`.
+ */
+fun OutgoingNewMessage.toWebSocketDto(): OutgoingWebSocketDto.NewMessage {
+    return OutgoingWebSocketDto.NewMessage(
+        chatId = chatId,
+        messageId = messageId,
+        content = content
+    )
+}
+
+/**
+ * Converts a `NewMessage` DTO from an outgoing WebSocket message into a `ChatMessageEntity`.
+ *
+ * This method maps the properties of the `NewMessage` object along with the provided `senderId`
+ * and `deliveryStatus` to create a new instance of `ChatMessageEntity`.
+ *
+ * @param senderId The unique identifier of the sender of the message.
+ * @param deliveryStatus The delivery status of the message, represented as a `ChatMessageDeliveryStatus` enum.
+ * @return A new instance of `ChatMessageEntity` containing the transformed data from the `NewMessage` DTO.
+ */
+fun OutgoingWebSocketDto.NewMessage.toEntity(
+    senderId: String,
+    deliveryStatus: ChatMessageDeliveryStatus
+): ChatMessageEntity {
+    return ChatMessageEntity(
+        messageId = messageId,
+        chatId = chatId,
+        content = content,
+        senderId = senderId,
+        deliveryStatus = deliveryStatus.name,
+        timestamp = Clock.System.now().toEpochMilliseconds()
     )
 }

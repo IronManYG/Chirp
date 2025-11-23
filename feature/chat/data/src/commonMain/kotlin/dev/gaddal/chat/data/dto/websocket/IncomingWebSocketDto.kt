@@ -13,15 +13,10 @@ enum class IncomingWebSocketType {
 }
 
 /**
- * Represents the base class for various types of incoming WebSocket messages.
- * Defines the common `type` property used to identify the specific subtype of the message.
- *
- * @param type The type of the incoming WebSocket message, represented by the [IncomingWebSocketType] enum.
+ * Represents the base interface for various types of incoming WebSocket messages.
  */
 @Serializable
-sealed class IncomingWebSocketDto(
-    val type: IncomingWebSocketType
-) {
+sealed interface IncomingWebSocketDto {
 
     /**
      * Represents the data transfer object for a new message event received through a WebSocket connection.
@@ -32,6 +27,7 @@ sealed class IncomingWebSocketDto(
      * @property content The actual content of the message.
      * @property senderId The unique identifier of the sender of the message.
      * @property createdAt The timestamp indicating when the message was created.
+     * @property type The type of the incoming WebSocket message, represented by the [IncomingWebSocketType] enum.
      */
     @Serializable
     data class NewMessageDto(
@@ -39,8 +35,9 @@ sealed class IncomingWebSocketDto(
         val chatId: String,
         val content: String,
         val senderId: String,
-        val createdAt: String
-    ) : IncomingWebSocketDto(IncomingWebSocketType.NEW_MESSAGE)
+        val createdAt: String,
+        val type: IncomingWebSocketType = IncomingWebSocketType.NEW_MESSAGE
+    ) : IncomingWebSocketDto
 
     /**
      * Data transfer object representing information about a deleted message event
@@ -49,12 +46,14 @@ sealed class IncomingWebSocketDto(
      *
      * @property messageId The unique identifier of the deleted message.
      * @property chatId The identifier of the chat where the message was deleted.
+     * @property type The type of the incoming WebSocket message, represented by the [IncomingWebSocketType] enum.
      */
     @Serializable
     data class MessageDeletedDto(
         val messageId: String,
-        val chatId: String
-    ) : IncomingWebSocketDto(IncomingWebSocketType.MESSAGE_DELETED)
+        val chatId: String,
+        val type: IncomingWebSocketType = IncomingWebSocketType.MESSAGE_DELETED
+    ) : IncomingWebSocketDto
 
     /**
      * Represents an event received via WebSocket indicating that a user's profile picture has been updated.
@@ -62,12 +61,14 @@ sealed class IncomingWebSocketDto(
      * @constructor Creates an instance of ProfilePictureUpdated.
      * @property userId The unique identifier of the user whose profile picture has been updated.
      * @property newUrl The URL of the updated profile picture. May be null if the profile picture is removed.
+     * @property type The type of the incoming WebSocket message, represented by the [IncomingWebSocketType] enum.
      */
     @Serializable
     data class ProfilePictureUpdated(
         val userId: String,
-        val newUrl: String?
-    ) : IncomingWebSocketDto(IncomingWebSocketType.PROFILE_PICTURE_UPDATED)
+        val newUrl: String?,
+        val type: IncomingWebSocketType = IncomingWebSocketType.PROFILE_PICTURE_UPDATED
+    ) : IncomingWebSocketDto
 
     /**
      * Represents a data transfer object for indicating that the participants list of a chat has changed.
@@ -76,9 +77,11 @@ sealed class IncomingWebSocketDto(
      * participants of a particular chat through a WebSocket message.
      *
      * @property chatId The unique identifier of the chat whose participants have changed.
+     * @property type The type of the incoming WebSocket message, represented by the [IncomingWebSocketType] enum.
      */
     @Serializable
     data class ChatParticipantsChangedDto(
-        val chatId: String
-    ) : IncomingWebSocketDto(IncomingWebSocketType.CHAT_PARTICIPANTS_CHANGED)
+        val chatId: String,
+        val type: IncomingWebSocketType = IncomingWebSocketType.CHAT_PARTICIPANTS_CHANGED
+    ) : IncomingWebSocketDto
 }

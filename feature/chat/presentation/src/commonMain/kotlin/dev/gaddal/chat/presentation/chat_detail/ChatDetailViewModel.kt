@@ -1,14 +1,16 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
+@file:OptIn(ExperimentalCoroutinesApi::class, ExperimentalUuidApi::class)
 
 package dev.gaddal.chat.presentation.chat_detail
 
 import androidx.compose.foundation.text.input.clearText
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.message.MessageRepository
 import dev.gaddal.chat.domain.models.ConnectionState
+import dev.gaddal.chat.domain.models.OutgoingNewMessage
 import dev.gaddal.chat.presentation.mappers.toUi
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.onFailure
@@ -30,6 +32,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class ChatDetailViewModel(
     private val chatRepository: ChatRepository,
@@ -51,6 +55,12 @@ class ChatDetailViewModel(
             if (chatId != null) {
                 chatRepository.getChatInfoById(chatId)
             } else emptyFlow()
+        }
+
+    private val canSendMessage = snapshotFlow { _state.value.messageTextFieldState.text.toString() }
+        .map { it.isBlank() }
+        .combine(connectionClient.connectionState) { isMessageBlank, connectionState ->
+            !isMessageBlank && connectionState == ConnectionState.CONNECTED
         }
 
     private val stateWithMessages = combine(
@@ -79,6 +89,7 @@ class ChatDetailViewModel(
             if (!hasLoadedInitialData) {
                 observeConnectionState()
                 observeChatMessages()
+                observeCanSendMessage()
                 hasLoadedInitialData = true
             }
         }
@@ -101,7 +112,7 @@ class ChatDetailViewModel(
             is ChatDetailAction.OnMessageLongClick -> {}
             is ChatDetailAction.OnRetryClick -> {}
             ChatDetailAction.OnScrollToTop -> {}
-            ChatDetailAction.OnSendMessageClick -> {}
+            ChatDetailAction.OnSendMessageClick -> sendMessage()
             else -> Unit
         }
     }
@@ -195,6 +206,74 @@ class ChatDetailViewModel(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Observes the state of whether the user can send messages and updates the application state accordingly.
+     *
+     * This method listens to updates emitted by the `canSendMessage` flow. Each emitted value determines
+     * whether the user is currently allowed to send a message. When an update is received, it modifies
+     * the `canSendMessage` property within the current `ChatDetailState` by creating a new state object
+     * with the updated value.
+     *
+     * Behavior:
+     * - Subscribes to the `canSendMessage` flow.
+     * - On each emitted value, updates the `_state` with a copy that reflects the new `canSendMessage` value.
+     *
+     * Scope:
+     * The flow collection runs within the `viewModelScope`, ensuring the coroutine's lifecycle is bound to the ViewModel.
+     */
+    private fun observeCanSendMessage() {
+        canSendMessage.onEach { canSend ->
+            _state.update {
+                it.copy(
+                    canSendMessage = canSend
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    /**
+     * Sends a textual message in the current chat.
+     *
+     * This method retrieves the current chat ID and the text content from the state.
+     * If the message content is blank or no valid chat ID is available, the function exits early.
+     * Otherwise, it constructs a new `OutgoingNewMessage` object with the necessary details
+     * (e.g., chat ID, message ID, and content) and calls the `sendMessage` method of the `messageRepository`
+     * to send the message asynchronously.
+     *
+     * Upon a successful message transmission:
+     * - The text field state is cleared.
+     *
+     * In case of an error:
+     * - An `OnError` event with a UI-friendly error message is emitted to the event channel.
+     *
+     * This method operates within the `viewModelScope` to handle coroutine lifecycle management
+     * for asynchronous operations.
+     */
+    private fun sendMessage() {
+        val currentChatId = _chatId.value
+        val content = state.value.messageTextFieldState.text.toString().trim()
+        if (content.isBlank() || currentChatId == null) {
+            return
+        }
+
+        viewModelScope.launch {
+            val message = OutgoingNewMessage(
+                chatId = currentChatId,
+                messageId = Uuid.random().toString(),
+                content = content
+            )
+
+            messageRepository
+                .sendMessage(message)
+                .onSuccess {
+                    state.value.messageTextFieldState.clearText()
+                }
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+        }
     }
 
     /**

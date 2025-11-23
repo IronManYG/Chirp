@@ -1,20 +1,31 @@
 package dev.gaddal.chat.data.message
 
+import dev.gaddal.chat.data.dto.websocket.OutgoingWebSocketDto
+import dev.gaddal.chat.data.dto.websocket.WebSocketMessageDto
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.data.mappers.toEntity
+import dev.gaddal.chat.data.mappers.toWebSocketDto
+import dev.gaddal.chat.data.network.KtorWebSocketConnector
 import dev.gaddal.chat.database.ChirpChatDatabase
 import dev.gaddal.chat.domain.message.ChatMessageService
 import dev.gaddal.chat.domain.message.MessageRepository
 import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ChatMessageDeliveryStatus
 import dev.gaddal.chat.domain.models.MessageWithSender
+import dev.gaddal.chat.domain.models.OutgoingNewMessage
 import dev.gaddal.core.data.database.safeDatabaseUpdate
+import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
+import dev.gaddal.core.domain.util.onFailure
 import dev.gaddal.core.domain.util.onSuccess
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 
 /**
@@ -28,7 +39,11 @@ import kotlin.time.Clock
  */
 class OfflineFirstMessageRepository(
     private val database: ChirpChatDatabase,
-    private val chatMessageService: ChatMessageService
+    private val chatMessageService: ChatMessageService,
+    private val sessionStorage: SessionStorage,
+    private val json: Json,
+    private val webSocketConnector: KtorWebSocketConnector,
+    private val applicationScope: CoroutineScope
 ) : MessageRepository {
 
     /**
@@ -89,6 +104,46 @@ class OfflineFirstMessageRepository(
     }
 
     /**
+     * Sends a new outgoing message in a chat.
+     *
+     * This method handles the process of sending a message by converting it to the appropriate
+     * WebSocket DTO, persisting it locally with a "sending" status, and transmitting it via
+     * WebSocket. In case of transmission failure, the delivery status is updated to "failed".
+     *
+     * @param message The `OutgoingNewMessage` instance containing the details of the message to be sent.
+     *                Includes the chat ID, message ID, and content of the message.
+     * @return An `EmptyResult` which signifies success or failure of the operation. In case of failure,
+     *         a `DataError` is returned describing the nature of the error.
+     */
+    override suspend fun sendMessage(message: OutgoingNewMessage): EmptyResult<DataError> {
+        return safeDatabaseUpdate {
+            val dto = message.toWebSocketDto()
+
+            val localUser = sessionStorage.observeAuthInfo().first()?.user
+                ?: return Result.Failure(DataError.Local.NOT_FOUND)
+
+            val entity = dto.toEntity(
+                senderId = localUser.id,
+                deliveryStatus = ChatMessageDeliveryStatus.SENDING
+            )
+            database.chatMessageDao.upsertMessage(entity)
+
+            return webSocketConnector
+                .sendMessage(dto.toJsonPayload())
+                .onFailure { error ->
+                    applicationScope.launch {
+                        database.chatMessageDao.upsertMessage(
+                            dto.toEntity(
+                                senderId = localUser.id,
+                                deliveryStatus = ChatMessageDeliveryStatus.FAILED
+                            )
+                        )
+                    }.join()
+                }
+        }
+    }
+
+    /**
      * Retrieves a flow of messages for a specific chat, mapping them to their domain representation.
      *
      * This method fetches all messages associated with the provided chat ID from the local database.
@@ -105,5 +160,22 @@ class OfflineFirstMessageRepository(
             .map { messages ->
                 messages.map { it.toDomain() }
             }
+    }
+
+    /**
+     * Converts the `OutgoingWebSocketDto.NewMessage` instance into a JSON payload string.
+     *
+     * This method serializes the `NewMessage` object into a JSON string
+     * by wrapping its data into a `WebSocketMessageDto` object, which provides
+     * the type and payload structure required for WebSocket communication.
+     *
+     * @return A JSON string representing the serialized `WebSocketMessageDto` with the encapsulated `NewMessage` details.
+     */
+    private fun OutgoingWebSocketDto.NewMessage.toJsonPayload(): String {
+        val webSocketMessage = WebSocketMessageDto(
+            type = type.name,
+            payload = json.encodeToString(this)
+        )
+        return json.encodeToString(webSocketMessage)
     }
 }
