@@ -218,6 +218,13 @@ class ChatDetailViewModel(
     }
 
     /**
+     * Stores the identifier of the most recent message that has been processed.
+     * This variable helps in tracking and ensuring that messages are not handled repeatedly.
+     * It is nullable to represent the absence of any previously handled message.
+     */
+    private var lastHandledNewestMessageId: String? = null
+
+    /**
      * Observes chat messages and integrates them into the application's state and event system.
      *
      * This method performs the following operations:
@@ -227,6 +234,8 @@ class ChatDetailViewModel(
      * - Combines new messages with authentication information to transform the messages into UI models,
      *   and updates the application state with these transformed messages.
      * - Monitors whether the user is near the bottom of the chat view to handle new message notifications appropriately.
+     * - Uses lastHandledNewestMessageId to prevent duplicate processing of the same message, ensuring
+     *   that new message notifications are only triggered once per unique message.
      * - Combines the current messages, new messages, and the "is near bottom" flag to determine if a new message
      *   notification event should be emitted. If the user is near the bottom of the chat and there are new messages,
      *   a `ChatDetailEvent.OnNewMessage` event is sent to the event channel.
@@ -252,11 +261,17 @@ class ChatDetailViewModel(
             newMessages,
             isNearBottom
         ) { currentMessages, newMessages, isNearBottom ->
-            val lastNewId = newMessages.lastOrNull()?.message?.id
-            val lastCurrentId = currentMessages.lastOrNull()?.id
+            val newestIncomingId = newMessages.firstOrNull()?.message?.id
+            val newestCurrentId = currentMessages.firstOrNull()?.id
 
-            if (lastNewId != lastCurrentId && isNearBottom) {
+            val isTrulyNew =
+                newestIncomingId != null &&
+                        newestIncomingId != newestCurrentId &&
+                        newestIncomingId != lastHandledNewestMessageId
+
+            if (isTrulyNew && isNearBottom) {
                 eventChannel.send(ChatDetailEvent.OnNewMessage)
+                lastHandledNewestMessageId = newestIncomingId
             }
         }.launchIn(viewModelScope)
     }
