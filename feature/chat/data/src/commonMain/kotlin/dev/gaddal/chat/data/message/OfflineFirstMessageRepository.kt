@@ -185,6 +185,26 @@ class OfflineFirstMessageRepository(
     }
 
     /**
+     * Deletes a specific chat message based on the provided message ID.
+     *
+     * This method communicates with the remote `chatMessageService` to delete the message
+     * and, upon successful completion, removes the message locally from the database.
+     *
+     * @param messageId The unique identifier of the message to be deleted.
+     * @return An `EmptyResult` indicating the success or failure of the deletion operation.
+     *         On failure, it returns a `DataError.Remote` describing the reason for the failure.
+     */
+    override suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote> {
+        return chatMessageService
+            .deleteMessage(messageId)
+            .onSuccess {
+                applicationScope.launch {
+                    database.chatMessageDao.deleteMessageById(messageId)
+                }.join()
+            }
+    }
+
+    /**
      * Retrieves a flow of messages for a specific chat, mapping them to their domain representation.
      *
      * This method fetches all messages associated with the provided chat ID from the local database.

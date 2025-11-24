@@ -21,14 +21,12 @@ sealed class MessageUi(open val id: String) {
      * @property id A unique identifier for the message.
      * @property content The text content of the message.
      * @property deliveryStatus The delivery status of the message, represented by [ChatMessageDeliveryStatus].
-     * @property isMenuOpen A flag indicating whether the message's context menu is currently open.
      * @property formattedSentTime The formatted time of when the message was sent, represented as [UiText].
      */
     data class LocalUserMessage(
         override val id: String,
         val content: String,
         val deliveryStatus: ChatMessageDeliveryStatus,
-        val isMenuOpen: Boolean,
         val formattedSentTime: UiText
     ) : MessageUi(id)
 

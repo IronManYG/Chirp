@@ -18,6 +18,7 @@ import dev.gaddal.core.presentation.util.UiText
  * @property isPaginationLoading Specifies whether messages are being fetched for pagination purposes.
  * @property paginationError Captures errors that occur during pagination as localized text.
  * @property endReached Denotes whether all the messages in the chat have been loaded.
+ * @property messageWithOpenMenu The message that is currently open in the context menu, if any.
  * @property bannerState The state of the banner shown within the chat, typically used for contextual information.
  * @property isChatOptionsOpen Indicates if the chat options menu is currently open.
  * @property isNearBottom Tracks whether the user is close to the bottom of the message list, often for UX improvements.
@@ -33,6 +34,7 @@ data class ChatDetailState(
     val isPaginationLoading: Boolean = false,
     val paginationError: UiText? = null,
     val endReached: Boolean = false,
+    val messageWithOpenMenu: MessageUi.LocalUserMessage? = null,
     val bannerState: BannerState = BannerState(),
     val isChatOptionsOpen: Boolean = false,
     val isNearBottom: Boolean = false,

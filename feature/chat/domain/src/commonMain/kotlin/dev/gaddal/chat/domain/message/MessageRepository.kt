@@ -92,6 +92,20 @@ interface MessageRepository {
     suspend fun retryMessage(messageId: String): EmptyResult<DataError>
 
     /**
+     * Deletes a message identified by its unique message ID.
+     *
+     * This method is responsible for removing a specific message from the underlying data source.
+     * It facilitates the deletion of messages based on their unique identifier to support
+     * message lifecycle management within a chat or messaging application.
+     *
+     * @param messageId The unique identifier of the message to be deleted.
+     * @return An `EmptyResult` indicating the success or failure of the operation.
+     *         On failure, it contains an instance of `DataError.Remote` providing details
+     *         about the specific remote error encountered.
+     */
+    suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote>
+
+    /**
      * Retrieves a flow of messages for a specific chat identified by its unique identifier.
      *
      * This method continuously provides a stream of updates containing the list of messages

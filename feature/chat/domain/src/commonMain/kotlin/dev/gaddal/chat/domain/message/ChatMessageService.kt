@@ -2,14 +2,15 @@ package dev.gaddal.chat.domain.message
 
 import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 
 /**
  * A service interface for handling chat messages.
  *
- * This interface provides operations for retrieving messages
- * associated with a specific chat, including support for optional
- * filtering parameters.
+ * This interface provides operations for retrieving messages from a chat,
+ * as well as deleting messages from the system.
+ *
  */
 interface ChatMessageService {
     /**
@@ -24,4 +25,17 @@ interface ChatMessageService {
         chatId: String,
         before: String? = null
     ): Result<List<ChatMessage>, DataError.Remote>
+
+    /**
+     * Deletes a chat message with the specified message ID.
+     *
+     * This function removes the message associated with the given ID
+     * from the system. If the operation fails, a remote data error is returned.
+     *
+     * @param messageId The unique identifier of the message to be deleted.
+     * @return An `EmptyResult` indicating the success or failure of the operation.
+     *         On success, no additional data is returned. On failure, a `DataError.Remote`
+     *         object provides details about the error.
+     */
+    suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote>
 }

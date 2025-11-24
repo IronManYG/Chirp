@@ -4,8 +4,10 @@ import dev.gaddal.chat.data.dto.ChatMessageDto
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.domain.message.ChatMessageService
 import dev.gaddal.chat.domain.models.ChatMessage
+import dev.gaddal.core.data.networking.delete
 import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import dev.gaddal.core.domain.util.map
 import io.ktor.client.HttpClient
@@ -45,5 +47,17 @@ class KtorChatMessageService(
                 }
             }
         ).map { it.map { it.toDomain() } }
+    }
+
+    /**
+     * Deletes a message with the specified identifier from the server.
+     *
+     * @param messageId The unique identifier of the message to delete.
+     * @return An [EmptyResult] indicating success or a [DataError.Remote] in case of a failure.
+     */
+    override suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote> {
+        return httpClient.delete(
+            route = "/messages/$messageId"
+        )
     }
 }

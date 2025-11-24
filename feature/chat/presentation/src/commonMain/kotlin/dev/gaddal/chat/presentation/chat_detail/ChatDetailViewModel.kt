@@ -107,11 +107,11 @@ class ChatDetailViewModel(
             ChatDetailAction.OnBackClick -> {}
             ChatDetailAction.OnChatMembersClick -> {}
             ChatDetailAction.OnChatOptionsClick -> onChatOptionsClick()
-            is ChatDetailAction.OnDeleteMessageClick -> {}
+            is ChatDetailAction.OnDeleteMessageClick -> deleteMessage(action.message)
             ChatDetailAction.OnDismissChatOptions -> onDismissChatOptions()
-            ChatDetailAction.OnDismissMessageMenu -> {}
+            ChatDetailAction.OnDismissMessageMenu -> onDismissMessageMenu()
             ChatDetailAction.OnLeaveChatClick -> onLeaveChatClick()
-            is ChatDetailAction.OnMessageLongClick -> {}
+            is ChatDetailAction.OnMessageLongClick -> onMessageLongClick(action.message)
             is ChatDetailAction.OnRetryClick -> retryMessage(action.message)
             ChatDetailAction.OnScrollToTop -> {}
             ChatDetailAction.OnSendMessageClick -> sendMessage()
@@ -338,6 +338,26 @@ class ChatDetailViewModel(
     }
 
     /**
+     * Deletes a local user message from the repository and handles errors by emitting events.
+     *
+     * This method launches a coroutine in the `viewModelScope` to execute the deletion
+     * asynchronously. If the operation fails, it sends an appropriate error event
+     * to the event channel.
+     *
+     * @param message The local user message to be deleted. It contains the necessary details,
+     *                including the unique identifier required for the deletion operation.
+     */
+    private fun deleteMessage(message: MessageUi.LocalUserMessage) {
+        viewModelScope.launch {
+            messageRepository
+                .deleteMessage(message.id)
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+        }
+    }
+
+    /**
      * Handles the dismissal of the chat options menu.
      *
      * This method updates the current state of the chat detail screen by setting
@@ -349,6 +369,43 @@ class ChatDetailViewModel(
         _state.update {
             it.copy(
                 isChatOptionsOpen = false
+            )
+        }
+    }
+
+    /**
+     * Handles the dismissal of the message options menu.
+     *
+     * This method updates the current application state to reflect that no message
+     * currently has its options menu open. It achieves this by setting the
+     * `messageWithOpenMenu` property to `null` in the `ChatDetailState`,
+     * effectively closing any open message menus.
+     *
+     * This is typically called when the user dismisses the message menu
+     * without selecting any specific action.
+     */
+    private fun onDismissMessageMenu() {
+        _state.update {
+            it.copy(
+                messageWithOpenMenu = null
+            )
+        }
+    }
+
+    /**
+     * Handles the event when the user performs a long click on a local user message.
+     *
+     * This action updates the current state to register the specific message that
+     * has its menu open. This is often used to trigger contextual actions like
+     * replying to, deleting, or copying the content of the message.
+     *
+     * @param message The local user message that was long-clicked. Includes details
+     *                such as content and metadata of the message.
+     */
+    private fun onMessageLongClick(message: MessageUi.LocalUserMessage) {
+        _state.update {
+            it.copy(
+                messageWithOpenMenu = message
             )
         }
     }
