@@ -9,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.message.MessageRepository
+import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ConnectionState
 import dev.gaddal.chat.domain.models.OutgoingNewMessage
 import dev.gaddal.chat.presentation.mappers.toUi
 import dev.gaddal.chat.presentation.model.MessageUi
 import dev.gaddal.core.domain.auth.SessionStorage
+import dev.gaddal.core.domain.util.DataErrorException
+import dev.gaddal.core.domain.util.Paginator
 import dev.gaddal.core.domain.util.onFailure
 import dev.gaddal.core.domain.util.onSuccess
 import dev.gaddal.core.presentation.util.toUiText
@@ -47,11 +50,20 @@ class ChatDetailViewModel(
 
     private var hasLoadedInitialData = false
 
+    private var currentPaginator: Paginator<String?, ChatMessage>? = null
+
     private val _state = MutableStateFlow(ChatDetailState())
 
     private val _chatId = MutableStateFlow<String?>(null)
 
     private val chatInfoFlow = _chatId
+        .onEach { chatId ->
+            if (chatId != null) {
+                setupPaginatorForChat(chatId)
+            } else {
+                currentPaginator = null
+            }
+        }
         .flatMapLatest { chatId ->
             if (chatId != null) {
                 chatRepository.getChatInfoById(chatId)
@@ -286,6 +298,53 @@ class ChatDetailViewModel(
                 .onFailure { error ->
                     eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
                 }
+        }
+    }
+
+    /**
+     * Sets up a paginator for the chat based on the provided chat ID. This paginator is used to
+     * load messages incrementally, handle pagination states, and manage errors or success events
+     * for the chat.
+     *
+     * @param chatId The unique identifier of the chat for which the paginator is being set up.
+     */
+    private fun setupPaginatorForChat(chatId: String) {
+        currentPaginator = Paginator(
+            initialKey = null,
+            onLoadUpdated = { isLoading ->
+                _state.update { it.copy(isPaginationLoading = isLoading) }
+            },
+            onRequest = { beforeTimestamp ->
+                messageRepository.fetchMessages(chatId, beforeTimestamp)
+            },
+            getNextKey = { messages ->
+                messages.minOfOrNull { it.createdAt }?.toString()
+            },
+            onError = { throwable ->
+                if (throwable is DataErrorException) {
+                    eventChannel.send(
+                        ChatDetailEvent.OnError(throwable.error.toUiText())
+                    )
+                }
+            },
+            onSuccess = { messages, _ ->
+                _state.update {
+                    it.copy(
+                        endReached = messages.isEmpty()
+                    )
+                }
+            }
+        )
+
+        _state.update {
+            it.copy(
+                endReached = false,
+                isPaginationLoading = false,
+            )
+        }
+
+        viewModelScope.launch {
+            currentPaginator?.loadNextItems()
         }
     }
 
