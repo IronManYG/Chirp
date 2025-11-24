@@ -78,6 +78,20 @@ interface MessageRepository {
     suspend fun sendMessage(message: OutgoingNewMessage): EmptyResult<DataError>
 
     /**
+     * Attempts to retry sending a message identified by its unique message ID.
+     *
+     * This method is utilized when a previously sent message has encountered a failure
+     * and needs to be re-delivered. It performs the necessary actions to attempt resending
+     * the message, handling any required updates in the underlying data source or network
+     * operations.
+     *
+     * @param messageId The unique identifier of the message to be retried.
+     * @return An `EmptyResult` indicating the success or failure of the retry operation. On failure,
+     * it contains an instance of `DataError` providing details about the specific error encountered.
+     */
+    suspend fun retryMessage(messageId: String): EmptyResult<DataError>
+
+    /**
      * Retrieves a flow of messages for a specific chat identified by its unique identifier.
      *
      * This method continuously provides a stream of updates containing the list of messages

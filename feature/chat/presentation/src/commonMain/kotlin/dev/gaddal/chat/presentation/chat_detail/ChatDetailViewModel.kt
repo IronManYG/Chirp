@@ -12,6 +12,7 @@ import dev.gaddal.chat.domain.message.MessageRepository
 import dev.gaddal.chat.domain.models.ConnectionState
 import dev.gaddal.chat.domain.models.OutgoingNewMessage
 import dev.gaddal.chat.presentation.mappers.toUi
+import dev.gaddal.chat.presentation.model.MessageUi
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.onFailure
 import dev.gaddal.core.domain.util.onSuccess
@@ -73,7 +74,8 @@ class ChatDetailViewModel(
         }
 
         currentState.copy(
-            chatUi = chatInfo.chat.toUi(authInfo.user.id)
+            chatUi = chatInfo.chat.toUi(authInfo.user.id),
+            messages = chatInfo.messages.map { it.toUi(authInfo.user.id) }
         )
     }
 
@@ -110,7 +112,7 @@ class ChatDetailViewModel(
             ChatDetailAction.OnDismissMessageMenu -> {}
             ChatDetailAction.OnLeaveChatClick -> onLeaveChatClick()
             is ChatDetailAction.OnMessageLongClick -> {}
-            is ChatDetailAction.OnRetryClick -> {}
+            is ChatDetailAction.OnRetryClick -> retryMessage(action.message)
             ChatDetailAction.OnScrollToTop -> {}
             ChatDetailAction.OnSendMessageClick -> sendMessage()
             else -> Unit
@@ -144,17 +146,6 @@ class ChatDetailViewModel(
                 messageRepository.getMessagesForChat(chatId)
             } else emptyFlow()
         }
-            .combine(sessionStorage.observeAuthInfo()) { messages, authInfo ->
-                if (authInfo == null) {
-                    return@combine messages
-                }
-                _state.update {
-                    it.copy(
-                        messages = messages.map { it.toUi(authInfo.user.id) }
-                    )
-                }
-                messages
-            }
 
         val isNearBottom = state.map { it.isNearBottom }.distinctUntilChanged()
 
@@ -264,12 +255,34 @@ class ChatDetailViewModel(
                 messageId = Uuid.random().toString(),
                 content = content
             )
+            println("Message ID sent: ${message.messageId}")
 
             messageRepository
                 .sendMessage(message)
                 .onSuccess {
                     state.value.messageTextFieldState.clearText()
                 }
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+        }
+    }
+
+    /**
+     * Retries sending a previously failed message.
+     *
+     * This method attempts to resend a specific local user message. It initiates the retry
+     * operation by calling the `retryMessage` function of the `messageRepository` with the
+     * identifier (`id`) of the message to be retried. If the operation fails, an error event
+     * is sent to the event channel for further handling in the UI.
+     *
+     * @param message The local user message to be retried. The message includes information such as its
+     *                unique identifier and content.
+     */
+    private fun retryMessage(message: MessageUi.LocalUserMessage) {
+        viewModelScope.launch {
+            messageRepository
+                .retryMessage(message.id)
                 .onFailure { error ->
                     eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
                 }

@@ -132,11 +132,52 @@ class OfflineFirstMessageRepository(
                 .sendMessage(dto.toJsonPayload())
                 .onFailure { error ->
                     applicationScope.launch {
-                        database.chatMessageDao.upsertMessage(
-                            dto.toEntity(
-                                senderId = localUser.id,
-                                deliveryStatus = ChatMessageDeliveryStatus.FAILED
-                            )
+                        database.chatMessageDao.updateDeliveryStatus(
+                            messageId = entity.messageId,
+                            timestamp = Clock.System.now().toEpochMilliseconds(),
+                            status = ChatMessageDeliveryStatus.FAILED.name
+                        )
+                    }.join()
+                }
+        }
+    }
+
+    /**
+     * Retries sending a message identified by its unique ID.
+     *
+     * This method attempts to resend a message that previously failed to send. It updates the delivery
+     * status of the message in the local database to "sending" and then attempts to transmit the message
+     * via WebSocket. If the resend fails, the delivery status is updated to "failed".
+     *
+     * @param messageId The unique identifier of the message to be retried.
+     * @return An `EmptyResult` object indicating success or failure of the operation. On failure, the
+     *         result contains a `DataError` providing details of the error.
+     */
+    override suspend fun retryMessage(messageId: String): EmptyResult<DataError> {
+        return safeDatabaseUpdate {
+            println("Message ID retry $messageId")
+            val message = database.chatMessageDao.getMessageById(messageId)
+                ?: return Result.Failure(DataError.Local.NOT_FOUND)
+
+            database.chatMessageDao.updateDeliveryStatus(
+                messageId = messageId,
+                timestamp = Clock.System.now().toEpochMilliseconds(),
+                status = ChatMessageDeliveryStatus.SENDING.name
+            )
+
+            val outgoingNewMessage = OutgoingWebSocketDto.NewMessage(
+                chatId = message.chatId,
+                messageId = messageId,
+                content = message.content
+            )
+            return webSocketConnector
+                .sendMessage(outgoingNewMessage.toJsonPayload())
+                .onFailure { error ->
+                    applicationScope.launch {
+                        database.chatMessageDao.updateDeliveryStatus(
+                            messageId = messageId,
+                            timestamp = Clock.System.now().toEpochMilliseconds(),
+                            status = ChatMessageDeliveryStatus.FAILED.name
                         )
                     }.join()
                 }
