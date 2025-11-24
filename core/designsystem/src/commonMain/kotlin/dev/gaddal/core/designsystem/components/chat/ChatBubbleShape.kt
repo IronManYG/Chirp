@@ -56,7 +56,16 @@ class ChatBubbleShape(
         val triangleSizePx = with(density) { triangleSize.toPx() }
         val cornerRadiusPx = with(density) { cornerRadius.toPx() }
 
-        val path = when(trianglePosition) {
+        // Respect layout direction: mirror LEFT/RIGHT for RTL so callers can pass logical sides.
+        val effectiveTrianglePosition = when (layoutDirection) {
+            LayoutDirection.Ltr -> trianglePosition
+            LayoutDirection.Rtl -> when (trianglePosition) {
+                TrianglePosition.LEFT -> TrianglePosition.RIGHT
+                TrianglePosition.RIGHT -> TrianglePosition.LEFT
+            }
+        }
+
+        val path = when (effectiveTrianglePosition) {
             TrianglePosition.LEFT -> {
                 val bodyPath = Path().apply {
                     addRoundRect(
