@@ -95,7 +95,6 @@ class Paginator<Key, Item>(
         }
 
         isMakingRequest = true
-        lastRequestKey = currentKey
         onLoadUpdated(true)
 
         try {
@@ -103,6 +102,7 @@ class Paginator<Key, Item>(
                 .onSuccess { items ->
                     val newKey = getNextKey(items)
                     onSuccess(items, newKey)
+                    lastRequestKey = currentKey
 
                     currentKey = newKey
                 }

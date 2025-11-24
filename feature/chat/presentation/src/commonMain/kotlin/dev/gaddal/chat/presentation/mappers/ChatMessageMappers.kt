@@ -5,6 +5,21 @@ import dev.gaddal.chat.presentation.model.MessageUi
 import dev.gaddal.chat.presentation.util.DateUtils
 
 /**
+ * Converts a list of [MessageWithSender] instances to a list of [MessageUi] instances for display in the chat interface.
+ *
+ * The method sorts the messages in descending order based on their creation time and maps each message
+ * to its corresponding UI model ([MessageUi.LocalUserMessage] or [MessageUi.OtherUserMessage]) using the provided local user ID.
+ *
+ * @param localUserId The unique identifier of the local user, used to determine whether a message belongs to the local user or another user.
+ * @return A list of [MessageUi] instances representing the messages in the chat UI, sorted in descending order of creation time.
+ */
+fun List<MessageWithSender>.toUiList(localUserId: String): List<MessageUi> {
+    return this
+        .sortedByDescending { it.message.createdAt }
+        .map { it.toUi(localUserId) }
+}
+
+/**
  * Converts a [MessageWithSender] domain model into a [MessageUi] UI model for display in the chat interface.
  *
  * The function determines whether a message was sent by the local user or another user based on the

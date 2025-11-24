@@ -13,6 +13,7 @@ import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ConnectionState
 import dev.gaddal.chat.domain.models.OutgoingNewMessage
 import dev.gaddal.chat.presentation.mappers.toUi
+import dev.gaddal.chat.presentation.mappers.toUiList
 import dev.gaddal.chat.presentation.model.MessageUi
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.DataErrorException
@@ -87,7 +88,7 @@ class ChatDetailViewModel(
 
         currentState.copy(
             chatUi = chatInfo.chat.toUi(authInfo.user.id),
-            messages = chatInfo.messages.map { it.toUi(authInfo.user.id) }
+            messages = chatInfo.messages.toUiList(authInfo.user.id)
         )
     }
 
@@ -125,10 +126,91 @@ class ChatDetailViewModel(
             ChatDetailAction.OnLeaveChatClick -> onLeaveChatClick()
             is ChatDetailAction.OnMessageLongClick -> onMessageLongClick(action.message)
             is ChatDetailAction.OnRetryClick -> retryMessage(action.message)
-            ChatDetailAction.OnScrollToTop -> {}
+            ChatDetailAction.OnScrollToTop -> onScrollToTop()
             ChatDetailAction.OnSendMessageClick -> sendMessage()
+            ChatDetailAction.OnRetryPaginationClick -> retryPagination()
             else -> Unit
         }
+    }
+
+    /**
+     * Sets up a paginator for the chat based on the provided chat ID. This paginator is used to
+     * load messages incrementally, handle pagination states, and manage errors or success events
+     * for the chat.
+     *
+     * @param chatId The unique identifier of the chat for which the paginator is being set up.
+     */
+    private fun setupPaginatorForChat(chatId: String) {
+        currentPaginator = Paginator(
+            initialKey = null,
+            onLoadUpdated = { isLoading ->
+                _state.update { it.copy(isPaginationLoading = isLoading) }
+            },
+            onRequest = { beforeTimestamp ->
+                messageRepository.fetchMessages(chatId, beforeTimestamp)
+            },
+            getNextKey = { messages ->
+                messages.minOfOrNull { it.createdAt }?.toString()
+            },
+            onError = { throwable ->
+                if (throwable is DataErrorException) {
+                    _state.update {
+                        it.copy(
+                            paginationError = throwable.error.toUiText()
+                        )
+                    }
+                }
+            },
+            onSuccess = { messages, _ ->
+                _state.update {
+                    it.copy(
+                        endReached = messages.isEmpty(),
+                        paginationError = null
+                    )
+                }
+            }
+        )
+
+        _state.update {
+            it.copy(
+                endReached = false,
+                isPaginationLoading = false,
+            )
+        }
+    }
+
+    /**
+     * Observes the connection state of the chat and updates the `ChatDetailState` accordingly.
+     *
+     * This method listens to changes in the connection state emitted by `connectionClient.connectionState`.
+     * When the connection transitions to `ConnectionState.CONNECTED`, it attempts to fetch the messages
+     * for the current chat by invoking `messageRepository.fetchMessages`. Additionally, it updates the `_state`
+     * to reflect the latest connection state.
+     *
+     * Behavior:
+     * - If the connection state is `CONNECTED`, the method fetches messages for the current chat ID.
+     *   The operation only proceeds if `_chatId` contains a valid chat ID.
+     * - Updates the `ChatDetailState.connectionState` property with the current connection state.
+     *
+     * Side effects:
+     * - Initiates a message fetch from `messageRepository` upon connection establishment.
+     * - Updates the `_state` with the new connection state, triggering any observers on the state.
+     */
+    private fun observeConnectionState() {
+        connectionClient
+            .connectionState
+            .onEach { connectionState ->
+                if (connectionState == ConnectionState.CONNECTED) {
+                    currentPaginator?.loadNextItems()
+                }
+
+                _state.update {
+                    it.copy(
+                        connectionState = connectionState
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     /**
@@ -176,42 +258,6 @@ class ChatDetailViewModel(
     }
 
     /**
-     * Observes the connection state of the chat and updates the `ChatDetailState` accordingly.
-     *
-     * This method listens to changes in the connection state emitted by `connectionClient.connectionState`.
-     * When the connection transitions to `ConnectionState.CONNECTED`, it attempts to fetch the messages
-     * for the current chat by invoking `messageRepository.fetchMessages`. Additionally, it updates the `_state`
-     * to reflect the latest connection state.
-     *
-     * Behavior:
-     * - If the connection state is `CONNECTED`, the method fetches messages for the current chat ID.
-     *   The operation only proceeds if `_chatId` contains a valid chat ID.
-     * - Updates the `ChatDetailState.connectionState` property with the current connection state.
-     *
-     * Side effects:
-     * - Initiates a message fetch from `messageRepository` upon connection establishment.
-     * - Updates the `_state` with the new connection state, triggering any observers on the state.
-     */
-    private fun observeConnectionState() {
-        connectionClient
-            .connectionState
-            .onEach { connectionState ->
-                if (connectionState == ConnectionState.CONNECTED) {
-                    _chatId.value?.let {
-                        messageRepository.fetchMessages(it, before = null)
-                    }
-                }
-
-                _state.update {
-                    it.copy(
-                        connectionState = connectionState
-                    )
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    /**
      * Observes the state of whether the user can send messages and updates the application state accordingly.
      *
      * This method listens to updates emitted by the `canSendMessage` flow. Each emitted value determines
@@ -237,162 +283,29 @@ class ChatDetailViewModel(
     }
 
     /**
-     * Sends a textual message in the current chat.
+     * Updates the current chat context by switching to the specified chat and fetching its data.
      *
-     * This method retrieves the current chat ID and the text content from the state.
-     * If the message content is blank or no valid chat ID is available, the function exits early.
-     * Otherwise, it constructs a new `OutgoingNewMessage` object with the necessary details
-     * (e.g., chat ID, message ID, and content) and calls the `sendMessage` method of the `messageRepository`
-     * to send the message asynchronously.
-     *
-     * Upon a successful message transmission:
-     * - The text field state is cleared.
-     *
-     * In case of an error:
-     * - An `OnError` event with a UI-friendly error message is emitted to the event channel.
-     *
-     * This method operates within the `viewModelScope` to handle coroutine lifecycle management
-     * for asynchronous operations.
+     * @param chatId The unique identifier of the chat to switch to. If null, no chat is selected.
      */
-    private fun sendMessage() {
-        val currentChatId = _chatId.value
-        val content = state.value.messageTextFieldState.text.toString().trim()
-        if (content.isBlank() || currentChatId == null) {
-            return
-        }
-
+    private fun switchChat(chatId: String?) {
+        _chatId.update { chatId }
         viewModelScope.launch {
-            val message = OutgoingNewMessage(
-                chatId = currentChatId,
-                messageId = Uuid.random().toString(),
-                content = content
-            )
-            println("Message ID sent: ${message.messageId}")
-
-            messageRepository
-                .sendMessage(message)
-                .onSuccess {
-                    state.value.messageTextFieldState.clearText()
-                }
-                .onFailure { error ->
-                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
-                }
-        }
-    }
-
-    /**
-     * Retries sending a previously failed message.
-     *
-     * This method attempts to resend a specific local user message. It initiates the retry
-     * operation by calling the `retryMessage` function of the `messageRepository` with the
-     * identifier (`id`) of the message to be retried. If the operation fails, an error event
-     * is sent to the event channel for further handling in the UI.
-     *
-     * @param message The local user message to be retried. The message includes information such as its
-     *                unique identifier and content.
-     */
-    private fun retryMessage(message: MessageUi.LocalUserMessage) {
-        viewModelScope.launch {
-            messageRepository
-                .retryMessage(message.id)
-                .onFailure { error ->
-                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
-                }
-        }
-    }
-
-    /**
-     * Sets up a paginator for the chat based on the provided chat ID. This paginator is used to
-     * load messages incrementally, handle pagination states, and manage errors or success events
-     * for the chat.
-     *
-     * @param chatId The unique identifier of the chat for which the paginator is being set up.
-     */
-    private fun setupPaginatorForChat(chatId: String) {
-        currentPaginator = Paginator(
-            initialKey = null,
-            onLoadUpdated = { isLoading ->
-                _state.update { it.copy(isPaginationLoading = isLoading) }
-            },
-            onRequest = { beforeTimestamp ->
-                messageRepository.fetchMessages(chatId, beforeTimestamp)
-            },
-            getNextKey = { messages ->
-                messages.minOfOrNull { it.createdAt }?.toString()
-            },
-            onError = { throwable ->
-                if (throwable is DataErrorException) {
-                    eventChannel.send(
-                        ChatDetailEvent.OnError(throwable.error.toUiText())
-                    )
-                }
-            },
-            onSuccess = { messages, _ ->
-                _state.update {
-                    it.copy(
-                        endReached = messages.isEmpty()
-                    )
-                }
+            chatId?.let {
+                chatRepository.fetchChatById(chatId)
             }
-        )
-
-        _state.update {
-            it.copy(
-                endReached = false,
-                isPaginationLoading = false,
-            )
-        }
-
-        viewModelScope.launch {
-            currentPaginator?.loadNextItems()
         }
     }
 
     /**
-     * Handles the event when the user clicks to leave the chat.
-     *
-     * This method performs the following steps:
-     * 1. Retrieves the current chat ID; if null, it exits early.
-     * 2. Updates the state to close the chat options menu.
-     * 3. Performs an asynchronous operation:
-     *    - Calls `leaveChat` on the `chatRepository` to leave the chat.
-     *    - If the operation is successful:
-     *      - Clears the current input in the message text field.
-     *      - Resets the state by removing chat-related data such as `chatUi`, `messages`, and `bannerState`.
-     *    - If the operation fails:
-     *      - Sends an error event encapsulating a user-friendly error message.
+     * Handles the opening of the chat options menu by updating the state to reflect that the menu is now open.
+     * Updates the `isChatOptionsOpen` property of the `ChatDetailState` to `true`.
+     * This allows the UI to react to the change and display the chat options menu.
      */
-    private fun onLeaveChatClick() {
-        val chatId = _chatId.value ?: return
-
+    private fun onChatOptionsClick() {
         _state.update {
             it.copy(
-                isChatOptionsOpen = false
+                isChatOptionsOpen = true
             )
-        }
-
-        viewModelScope.launch {
-            chatRepository
-                .leaveChat(chatId)
-                .onSuccess {
-                    _state.value.messageTextFieldState.clearText()
-
-                    _chatId.update { null }
-                    _state.update {
-                        it.copy(
-                            chatUi = null,
-                            messages = emptyList(),
-                            bannerState = BannerState()
-                        )
-                    }
-                }
-                .onFailure { error ->
-                    eventChannel.send(
-                        ChatDetailEvent.OnError(
-                            error.toUiText()
-                        )
-                    )
-                }
         }
     }
 
@@ -452,6 +365,54 @@ class ChatDetailViewModel(
     }
 
     /**
+     * Handles the event when the user clicks to leave the chat.
+     *
+     * This method performs the following steps:
+     * 1. Retrieves the current chat ID; if null, it exits early.
+     * 2. Updates the state to close the chat options menu.
+     * 3. Performs an asynchronous operation:
+     *    - Calls `leaveChat` on the `chatRepository` to leave the chat.
+     *    - If the operation is successful:
+     *      - Clears the current input in the message text field.
+     *      - Resets the state by removing chat-related data such as `chatUi`, `messages`, and `bannerState`.
+     *    - If the operation fails:
+     *      - Sends an error event encapsulating a user-friendly error message.
+     */
+    private fun onLeaveChatClick() {
+        val chatId = _chatId.value ?: return
+
+        _state.update {
+            it.copy(
+                isChatOptionsOpen = false
+            )
+        }
+
+        viewModelScope.launch {
+            chatRepository
+                .leaveChat(chatId)
+                .onSuccess {
+                    _state.value.messageTextFieldState.clearText()
+
+                    _chatId.update { null }
+                    _state.update {
+                        it.copy(
+                            chatUi = null,
+                            messages = emptyList(),
+                            bannerState = BannerState()
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    eventChannel.send(
+                        ChatDetailEvent.OnError(
+                            error.toUiText()
+                        )
+                    )
+                }
+        }
+    }
+
+    /**
      * Handles the event when the user performs a long click on a local user message.
      *
      * This action updates the current state to register the specific message that
@@ -470,30 +431,116 @@ class ChatDetailViewModel(
     }
 
     /**
-     * Handles the opening of the chat options menu by updating the state to reflect that the menu is now open.
-     * Updates the `isChatOptionsOpen` property of the `ChatDetailState` to `true`.
-     * This allows the UI to react to the change and display the chat options menu.
+     * Retries sending a previously failed message.
+     *
+     * This method attempts to resend a specific local user message. It initiates the retry
+     * operation by calling the `retryMessage` function of the `messageRepository` with the
+     * identifier (`id`) of the message to be retried. If the operation fails, an error event
+     * is sent to the event channel for further handling in the UI.
+     *
+     * @param message The local user message to be retried. The message includes information such as its
+     *                unique identifier and content.
      */
-    private fun onChatOptionsClick() {
-        _state.update {
-            it.copy(
-                isChatOptionsOpen = true
-            )
+    private fun retryMessage(message: MessageUi.LocalUserMessage) {
+        viewModelScope.launch {
+            messageRepository
+                .retryMessage(message.id)
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
         }
     }
 
     /**
-     * Updates the current chat context by switching to the specified chat and fetching its data.
+     * Handles the scroll-to-top action in the chat view.
      *
-     * @param chatId The unique identifier of the chat to switch to. If null, no chat is selected.
+     * This method is triggered when the user scrolls to the top of the chat, indicating that
+     * they want to load older messages. It internally delegates to the `loadNextItems` function
+     * to fetch the next set of messages from the paginator.
+     *
+     * Behavior:
+     * - Invokes the `loadNextItems` method to load more messages.
+     * - Ensures seamless integration with the pagination mechanism to incrementally fetch data.
+     *
+     * Use case includes scenarios where modern chat applications load messages in chunks
+     * based on scroll actions.
      */
-    private fun switchChat(chatId: String?) {
-        _chatId.update { chatId }
+    private fun onScrollToTop() = loadNextItems()
+
+    /**
+     * Sends a textual message in the current chat.
+     *
+     * This method retrieves the current chat ID and the text content from the state.
+     * If the message content is blank or no valid chat ID is available, the function exits early.
+     * Otherwise, it constructs a new `OutgoingNewMessage` object with the necessary details
+     * (e.g., chat ID, message ID, and content) and calls the `sendMessage` method of the `messageRepository`
+     * to send the message asynchronously.
+     *
+     * Upon a successful message transmission:
+     * - The text field state is cleared.
+     *
+     * In case of an error:
+     * - An `OnError` event with a UI-friendly error message is emitted to the event channel.
+     *
+     * This method operates within the `viewModelScope` to handle coroutine lifecycle management
+     * for asynchronous operations.
+     */
+    private fun sendMessage() {
+        val currentChatId = _chatId.value
+        val content = state.value.messageTextFieldState.text.toString().trim()
+        if (content.isBlank() || currentChatId == null) {
+            return
+        }
+
         viewModelScope.launch {
-            chatId?.let {
-                chatRepository.fetchChatById(chatId)
-            }
+            val message = OutgoingNewMessage(
+                chatId = currentChatId,
+                messageId = Uuid.random().toString(),
+                content = content
+            )
+
+            messageRepository
+                .sendMessage(message)
+                .onSuccess {
+                    state.value.messageTextFieldState.clearText()
+                }
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
         }
     }
 
+    /**
+     * Attempts to retry the pagination process for loading the next set of chat items.
+     *
+     * This method is typically called when a previous pagination attempt fails or encounters
+     * an error. It triggers the `loadNextItems` method, which initiates the loading of the next
+     * batch of chat items through the defined paginator.
+     *
+     * Behavior:
+     * - Invokes the `loadNextItems` function to resume or restart the pagination process.
+     * - Ensures that the application attempts to fetch more messages for the chat.
+     *
+     * Purpose:
+     * - Used to handle retries when the chat content fails to load due to connectivity issues
+     *   or other interruptions during pagination.
+     */
+    private fun retryPagination() = loadNextItems()
+
+    /**
+     * Triggers the loading of the next set of items in the chat, typically for pagination purposes.
+     *
+     * This method launches a coroutine within the `viewModelScope`, invoking the `loadNextItems`
+     * function of the current paginator (`currentPaginator`). If no paginator is set up, the method
+     * will have no effect.
+     *
+     * Behavior:
+     * - Operates within the `viewModelScope` for lifecycle-bound coroutine management.
+     * - Delegates the responsibility of loading the next set of items to the paginator.
+     */
+    private fun loadNextItems() {
+        viewModelScope.launch {
+            currentPaginator?.loadNextItems()
+        }
+    }
 }
