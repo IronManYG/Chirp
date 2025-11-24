@@ -3,20 +3,34 @@ package dev.gaddal.chat.presentation.mappers
 import dev.gaddal.chat.domain.models.MessageWithSender
 import dev.gaddal.chat.presentation.model.MessageUi
 import dev.gaddal.chat.presentation.util.DateUtils
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 /**
- * Converts a list of [MessageWithSender] instances to a list of [MessageUi] instances for display in the chat interface.
+ * Converts a list of [MessageWithSender] domain models into a list of [MessageUi] UI models
+ * suitable for displaying in a chat interface, including date separators.
  *
- * The method sorts the messages in descending order based on their creation time and maps each message
- * to its corresponding UI model ([MessageUi.LocalUserMessage] or [MessageUi.OtherUserMessage]) using the provided local user ID.
+ * Messages are sorted by their creation time in descending order, grouped by their creation date,
+ * and transformed into corresponding [MessageUi] instances. A [MessageUi.DateSeparator] is added
+ * for each group to visually separate messages by date.
  *
- * @param localUserId The unique identifier of the local user, used to determine whether a message belongs to the local user or another user.
- * @return A list of [MessageUi] instances representing the messages in the chat UI, sorted in descending order of creation time.
+ * @param localUserId The unique identifier of the local user, used to determine if the message
+ * was sent by the local user or others.
+ * @return A list of [MessageUi] models, including messages and date separators, ordered for
+ * display in a chat interface.
  */
 fun List<MessageWithSender>.toUiList(localUserId: String): List<MessageUi> {
     return this
         .sortedByDescending { it.message.createdAt }
-        .map { it.toUi(localUserId) }
+        .groupBy {
+            it.message.createdAt.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        }
+        .flatMap { (date, messages) ->
+            messages.map { it.toUi(localUserId) } + MessageUi.DateSeparator(
+                id = date.toString(),
+                date = DateUtils.formatDateSeparator(date)
+            )
+        }
 }
 
 /**

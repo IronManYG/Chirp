@@ -19,8 +19,9 @@
     <string name="yesterday">Yesterday</string>
     <string name="yesterday_format_am">Yesterday, %1$d:%2$d AM</string>
     <string name="yesterday_format_pm">Yesterday, %1$d:%2$d PM</string>
-    <string name="date_time_format_am">%1$d/%2$d/%3$04d %4$d:%5$d AM</string>
-    <string name="date_time_format_pm">%1$d/%2$d/%3$04d %4$d:%5$d PM</string>
+    <string name="date_time_format_am">%1$d/%2$d/%3$d %4$d:%5$d AM</string>
+    <string name="date_time_format_pm">%1$d/%2$d/%3$d %4$d:%5$d PM</string>
+    <string name="date_separator_format">%1$d/%2$d/%3$d</string>
     <string name="no_chat_selected">No chat selected</string>
     <string name="select_a_chat">Select a chat to start chatting!</string>
     <string name="open_chat_options_menu">Open chat options menu</string>

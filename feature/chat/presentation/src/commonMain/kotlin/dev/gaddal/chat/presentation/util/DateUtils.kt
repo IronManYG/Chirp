@@ -1,14 +1,18 @@
 package dev.gaddal.chat.presentation.util
 
 import chirp.feature.chat.presentation.generated.resources.Res
+import chirp.feature.chat.presentation.generated.resources.date_separator_format
 import chirp.feature.chat.presentation.generated.resources.date_time_format_am
 import chirp.feature.chat.presentation.generated.resources.date_time_format_pm
+import chirp.feature.chat.presentation.generated.resources.today
 import chirp.feature.chat.presentation.generated.resources.today_format_am
 import chirp.feature.chat.presentation.generated.resources.today_format_pm
+import chirp.feature.chat.presentation.generated.resources.yesterday
 import chirp.feature.chat.presentation.generated.resources.yesterday_format_am
 import chirp.feature.chat.presentation.generated.resources.yesterday_format_pm
 import dev.gaddal.core.presentation.util.UiText
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -121,5 +125,34 @@ object DateUtils {
                 this.minute              // %5$d
             )
         )
+    }
+
+    /**
+     * Formats a date into a user-friendly separator text for display in the chat interface.
+     * The date is compared to the current date and its relative position (today, yesterday, or otherwise)
+     * is determined. For today and yesterday, appropriate localized text is returned. For other dates,
+     * the date is formatted using a specific string resource.
+     *
+     * @param date The [LocalDate] to be formatted.
+     * @param clock An optional [Clock] instance used to provide the current date. Defaults to the system clock.
+     * @return A [UiText] instance representing the formatted date separator text.
+     */
+    fun formatDateSeparator(date: LocalDate, clock: Clock = Clock.System): UiText {
+        val timeZone = TimeZone.currentSystemDefault()
+        val today = clock.now().toLocalDateTime(timeZone).date
+        val yesterday = today.minus(1, DateTimeUnit.DAY)
+
+        return when (date) {
+            today -> UiText.Resource(Res.string.today)
+            yesterday -> UiText.Resource(Res.string.yesterday)
+            else -> UiText.Resource(
+                id = Res.string.date_separator_format,
+                args = arrayOf(
+                    date.day,           // %1$d
+                    date.month.number,  // %2$d
+                    date.year,          // %3$d
+                )
+            )
+        }
     }
 }
