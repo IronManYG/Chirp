@@ -14,9 +14,13 @@
     <string name="failed">فشل</string>
     <string name="save">حفظ</string>
     <string name="today">اليوم</string>
+    <string name="today_format_am">اليوم, %1$d:%2$d ص</string>
+    <string name="today_format_pm">اليوم, %1$d:%2$d م</string>
     <string name="yesterday">أمس</string>
-    <string name="date_time_format_am">\u200F%1$02d/%2$02d/%3$04d %4$02d:%5$02d ص</string>
-    <string name="date_time_format_pm">\u200F%1$02d/%2$02d/%3$04d %4$02d:%5$02d م</string>
+    <string name="yesterday_format_am">أمس, %1$d:%2$d ص</string>
+    <string name="yesterday_format_pm">أمس, %1$d:%2$d م</string>
+    <string name="date_time_format_am">\u200F%1$d/%2$d/%3$04d %4$d:%5$d ص</string>
+    <string name="date_time_format_pm">\u200F%1$d/%2$d/%3$04d %4$d:%5$d م</string>
     <string name="no_chat_selected">لا يوجد محادثة محددة</string>
     <string name="select_a_chat">اختر محادثة لبدء الدردشة!</string>
     <string name="open_chat_options_menu">فتح قائمة الخيارات للدردشة</string>

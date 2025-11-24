@@ -45,7 +45,6 @@ fun MessageBox(
         state = messageTextFieldState,
         modifier = modifier,
         placeholder = stringResource(Res.string.send_a_message),
-        enabled = isSendButtonEnabled,
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Send
         ),
