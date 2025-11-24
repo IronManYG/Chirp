@@ -6,6 +6,8 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chirp.feature.chat.presentation.generated.resources.Res
+import chirp.feature.chat.presentation.generated.resources.today
 import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.message.MessageRepository
@@ -20,6 +22,7 @@ import dev.gaddal.core.domain.util.DataErrorException
 import dev.gaddal.core.domain.util.Paginator
 import dev.gaddal.core.domain.util.onFailure
 import dev.gaddal.core.domain.util.onSuccess
+import dev.gaddal.core.presentation.util.UiText
 import dev.gaddal.core.presentation.util.toUiText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -117,8 +120,6 @@ class ChatDetailViewModel(
     fun onAction(action: ChatDetailAction) {
         when (action) {
             is ChatDetailAction.OnSelectChat -> switchChat(action.chatId)
-            ChatDetailAction.OnBackClick -> {}
-            ChatDetailAction.OnChatMembersClick -> {}
             ChatDetailAction.OnChatOptionsClick -> onChatOptionsClick()
             is ChatDetailAction.OnDeleteMessageClick -> deleteMessage(action.message)
             ChatDetailAction.OnDismissChatOptions -> onDismissChatOptions()
@@ -129,6 +130,9 @@ class ChatDetailViewModel(
             ChatDetailAction.OnScrollToTop -> onScrollToTop()
             ChatDetailAction.OnSendMessageClick -> sendMessage()
             ChatDetailAction.OnRetryPaginationClick -> retryPagination()
+            ChatDetailAction.OnHideBanner -> hideBanner()
+            is ChatDetailAction.OnTopVisibleIndexChanged -> updateBanner(action.topVisibleIndex)
+            is ChatDetailAction.OnFirstVisibleIndexChanged -> updateNearBottom(action.index)
             else -> Unit
         }
     }
@@ -541,6 +545,93 @@ class ChatDetailViewModel(
     private fun loadNextItems() {
         viewModelScope.launch {
             currentPaginator?.loadNextItems()
+        }
+    }
+
+    /**
+     * Hides the banner by updating the banner's visibility state to false.
+     * This method modifies the underlying state to ensure that the banner
+     * is not displayed in the UI.
+     */
+    private fun hideBanner() {
+        _state.update {
+            it.copy(
+                bannerState = it.bannerState.copy(
+                    isVisible = false
+                )
+            )
+        }
+    }
+
+    /**
+     * Updates the banner state based on the visible message index.
+     *
+     * @param topVisibleIndex The index of the topmost visible message in the list,
+     *                        used to calculate the banner date.
+     */
+    private fun updateBanner(topVisibleIndex: Int) {
+        val visibleDate = calculateBannerDateFromIndex(
+            messages = state.value.messages,
+            index = topVisibleIndex
+        )
+
+        _state.update {
+            it.copy(
+                bannerState = BannerState(
+                    formattedDate = visibleDate,
+                    isVisible = visibleDate != null
+                )
+            )
+        }
+    }
+
+    /**
+     * Updates the state to indicate whether the user is near the bottom of the list.
+     *
+     * @param firstVisibleIndex The index of the first visible item in the list.
+     * A value less than or equal to 3 is considered near the bottom.
+     */
+    private fun updateNearBottom(firstVisibleIndex: Int) {
+        _state.update {
+            it.copy(
+                isNearBottom = firstVisibleIndex <= 3
+            )
+        }
+    }
+
+    /**
+     * Calculates the banner date from a given index in a list of messages.
+     *
+     * It scans through the messages starting from the provided index to find the nearest
+     * date separator. If a valid date is found, it returns the corresponding banner date.
+     * Otherwise, it returns null.
+     *
+     * @param messages A list of MessageUi objects which may contain messages and date separators.
+     * @param index The starting index in the list from which the search for a date separator begins.
+     * @return A UiText representing the banner date if found, or null if no valid date separator exists.
+     */
+    private fun calculateBannerDateFromIndex(
+        messages: List<MessageUi>,
+        index: Int
+    ): UiText? {
+        if (messages.isEmpty() || index < 0 || index >= messages.size) {
+            return null
+        }
+
+        val nearestDateSeparator = (index until messages.size)
+            .asSequence()
+            .mapNotNull { index ->
+                val item = messages.getOrNull(index)
+                if (item is MessageUi.DateSeparator) item.date else null
+            }
+            .firstOrNull()
+
+        return when (nearestDateSeparator) {
+            is UiText.Resource -> {
+                if (nearestDateSeparator.id == Res.string.today) null else nearestDateSeparator
+            }
+
+            else -> nearestDateSeparator
         }
     }
 }
