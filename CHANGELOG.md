@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.16.0] - 2025-11-25
+
+### Added
+
+- Chat: Implement message pagination in Chat Detail screen
+  ([15dee07](https://github.com/IronManYG/Chirp/commit/15dee07), [f9dcaa3](https://github.com/IronManYG/Chirp/commit/f9dcaa3))
+- Chat: Add date separators to chat messages
+  ([3b13621](https://github.com/IronManYG/Chirp/commit/3b13621))
+- Chat: Add date banner while scrolling message list
+  ([f5d6ef8](https://github.com/IronManYG/Chirp/commit/f5d6ef8))
+- Chat: Implement message deletion and context menu
+  ([454cb52](https://github.com/IronManYG/Chirp/commit/454cb52))
+- Chat: Implement message retry functionality
+  ([7800d10](https://github.com/IronManYG/Chirp/commit/7800d10))
+- Chat: Implement message fetching and display in detail view
+  ([a82b024](https://github.com/IronManYG/Chirp/commit/a82b024))
+- Core: Introduce `Paginator` and `DataErrorException` utilities
+  ([01be68b](https://github.com/IronManYG/Chirp/commit/01be68b))
+
+### Changed
+
+- Chat: Refactor message sending logic and event handling
+  ([5f70224](https://github.com/IronManYG/Chirp/commit/5f70224), [e0dcd25](https://github.com/IronManYG/Chirp/commit/e0dcd25))
+- Chat: Use resource strings for date/time formatting
+  ([36014b1](https://github.com/IronManYG/Chirp/commit/36014b1))
+- Chat: Refactor chat selection and improve UI
+  ([56e9ef0](https://github.com/IronManYG/Chirp/commit/56e9ef0))
+- Build: Remove unnecessary cinterop for Network framework
+  ([ad8a0b1](https://github.com/IronManYG/Chirp/commit/ad8a0b1))
+
+### Fixed
+
+- Chat: Prevent duplicate new message notifications and false auto‑scroll
+  ([54613b9](https://github.com/IronManYG/Chirp/commit/54613b9))
+- Design System: Add RTL support to `ChatBubbleShape`
+  ([eae93bd](https://github.com/IronManYG/Chirp/commit/eae93bd))
+
+[0.16.0]: https://github.com/IronManYG/Chirp/compare/0c4eba3...e0dcd25
+
 ## [0.15.0] - 2025-11-22
 
 ### Added
