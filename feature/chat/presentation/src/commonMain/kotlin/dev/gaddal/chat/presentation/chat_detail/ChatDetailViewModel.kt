@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -218,13 +219,6 @@ class ChatDetailViewModel(
     }
 
     /**
-     * Stores the identifier of the most recent message that has been processed.
-     * This variable helps in tracking and ensuring that messages are not handled repeatedly.
-     * It is nullable to represent the absence of any previously handled message.
-     */
-    private var lastHandledNewestMessageId: String? = null
-
-    /**
      * Observes chat messages and integrates them into the application's state and event system.
      *
      * This method performs the following operations:
@@ -234,8 +228,6 @@ class ChatDetailViewModel(
      * - Combines new messages with authentication information to transform the messages into UI models,
      *   and updates the application state with these transformed messages.
      * - Monitors whether the user is near the bottom of the chat view to handle new message notifications appropriately.
-     * - Uses lastHandledNewestMessageId to prevent duplicate processing of the same message, ensuring
-     *   that new message notifications are only triggered once per unique message.
      * - Combines the current messages, new messages, and the "is near bottom" flag to determine if a new message
      *   notification event should be emitted. If the user is near the bottom of the chat and there are new messages,
      *   a `ChatDetailEvent.OnNewMessage` event is sent to the event channel.
@@ -244,36 +236,16 @@ class ChatDetailViewModel(
      * The operations are scoped to the `viewModelScope` to manage coroutine lifecycle.
      */
     private fun observeChatMessages() {
-        val currentMessages = state
-            .map { it.messages }
+        state
+            .map { it.messages.firstOrNull()?.id }
             .distinctUntilChanged()
-
-        val newMessages = _chatId.flatMapLatest { chatId ->
-            if (chatId != null) {
-                messageRepository.getMessagesForChat(chatId)
-            } else emptyFlow()
-        }
-
-        val isNearBottom = state.map { it.isNearBottom }.distinctUntilChanged()
-
-        combine(
-            currentMessages,
-            newMessages,
-            isNearBottom
-        ) { currentMessages, newMessages, isNearBottom ->
-            val newestIncomingId = newMessages.firstOrNull()?.message?.id
-            val newestCurrentId = currentMessages.firstOrNull()?.id
-
-            val isTrulyNew =
-                newestIncomingId != null &&
-                        newestIncomingId != newestCurrentId &&
-                        newestIncomingId != lastHandledNewestMessageId
-
-            if (isTrulyNew && isNearBottom) {
-                eventChannel.send(ChatDetailEvent.OnNewMessage)
-                lastHandledNewestMessageId = newestIncomingId
+            .drop(1)
+            .onEach { newestMessageId ->
+                if (newestMessageId != null && state.value.isNearBottom) {
+                    eventChannel.send(ChatDetailEvent.OnNewMessage)
+                }
             }
-        }.launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
     /**
