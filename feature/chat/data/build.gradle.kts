@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     alias(libs.plugins.convention.kmp.library)
     alias(libs.plugins.convention.buildkonfig)
@@ -44,13 +42,9 @@ kotlin {
         }
     }
 
-    targets.withType<KotlinNativeTarget> {
-        compilations.getByName("main") {
-            cinterops {
-                create("network") {
-                    defFile(file("src/nativeInterop/cinterop/network.def"))
-                }
-            }
-        }
-    }
+    // Note: Kotlin/Native already ships bindings for Apple system frameworks under the
+    // `platform.*` packages (e.g., `platform.Network`). A manual cinterop for the
+    // Network framework is unnecessary and can cause build issues with recent Xcode SDKs.
+    // If you need additional custom C interops, declare them here, but avoid duplicating
+    // system frameworks that are already provided by Kotlin/Native.
 }

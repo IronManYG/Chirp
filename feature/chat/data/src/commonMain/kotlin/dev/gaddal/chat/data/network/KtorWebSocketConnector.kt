@@ -4,11 +4,11 @@ package dev.gaddal.chat.data.network
 
 import dev.gaddal.chat.data.dto.websocket.WebSocketMessageDto
 import dev.gaddal.chat.data.lifecycle.AppLifecycleObserver
-import dev.gaddal.chat.domain.error.ConnectionError
 import dev.gaddal.chat.domain.models.ConnectionState
 import dev.gaddal.core.data.networking.UrlConstants
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.logging.ChirpLogger
+import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import dev.gaddal.feature.chat.data.BuildKonfig
@@ -345,14 +345,14 @@ class KtorWebSocketConnector(
      * @param message The message to be sent over the WebSocket.
      * @return An `EmptyResult` representing the outcome of the operation:
      *         - `Result.Success` if the message was successfully sent.
-     *         - `Result.Failure` with `ConnectionError.NOT_CONNECTED` if the WebSocket is not connected.
-     *         - `Result.Failure` with `ConnectionError.MESSAGE_SEND_FAILED` if the message could not be sent due to an error.
+     *         - `Result.Failure` with `DataError.Connection.NOT_CONNECTED` if the WebSocket is not connected.
+     *         - `Result.Failure` with `DataError.Connection.MESSAGE_SEND_FAILED` if the message could not be sent due to an error.
      */
-    suspend fun sendMessage(message: String): EmptyResult<ConnectionError> {
+    suspend fun sendMessage(message: String): EmptyResult<DataError.Connection> {
         val connectionState = connectionState.value
 
         if (currentSession == null || connectionState != ConnectionState.CONNECTED) {
-            return Result.Failure(ConnectionError.NOT_CONNECTED)
+            return Result.Failure(DataError.Connection.NOT_CONNECTED)
         }
 
         return try {
@@ -361,7 +361,7 @@ class KtorWebSocketConnector(
         } catch (e: Exception) {
             coroutineContext.ensureActive()
             logger.error("Unable to send WebSocket message", e)
-            Result.Failure(ConnectionError.MESSAGE_SEND_FAILED)
+            Result.Failure(DataError.Connection.MESSAGE_SEND_FAILED)
         }
     }
 }

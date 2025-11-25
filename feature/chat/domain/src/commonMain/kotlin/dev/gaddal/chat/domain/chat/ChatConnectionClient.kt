@@ -1,17 +1,15 @@
 package dev.gaddal.chat.domain.chat
 
-import dev.gaddal.chat.domain.error.ConnectionError
 import dev.gaddal.chat.domain.models.ChatMessage
 import dev.gaddal.chat.domain.models.ConnectionState
-import dev.gaddal.core.domain.util.EmptyResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Defines a client for managing chat connections and interactions.
  *
- * This interface allows observing chat messages, monitoring connection states,
- * and sending chat messages within a connected environment. The client ensures
+ * This interface allows observing chat messages and monitoring connection states
+ * within a connected environment. The client ensures
  * that chat operations are performed in a consistent and asynchronous manner.
  */
 interface ChatConnectionClient {
@@ -44,15 +42,4 @@ interface ChatConnectionClient {
      * - `ERROR_UNKNOWN`: An unidentified error occurred during the connection process.
      */
     val connectionState: StateFlow<ConnectionState>
-
-    /**
-     * Sends a chat message over the network connection.
-     *
-     * Attempts to send the specified `ChatMessage` to its associated chat. If the operation fails,
-     * it will return a `ConnectionError` indicating the type of failure.
-     *
-     * @param message The `ChatMessage` object containing the message content and metadata to be sent.
-     * @return An `EmptyResult` which indicates successful operation or a `ConnectionError` in case of failure.
-     */
-    suspend fun sendChatMessage(message: ChatMessage): EmptyResult<ConnectionError>
 }

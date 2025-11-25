@@ -18,4 +18,5 @@
     <string name="error_server">عذراً، حدث خطأ في الخادم</string>
     <string name="error_service_unavailable">الخدمة غير متوفرة، يرجى المحاولة لاحقاً</string>
     <string name="error_serialization">خطأ في التسلسل</string>
+    <string name="error_unable_to_send_message">حدث خطأ أثناء إرسال الرسالة</string>
 </resources>

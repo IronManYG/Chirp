@@ -13,6 +13,7 @@ import chirp.core.presentation.generated.resources.error_serialization
 import chirp.core.presentation.generated.resources.error_server
 import chirp.core.presentation.generated.resources.error_service_unavailable
 import chirp.core.presentation.generated.resources.error_too_many_requests
+import chirp.core.presentation.generated.resources.error_unable_to_send_message
 import chirp.core.presentation.generated.resources.error_unauthorized
 import chirp.core.presentation.generated.resources.error_unknown
 import dev.gaddal.core.domain.util.DataError
@@ -26,7 +27,7 @@ import dev.gaddal.core.domain.util.DataError
  * @return A `UiText` instance representing the corresponding user-friendly error message or text.
  */
 fun DataError.toUiText(): UiText {
-    val resource = when(this) {
+    val resource = when (this) {
         DataError.Local.DISK_FULL -> Res.string.error_disk_full
         DataError.Local.NOT_FOUND -> Res.string.error_not_found
         DataError.Local.UNKNOWN -> Res.string.error_unknown
@@ -43,6 +44,8 @@ fun DataError.toUiText(): UiText {
         DataError.Remote.SERVICE_UNAVAILABLE -> Res.string.error_service_unavailable
         DataError.Remote.SERIALIZATION -> Res.string.error_serialization
         DataError.Remote.UNKNOWN -> Res.string.error_unknown
+        DataError.Connection.NOT_CONNECTED -> Res.string.error_no_internet
+        DataError.Connection.MESSAGE_SEND_FAILED -> Res.string.error_unable_to_send_message
     }
     return UiText.Resource(resource)
 }

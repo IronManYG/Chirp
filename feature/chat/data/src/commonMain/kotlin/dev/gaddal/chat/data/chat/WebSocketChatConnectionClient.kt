@@ -5,18 +5,11 @@ import dev.gaddal.chat.data.dto.websocket.IncomingWebSocketType
 import dev.gaddal.chat.data.dto.websocket.WebSocketMessageDto
 import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.data.mappers.toEntity
-import dev.gaddal.chat.data.mappers.toNewMessage
 import dev.gaddal.chat.data.network.KtorWebSocketConnector
 import dev.gaddal.chat.database.ChirpChatDatabase
 import dev.gaddal.chat.domain.chat.ChatConnectionClient
 import dev.gaddal.chat.domain.chat.ChatRepository
-import dev.gaddal.chat.domain.error.ConnectionError
-import dev.gaddal.chat.domain.message.MessageRepository
-import dev.gaddal.chat.domain.models.ChatMessage
-import dev.gaddal.chat.domain.models.ChatMessageDeliveryStatus
 import dev.gaddal.core.domain.auth.SessionStorage
-import dev.gaddal.core.domain.util.EmptyResult
-import dev.gaddal.core.domain.util.onFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
@@ -41,7 +34,6 @@ import kotlinx.serialization.json.Json
  * @property database The local database instance used for storing and querying persistent data.
  * @property sessionStorage Manages session-related storage required during WebSocket interactions.
  * @property json JSON serializer/deserializer for encoding/decoding message payloads.
- * @property messageRepository Repository for managing message data and delivery status updates.
  * @property applicationScope The coroutine scope in which background operations and message streaming are managed.
  */
 class WebSocketChatConnectionClient(
@@ -50,7 +42,6 @@ class WebSocketChatConnectionClient(
     private val database: ChirpChatDatabase,
     private val sessionStorage: SessionStorage,
     private val json: Json,
-    private val messageRepository: MessageRepository,
     private val applicationScope: CoroutineScope
 ) : ChatConnectionClient {
 
@@ -94,33 +85,6 @@ class WebSocketChatConnectionClient(
      * depending on the implementation of `webSocketConnector.connectionState`.
      */
     override val connectionState = webSocketConnector.connectionState
-
-    /**
-     * Sends a chat message over a WebSocket connection and updates the message delivery status
-     * in case of a failure.
-     *
-     * @param message The chat message to be sent, including its metadata and content.
-     * @return An `EmptyResult` representing the result of the operation:
-     *         - Success: The message was sent successfully.
-     *         - Failure: Contains a `ConnectionError` indicating the reason for the failure.
-     */
-    override suspend fun sendChatMessage(message: ChatMessage): EmptyResult<ConnectionError> {
-        val outgoingDto = message.toNewMessage()
-        val webSocketMessage = WebSocketMessageDto(
-            type = outgoingDto.type.name,
-            payload = json.encodeToString(outgoingDto)
-        )
-        val rawJsonPayload = json.encodeToString(webSocketMessage)
-
-        return webSocketConnector
-            .sendMessage(rawJsonPayload)
-            .onFailure { error ->
-                messageRepository.updateMessageDeliveryStatus(
-                    messageId = message.id,
-                    status = ChatMessageDeliveryStatus.FAILED
-                )
-            }
-    }
 
     /**
      * Parses an incoming WebSocket message and converts it into a specific subtype of [IncomingWebSocketDto].

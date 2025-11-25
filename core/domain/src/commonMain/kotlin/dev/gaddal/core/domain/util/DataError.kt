@@ -9,7 +9,7 @@ package dev.gaddal.core.domain.util
  * - Remote errors: Errors originating from external sources such as network or API issues.
  * - Local errors: Errors resulting from issues within the device or application, e.g., disk constraints.
  */
-sealed interface DataError: Error {
+sealed interface DataError : Error {
     /**
      * Represents remote error types that might occur during network or API operations.
      *
@@ -18,7 +18,7 @@ sealed interface DataError: Error {
      * issues, or data serialization problems. Each value corresponds to a specific
      * kind of remote error commonly encountered in such scenarios.
      */
-    enum class Remote: DataError {
+    enum class Remote : DataError {
         /**
          * Represents an HTTP 400 Bad Request error.
          *
@@ -27,6 +27,7 @@ sealed interface DataError: Error {
          * input or request structure, making it impossible for the server to understand or fulfill the request.
          */
         BAD_REQUEST,
+
         /**
          * Represents a specific type of remote error that occurs when a request exceeds the allotted time limit.
          *
@@ -35,6 +36,7 @@ sealed interface DataError: Error {
          * or server overloads that prevent timely processing of the request.
          */
         REQUEST_TIMEOUT,
+
         /**
          * Represents the "Unauthorized" error in the context of remote data interactions.
          *
@@ -45,6 +47,7 @@ sealed interface DataError: Error {
          * related to remote or server interactions.
          */
         UNAUTHORIZED,
+
         /**
          * Indicates that the request was understood by the server, but the client does not have permission
          * to access the requested resource or perform the requested action.
@@ -54,6 +57,7 @@ sealed interface DataError: Error {
          * to proceed with the action.
          */
         FORBIDDEN,
+
         /**
          * Represents a remote error indicating that the requested resource could not be found.
          *
@@ -61,6 +65,7 @@ sealed interface DataError: Error {
          * is requested by the client but cannot be located on the server.
          */
         NOT_FOUND,
+
         /**
          * Represents a remote error indicating a resource conflict.
          *
@@ -69,6 +74,7 @@ sealed interface DataError: Error {
          * HTTP 409 Conflict status code.
          */
         CONFLICT,
+
         /**
          * Represents an error that occurs when too many requests have been made in a short period of time.
          *
@@ -77,6 +83,7 @@ sealed interface DataError: Error {
          * information about when further requests will be allowed.
          */
         TOO_MANY_REQUESTS,
+
         /**
          * Represents an error indicating that there is no internet connection available.
          *
@@ -85,6 +92,7 @@ sealed interface DataError: Error {
          * but not available.
          */
         NO_INTERNET,
+
         /**
          * Represents an error indicating that the payload size exceeds the allowable limit for a request.
          *
@@ -93,6 +101,7 @@ sealed interface DataError: Error {
          * requests need to be adjusted to comply with server limitations.
          */
         PAYLOAD_TOO_LARGE,
+
         /**
          * Represents a server-side error occurring during a remote operation.
          *
@@ -103,6 +112,7 @@ sealed interface DataError: Error {
          * SERVER_ERROR is a type of `Remote` error under `DataError`.
          */
         SERVER_ERROR,
+
         /**
          * Represents a remote data error indicating that the requested service is currently unavailable.
          *
@@ -110,6 +120,7 @@ sealed interface DataError: Error {
          * temporary overloading or maintenance of the server. It typically maps to the HTTP 503 status code.
          */
         SERVICE_UNAVAILABLE,
+
         /**
          * Represents an error related to serialization or deserialization processes.
          *
@@ -119,6 +130,7 @@ sealed interface DataError: Error {
          * invalid data format, corrupted data, or mismatched schema expectations.
          */
         SERIALIZATION,
+
         /**
          * Represents an unknown error within the `Remote` category of `DataError`.
          *
@@ -140,7 +152,7 @@ sealed interface DataError: Error {
      * resource access constraints. It is intended to provide a domain-specific way to
      * categorize and handle locally sourced errors.
      */
-    enum class Local: DataError {
+    enum class Local : DataError {
         /**
          * Represents a local error scenario where a disk is full, preventing further storage operations.
          *
@@ -149,6 +161,7 @@ sealed interface DataError: Error {
          * `DataError` hierarchy, distinguishing it as a locally scoped error.
          */
         DISK_FULL,
+
         /**
          * Represents an error state indicating that the requested resource or data was not found.
          *
@@ -160,6 +173,7 @@ sealed interface DataError: Error {
          * - Differentiating resource absence from other types of errors in results or failure handling.
          */
         NOT_FOUND,
+
         /**
          * Represents an unknown error scenario in the local error context.
          *
@@ -170,5 +184,36 @@ sealed interface DataError: Error {
          * specific nature of the error is unclear or not explicitly defined.
          */
         UNKNOWN
+    }
+
+    /**
+     * Enum representing specific connection-related errors.
+     *
+     * This enum provides a standardized way to classify and handle errors related to
+     * connection issues. Each value corresponds to a distinct type of error that can occur
+     * when dealing with connectivity or communication processes.
+     */
+    enum class Connection : DataError {
+        /**
+         * Represents a state where a connection is not established.
+         *
+         * This enumeration value is used to indicate that a connection is missing or unavailable,
+         * which can be caused by various factors such as network issues, configuration errors,
+         * or the absence of an initialization step. It is typically used in the context of result-handling
+         * mechanisms or error propagation to specify a failure related to connection establishment.
+         */
+        NOT_CONNECTED,
+
+        /**
+         * Represents a specific error indicating that a message could not be sent.
+         *
+         * This error is part of the `Connection` enum, which defines various connection-related
+         * errors within the domain layer. It signifies a failure in the message delivery process,
+         * typically due to connection issues or other unexpected problems during communication.
+         *
+         * This error can be used in scenarios where the messaging or communication functionality
+         * of an application encounters a failure, enabling consistent error handling and reporting.
+         */
+        MESSAGE_SEND_FAILED
     }
 }

@@ -1,7 +1,5 @@
 package dev.gaddal.chat.presentation.chat_list
 
-import dev.gaddal.chat.presentation.model.ChatUi
-
 /**
  * Represents the user actions triggered on the Chat List Screen of the application.
  * These actions are used to manage navigation, UI state changes, and user interactions
@@ -15,5 +13,5 @@ sealed interface ChatListAction {
     data object OnDismissLogoutDialog : ChatListAction
     data object OnCreateChatClick : ChatListAction
     data object OnProfileSettingsClick : ChatListAction
-    data class OnChatClick(val chat: ChatUi) : ChatListAction
+    data class OnSelectChat(val chatId: String?) : ChatListAction
 }
