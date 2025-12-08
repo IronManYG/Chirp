@@ -22,6 +22,7 @@ import dev.gaddal.chat.presentation.chat_detail.ChatDetailRoot
 import dev.gaddal.chat.presentation.chat_list.ChatListRoot
 import dev.gaddal.chat.presentation.create_chat.CreateChatRoot
 import dev.gaddal.chat.presentation.manage_chat.ManageChatRoot
+import dev.gaddal.chat.presentation.profile.ProfileRoot
 import dev.gaddal.core.designsystem.theme.extended
 import dev.gaddal.core.presentation.util.DialogSheetScopedViewModel
 import kotlinx.coroutines.launch
@@ -126,6 +127,16 @@ fun ChatListDetailAdaptiveLayout(
             onMembersAdded = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             },
+            onDismiss = {
+                chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
+            }
+        )
+    }
+
+    DialogSheetScopedViewModel(
+        visible = sharedState.dialogState is DialogState.Profile
+    ) {
+        ProfileRoot(
             onDismiss = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             }
