@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.17.0] - 2025-12-08
+
+### Added
+
+- Profile: Implement profile settings screen
+  ([ae28ba5](https://github.com/IronManYG/Chirp/commit/ae28ba5))
+- Profile: Implement change password functionality
+  ([bc5bc24](https://github.com/IronManYG/Chirp/commit/bc5bc24))
+- Profile: Implement multiplatform profile picture picker
+  ([2cdbdfb](https://github.com/IronManYG/Chirp/commit/2cdbdfb))
+- Media Picker (iOS): Implement iOS image picker
+  ([8aa986f](https://github.com/IronManYG/Chirp/commit/8aa986f))
+- Profile: Implement profile picture upload functionality
+  ([d10a26c](https://github.com/IronManYG/Chirp/commit/d10a26c))
+- Profile: Implement profile picture deletion
+  ([e9f55de](https://github.com/IronManYG/Chirp/commit/e9f55de))
+
+### Changed
+
+- Chat: Relocate chat participant logic to a dedicated participant module; synchronize local
+  user details on profile view; update DI and ViewModel wiring
+  ([a4c14d6](https://github.com/IronManYG/Chirp/commit/a4c14d6))
+
+### Fixed
+
+- WebSocket: Ensure session updates only when the profile picture update event belongs to the
+  current user, preventing incorrect session changes
+  ([d10a26c](https://github.com/IronManYG/Chirp/commit/d10a26c))
+
+[0.17.0]: https://github.com/IronManYG/Chirp/compare/e0dcd25...e9f55de
+
 ## [0.16.0] - 2025-11-25
 
 ### Added

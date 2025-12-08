@@ -128,10 +128,16 @@ BuildKonfig (per-module, optional)
 - Some modules apply `dev.gaddal.convention.buildkonfig`. When applied, you MUST define `API_KEY` in `local.properties` at the repo root, or the build will fail.
   - Example entry in `local.properties` (do not commit this file):
     - `API_KEY=your_value_here`
-  - Modules that currently apply this convention (as of 2025-11-16):
+  - Modules applying this convention include:
       - `core:data`
       - `feature:chat:data`
   - Generated package name for BuildKonfig is derived from the module path via `pathToPackageName()`.
+
+Room schemas
+
+- The Room convention plugin configures `schemaDirectory` to `<module>/schemas`.
+- Example present in repo: `feature/chat/database/schemas`.
+- Recommendation: commit schemas to version control to enable reliable migration testing.
 
 Potential future configuration
 - API endpoints/keys for Ktor — consider using BuildKonfig or another secure mechanism for non‑secret config; avoid committing secrets.

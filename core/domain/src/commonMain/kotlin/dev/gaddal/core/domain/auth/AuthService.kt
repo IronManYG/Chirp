@@ -15,6 +15,7 @@ import dev.gaddal.core.domain.util.Result
  * - Email verification workflows
  * - Handling secure communication with the authentication backend
  * - Password reset functionality
+ * - Account password updates
  *
  * All operations within this interface are asynchronous and return either a successful result
  * (with authentication data where applicable) or a [DataError.Remote] describing any failures
@@ -104,5 +105,21 @@ interface AuthService {
     suspend fun resetPassword(
         newPassword: String,
         token: String
+    ): EmptyResult<DataError.Remote>
+
+    /**
+     * Updates the user's account password with a new one after validating the existing password.
+     *
+     * This function communicates with the authentication service to change the user's password.
+     * The operation may succeed or return an error if the current password is incorrect or
+     * another issue occurs during the update process.
+     *
+     * @param currentPassword The current password of the user's account.
+     * @param newPassword The new password to replace the current one.
+     * @return An `EmptyResult` encapsulating either success or a `DataError.Remote` describing the failure type.
+     */
+    suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String
     ): EmptyResult<DataError.Remote>
 }

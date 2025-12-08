@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chirp.feature.chat.presentation.generated.resources.Res
 import chirp.feature.chat.presentation.generated.resources.error_participant_not_found
-import dev.gaddal.chat.domain.chat.ChatParticipantService
 import dev.gaddal.chat.domain.chat.ChatRepository
+import dev.gaddal.chat.domain.participant.ChatParticipantService
 import dev.gaddal.chat.presentation.components.manage_chat.ManageChatAction
 import dev.gaddal.chat.presentation.components.manage_chat.ManageChatState
 import dev.gaddal.chat.presentation.mappers.toUi
