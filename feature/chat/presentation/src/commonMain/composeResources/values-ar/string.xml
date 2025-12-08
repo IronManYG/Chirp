@@ -59,4 +59,5 @@
     <string name="password_change_successful">تم تغيير كلمة المرور بنجاح!</string>
     <string name="error_current_password_incorrect">كلمة المرور الحالية غير صحيحة</string>
     <string name="error_current_password_equal_to_new_one">لا يمكن أن تكون كلمة المرور الجديدة مساوية للكلمة المرور القديمة.</string>
+    <string name="error_invalid_file_type">هذا النوع من الملفات غير مدعوم.</string>
 </resources>

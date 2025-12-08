@@ -2,6 +2,7 @@ package dev.gaddal.chat.domain.participant
 
 import dev.gaddal.chat.domain.models.ChatParticipant
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 
 /**
@@ -22,4 +23,22 @@ interface ChatParticipantRepository {
      * @return A [Result] containing a [ChatParticipant] in case of success or a [DataError] in case of failure.
      */
     suspend fun fetchLocalParticipant(): Result<ChatParticipant, DataError>
+
+    /**
+     * Uploads a profile picture for the currently authenticated user.
+     *
+     * This method allows uploading a new profile picture to the server by providing
+     * the image data in the form of a byte array and specifying the image's MIME type.
+     * It performs a suspended operation and returns a result indicating the success or failure
+     * of the upload process.
+     *
+     * @param imageBytes The raw byte array representing the image to be uploaded.
+     * @param mimeType The MIME type of the image (e.g., "image/png", "image/jpeg").
+     * @return An [EmptyResult] indicating the outcome of the upload operation. In case of failure,
+     *         it returns a [DataError.Remote] detailing the error.
+     */
+    suspend fun uploadProfilePicture(
+        imageBytes: ByteArray,
+        mimeType: String
+    ): EmptyResult<DataError.Remote>
 }

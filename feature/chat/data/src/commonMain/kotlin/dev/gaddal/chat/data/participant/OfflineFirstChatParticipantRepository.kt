@@ -5,6 +5,7 @@ import dev.gaddal.chat.domain.participant.ChatParticipantRepository
 import dev.gaddal.chat.domain.participant.ChatParticipantService
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.util.DataError
+import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import dev.gaddal.core.domain.util.onSuccess
 import kotlinx.coroutines.flow.first
@@ -46,6 +47,53 @@ class OfflineFirstChatParticipantRepository(
                             id = participant.userId,
                             username = participant.username,
                             profilePictureUrl = participant.profilePictureUrl
+                        )
+                    )
+                )
+            }
+    }
+
+    /**
+     * Uploads a user's profile picture to the server and updates the session storage with the new picture URL.
+     *
+     * This method handles the entire process of uploading a profile picture in multiple steps:
+     * 1. Retrieves the upload URL and associated headers from the server based on the provided MIME type.
+     * 2. Uploads the image data to the obtained upload URL.
+     * 3. Confirms the upload and updates the session storage with the new profile picture's public URL.
+     *
+     * @param imageBytes The byte array representing the profile picture data to be uploaded.
+     * @param mimeType The MIME type of the image being uploaded (e.g., "image/png" or "image/jpeg").
+     * @return An [EmptyResult] indicating success or a [DataError.Remote] in case of failure during any step.
+     */
+    override suspend fun uploadProfilePicture(
+        imageBytes: ByteArray,
+        mimeType: String
+    ): EmptyResult<DataError.Remote> {
+        val result = chatParticipantService.getProfilePictureUploadUrl(mimeType)
+
+        if (result is Result.Failure) {
+            return result
+        }
+
+        val uploadUrls = (result as Result.Success).data
+        val uploadResult = chatParticipantService.uploadProfilePicture(
+            uploadUrl = uploadUrls.uploadUrl,
+            imageBytes = imageBytes,
+            headers = uploadUrls.headers
+        )
+
+        if (uploadResult is Result.Failure) {
+            return uploadResult
+        }
+
+        return chatParticipantService
+            .confirmProfilePictureUpload(uploadUrls.publicUrl)
+            .onSuccess {
+                val currentAuthInfo = sessionStorage.observeAuthInfo().first()
+                sessionStorage.set(
+                    currentAuthInfo?.copy(
+                        user = currentAuthInfo.user.copy(
+                            profilePictureUrl = uploadUrls.publicUrl
                         )
                     )
                 )
