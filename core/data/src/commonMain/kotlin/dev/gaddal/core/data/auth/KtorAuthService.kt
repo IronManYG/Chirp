@@ -1,6 +1,7 @@
 package dev.gaddal.core.data.auth
 
 import dev.gaddal.core.data.dto.AuthInfoSerializable
+import dev.gaddal.core.data.dto.requests.ChangePasswordRequest
 import dev.gaddal.core.data.dto.requests.EmailRequest
 import dev.gaddal.core.data.dto.requests.LoginRequest
 import dev.gaddal.core.data.dto.requests.RegisterRequest
@@ -136,6 +137,27 @@ class KtorAuthService(
             body = ResetPasswordRequest(
                 newPassword = newPassword,
                 token = token
+            )
+        )
+    }
+
+    /**
+     * Changes the password for the currently authenticated user.
+     *
+     * @param currentPassword The current password of the user.
+     * @param newPassword The new password that the user wants to set.
+     * @return An `EmptyResult` indicating the success or failure of the operation,
+     *         with a potential `DataError.Remote` detailing any error that occurred.
+     */
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String
+    ): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "/auth/change-password",
+            body = ChangePasswordRequest(
+                oldPassword = currentPassword,
+                newPassword = newPassword
             )
         )
     }

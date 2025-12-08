@@ -21,9 +21,9 @@ import dev.gaddal.core.presentation.util.UiText
  * @property isCurrentPasswordVisible A flag indicating the visibility status of the current password input.
  * @property isNewPasswordVisible A flag indicating the visibility status of the new password input.
  * @property isChangingPassword A flag indicating whether the password change process is in progress.
- * @property currentPasswordError Represents an error related to the current password field, such as incorrect password.
  * @property newPasswordError Represents an error related to the new password field, such as invalid formatting.
  * @property canChangePassword A computed flag indicating whether the password change process can be initiated.
+ * @property isPasswordChangeSuccessful A flag indicating whether the password change process was successful.
  */
 data class ProfileState(
     val username: String = "",
@@ -39,7 +39,7 @@ data class ProfileState(
     val isCurrentPasswordVisible: Boolean = false,
     val isNewPasswordVisible: Boolean = false,
     val isChangingPassword: Boolean = false,
-    val currentPasswordError: UiText? = null,
     val newPasswordError: UiText? = null,
     val canChangePassword: Boolean = false,
+    val isPasswordChangeSuccessful: Boolean = false
 )
