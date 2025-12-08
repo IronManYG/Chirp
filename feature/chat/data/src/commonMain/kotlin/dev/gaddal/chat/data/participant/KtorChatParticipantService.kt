@@ -1,9 +1,9 @@
-package dev.gaddal.chat.data.chat
+package dev.gaddal.chat.data.participant
 
 import dev.gaddal.chat.data.dto.ChatParticipantDto
 import dev.gaddal.chat.data.mappers.toDomain
-import dev.gaddal.chat.domain.chat.ChatParticipantService
 import dev.gaddal.chat.domain.models.ChatParticipant
+import dev.gaddal.chat.domain.participant.ChatParticipantService
 import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.Result
@@ -31,7 +31,7 @@ class KtorChatParticipantService(
      * In case of failure, a corresponding error is returned.
      *
      * @param query The search query used to locate a specific chat participant.
-     * @return A [Result] containing either a [ChatParticipant] on success or a [DataError.Remote] on failure.
+     * @return A [dev.gaddal.core.domain.util.Result] containing either a [dev.gaddal.chat.domain.models.ChatParticipant] on success or a [dev.gaddal.core.domain.util.DataError.Remote] on failure.
      */
     override suspend fun searchParticipant(query: String): Result<ChatParticipant, DataError.Remote> {
         return httpClient.get<ChatParticipantDto>(
@@ -39,6 +39,21 @@ class KtorChatParticipantService(
             queryParams = mapOf(
                 "query" to query
             )
+        ).map { it.toDomain() }
+    }
+
+    /**
+     * Retrieves the local participant in the chat system.
+     *
+     * This method performs a network operation to fetch information about the participant
+     * associated with the local client. The operation either returns the participant's details
+     * or provides an error if the request fails.
+     *
+     * @return A [Result] containing either a [ChatParticipant] on success or a [DataError.Remote] on failure.
+     */
+    override suspend fun getLocalParticipant(): Result<ChatParticipant, DataError.Remote> {
+        return httpClient.get<ChatParticipantDto>(
+            route = "/participants"
         ).map { it.toDomain() }
     }
 }
