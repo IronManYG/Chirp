@@ -7,6 +7,7 @@ import dev.gaddal.chat.data.mappers.toDomain
 import dev.gaddal.chat.domain.models.ChatParticipant
 import dev.gaddal.chat.domain.models.ProfilePictureUploadUrls
 import dev.gaddal.chat.domain.participant.ChatParticipantService
+import dev.gaddal.core.data.networking.delete
 import dev.gaddal.core.data.networking.get
 import dev.gaddal.core.data.networking.post
 import dev.gaddal.core.data.networking.safeCall
@@ -130,6 +131,21 @@ class KtorChatParticipantService(
         return httpClient.post<ConfirmProfilePictureRequest, Unit>(
             route = "/participants/confirm-profile-picture",
             body = ConfirmProfilePictureRequest(publicUrl)
+        )
+    }
+
+    /**
+     * Deletes the profile picture of the current participant.
+     *
+     * This method performs a network operation to remove the profile picture associated with the
+     * local participant in the chat system. If the operation is successful, an empty result is
+     * returned. Otherwise, it provides a remote data error.
+     *
+     * @return An [EmptyResult] that indicates success or contains a [DataError.Remote] in case of failure.
+     */
+    override suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote> {
+        return httpClient.delete(
+            route = "/participants/profile-picture"
         )
     }
 }

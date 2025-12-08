@@ -41,4 +41,17 @@ interface ChatParticipantRepository {
         imageBytes: ByteArray,
         mimeType: String
     ): EmptyResult<DataError.Remote>
+
+    /**
+     * Deletes the profile picture of the currently authenticated user.
+     *
+     * This method performs a suspended operation to remove the existing profile picture
+     * from the server. It ensures that the profile picture is no longer associated with
+     * the user's account. The result of the operation indicates whether the deletion
+     * was successful or if it encountered a remote error.
+     *
+     * @return An [EmptyResult] indicating the outcome of the delete operation. In case of failure,
+     *         it returns a [DataError.Remote] detailing the error.
+     */
+    suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote>
 }

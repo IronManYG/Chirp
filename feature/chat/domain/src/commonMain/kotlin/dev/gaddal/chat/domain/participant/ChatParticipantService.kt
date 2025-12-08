@@ -79,4 +79,15 @@ interface ChatParticipantService {
     suspend fun confirmProfilePictureUpload(
         publicUrl: String
     ): EmptyResult<DataError.Remote>
+
+    /**
+     * Deletes the user's profile picture.
+     *
+     * This method removes the profile picture associated with the user's account.
+     * If the operation is successful, an empty result is returned. In case of failure,
+     * a remote data error detailing the issue will be provided.
+     *
+     * @return An `EmptyResult` indicating either success or a `DataError.Remote` on failure.
+     */
+    suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote>
 }

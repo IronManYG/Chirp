@@ -99,4 +99,28 @@ class OfflineFirstChatParticipantRepository(
                 )
             }
     }
+
+    /**
+     * Deletes the user's profile picture from the server and updates the session storage.
+     *
+     * This method removes the profile picture URL from the user's authentication information
+     * stored in the session storage, ensuring the user's profile reflects the removal of the picture.
+     *
+     * @return An [EmptyResult] indicating success, or a [DataError.Remote] in case of failure during
+     * the deletion process.
+     */
+    override suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote> {
+        return chatParticipantService
+            .deleteProfilePicture()
+            .onSuccess {
+                val authInfo = sessionStorage.observeAuthInfo().first()
+                sessionStorage.set(
+                    authInfo?.copy(
+                        user = authInfo.user.copy(
+                            profilePictureUrl = null
+                        )
+                    )
+                )
+            }
+    }
 }

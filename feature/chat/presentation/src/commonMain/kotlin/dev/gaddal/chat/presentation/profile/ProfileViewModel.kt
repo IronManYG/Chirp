@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val authService: AuthService,
     private val chatParticipantRepository: ChatParticipantRepository,
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -74,6 +74,9 @@ class ProfileViewModel(
                 action.mimeType
             )
 
+            is ProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
+            is ProfileAction.OnConfirmDeleteClick -> deleteProfilePicture()
+            is ProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
             else -> Unit
         }
     }
@@ -294,6 +297,89 @@ class ProfileViewModel(
                         )
                     }
                 }
+        }
+    }
+
+    /**
+     * Updates the current state to display the delete confirmation dialog.
+     *
+     * This method modifies the shared `_state` by setting the `showDeleteConfirmationDialog`
+     * flag to `true`. When invoked, it transitions the UI to present a confirmation dialog
+     * that typically prompts the user to confirm or cancel a delete action.
+     *
+     * Note: The state change relies on the `copy` function to ensure immutability of the
+     * state object while applying the update.
+     */
+    private fun showDeleteConfirmation() {
+        _state.update {
+            it.copy(
+                showDeleteConfirmationDialog = true
+            )
+        }
+    }
+
+    /**
+     * Deletes the user's profile picture from the repository and updates the UI state accordingly.
+     *
+     * The method first checks if an image deletion process is already in progress or if there is no
+     * profile picture URL. If either condition is true, the operation is terminated early.
+     *
+     * The state is updated to reflect the start of the deletion process and to reset any existing
+     * error or confirmation dialog visibility.
+     *
+     * The actual deletion operation is performed asynchronously using a coroutine in the `viewModelScope`.
+     * Upon success, the deletion state is updated to indicate completion. In case of failure, the error
+     * is captured and reflected in the UI state.
+     */
+    private fun deleteProfilePicture() {
+        if (state.value.isDeletingImage && state.value.profilePictureUrl == null) {
+            return
+        }
+
+        _state.update {
+            it.copy(
+                isDeletingImage = true,
+                imageError = null,
+                showDeleteConfirmationDialog = false
+            )
+        }
+
+        viewModelScope.launch {
+            chatParticipantRepository
+                .deleteProfilePicture()
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isDeletingImage = false
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            imageError = error.toUiText(),
+                            isDeletingImage = false
+                        )
+                    }
+                }
+        }
+    }
+
+    /**
+     * Handles the dismissal of the delete confirmation dialog in the profile UI.
+     *
+     * This method updates the `showDeleteConfirmationDialog` property within the
+     * profile state to `false`, effectively hiding the delete confirmation dialog.
+     * It ensures that the UI reflects this change, preventing the dialog from being displayed.
+     *
+     * This operation is performed through the `_state` property by creating a
+     * modified copy of the current `ProfileState`.
+     */
+    private fun dismissDeleteConfirmation() {
+        _state.update {
+            it.copy(
+                showDeleteConfirmationDialog = false
+            )
         }
     }
 
