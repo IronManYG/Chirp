@@ -3,7 +3,6 @@ package dev.gaddal.chat.data.di
 import dev.gaddal.chat.data.lifecycle.AppLifecycleObserver
 import dev.gaddal.chat.data.network.ConnectionErrorHandler
 import dev.gaddal.chat.data.network.ConnectivityObserver
-import dev.gaddal.chat.data.notification.FirebasePushNotificationService
 import dev.gaddal.chat.database.DatabaseFactory
 import dev.gaddal.chat.domain.notification.PushNotificationService
 import org.koin.android.ext.koin.androidContext
