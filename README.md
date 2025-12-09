@@ -2,7 +2,9 @@
 
 A Kotlin Multiplatform (KMP) application targeting Android and iOS using Compose Multiplatform. The repository is organized as a multi-module project with shared core modules and feature modules.
 
-This README covers the stack, requirements, setup, run/build/test commands, useful Gradle tasks, environment variables, project structure, and licensing. Unknowns are explicitly marked as TODO.
+This README covers the stack, requirements, setup, run/build/test commands, useful Gradle tasks,
+environment variables, project structure, and licensing. Unknowns are explicitly marked as TODO. See
+also CHANGELOG.md for recent changes.
 
 ## Overview
 - Platforms: Android, iOS
@@ -51,6 +53,8 @@ Notes
 ## Entry points
 - Android: `composeApp/src/androidMain/kotlin/dev/gaddal/chirp/MainActivity.kt` hosts the `App()` composable.
 - Shared UI root: `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/App.kt`.
+- Shared navigation root:
+  `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/navigation/NavigationRoot.kt`.
 - iOS: `composeApp/src/iosMain/kotlin/dev/gaddal/chirp/MainViewController.kt` provides the view controller; frameworks are produced from `composeApp` and the `iosApp` Xcode project wraps and launches the UI.
 
 ## Run / Build
@@ -99,6 +103,12 @@ Testing tasks (see Tests section for details)
 - `:<module>:testDebugUnitTest` — Android JVM unit tests (debug variant)
 - `:<module>:testReleaseUnitTest` — Android JVM unit tests (release variant)
 - `:<module>:connectedDebugAndroidTest` — instrumented tests on device/emulator (if configured)
+
+## Scripts
+
+- Package manager/build tool: Gradle (use the wrapper in the repo root). There are no additional
+  script runners (e.g., npm/yarn) in this repository.
+- To list tasks for any module (Windows): `.\gradlew.bat :<module>:tasks`
 
 Build logic
 Convention plugins live under `build-logic/convention` and are applied via the version catalog (see `gradle/libs.versions.toml`). Relevant plugin IDs registered in `build-logic`:
@@ -157,6 +167,15 @@ Potential future configuration
 
 TODO
 - Document any additional environment variables or service credentials once integrated.
+
+## Documentation
+
+- Internationalization (i18n): `docs/i18n.md`
+- i18n implementation plan and tasks: `docs/i18n-implementation-plan.md`
+- Android-specific multilingual support notes (older draft):
+  `docs/MultilingualSupportGuideOnAndroid(old).md`
+
+If you add more docs under the `docs/` directory, please link them here.
 
 ## Tests
 Global unit tests
