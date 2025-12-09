@@ -8,6 +8,7 @@ import dev.gaddal.chat.data.message.KtorChatMessageService
 import dev.gaddal.chat.data.message.OfflineFirstMessageRepository
 import dev.gaddal.chat.data.network.ConnectionRetryHandler
 import dev.gaddal.chat.data.network.KtorWebSocketConnector
+import dev.gaddal.chat.data.notification.KtorDeviceTokenService
 import dev.gaddal.chat.data.participant.KtorChatParticipantService
 import dev.gaddal.chat.data.participant.OfflineFirstChatParticipantRepository
 import dev.gaddal.chat.database.DatabaseFactory
@@ -16,6 +17,7 @@ import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.chat.ChatService
 import dev.gaddal.chat.domain.message.ChatMessageService
 import dev.gaddal.chat.domain.message.MessageRepository
+import dev.gaddal.chat.domain.notification.DeviceTokenService
 import dev.gaddal.chat.domain.participant.ChatParticipantRepository
 import dev.gaddal.chat.domain.participant.ChatParticipantService
 import kotlinx.serialization.json.Json
@@ -46,6 +48,7 @@ expect val platformChatDataModule: Module
  * - Configures a WebSocket client for real-time chat functionality
  * - Handles connection errors and retries
  * - Provides a Ktor-based implementation for chat message service
+ * - Provides a Ktor-based implementation for device token service
  * - Provides an offline-first implementation for chat participant repository
  * - Sets up JSON serialization configuration
  * - Configures and builds the SQLite database using BundledSQLiteDriver
@@ -61,6 +64,7 @@ val chatDataModule = module {
     singleOf(::ConnectionRetryHandler)
     singleOf(::KtorWebSocketConnector)
     singleOf(::KtorChatMessageService) bind ChatMessageService::class
+    singleOf(::KtorDeviceTokenService) bind DeviceTokenService::class
     singleOf(::OfflineFirstChatParticipantRepository) bind ChatParticipantRepository::class
     single {
         Json {

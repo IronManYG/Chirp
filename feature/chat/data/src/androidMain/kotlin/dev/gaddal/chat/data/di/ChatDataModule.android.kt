@@ -3,9 +3,12 @@ package dev.gaddal.chat.data.di
 import dev.gaddal.chat.data.lifecycle.AppLifecycleObserver
 import dev.gaddal.chat.data.network.ConnectionErrorHandler
 import dev.gaddal.chat.data.network.ConnectivityObserver
+import dev.gaddal.chat.data.notification.FirebasePushNotificationService
 import dev.gaddal.chat.database.DatabaseFactory
+import dev.gaddal.chat.domain.notification.PushNotificationService
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 /**
@@ -17,6 +20,7 @@ import org.koin.dsl.module
  * - `AppLifecycleObserver`: A class that monitors application lifecycle state (foreground/background).
  * - `ConnectivityObserver`: A class that monitors network connectivity status.
  * - `ConnectionErrorHandler`: A class that handles connection errors and retries.
+ * - `FirebasePushNotificationService`: A class that implements the `PushNotificationService` interface using Firebase Cloud Messaging.
  *
  * This module ensures that platform-specific configurations required for database operations, lifecycle monitoring,
  * and network connectivity tracking are properly set up for the Android platform.
@@ -26,6 +30,7 @@ import org.koin.dsl.module
  * - `AppLifecycleObserver`: Tracks application foreground/background state using Android lifecycle components.
  * - `ConnectivityObserver`: Monitors network connectivity status using Android connectivity manager.
  * - `ConnectionErrorHandler`: Handles connection errors and retries using Android connectivity manager.
+ * - `FirebasePushNotificationService`: Implements the `PushNotificationService` interface using Firebase Cloud Messaging.
  *
  * Usage Context:
  * - This Koin module should be included in an application's dependency injection setup,
@@ -36,4 +41,6 @@ actual val platformChatDataModule = module {
     singleOf(::AppLifecycleObserver)
     singleOf(::ConnectivityObserver)
     singleOf(::ConnectionErrorHandler)
+
+    singleOf(::FirebasePushNotificationService) bind PushNotificationService::class
 }
