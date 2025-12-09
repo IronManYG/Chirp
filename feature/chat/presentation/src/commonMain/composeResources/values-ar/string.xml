@@ -41,6 +41,7 @@
     <string name="chat_members">أعضاء الدردشة</string>
     <string name="leave_chat">انسحاب من الدردشة</string>
     <string name="go_back">العودة</string>
+    <string name="only_you">انت فقط</string>
     <string name="online">متصل</string>
     <string name="offline">غير متصل</string>
     <string name="reconnecting">جاري إعادة الاتصال...</string>
