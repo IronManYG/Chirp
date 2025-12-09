@@ -78,9 +78,11 @@ sealed interface ChatGraphRoutes {
  *
  * @param navController The `NavController` for handling navigation actions within the graph,
  *                      such as navigating to different chats or handling back navigation.
+ * @param onLogout The callback function to be invoked when the user initiates a logout action.
  */
 fun NavGraphBuilder.chatGraph(
-    navController: NavController
+    navController: NavController,
+    onLogout: () -> Unit
 ) {
     navigation<ChatGraphRoutes.Graph>(
         startDestination = ChatGraphRoutes.ChatListDetailRoute(null)
@@ -95,9 +97,7 @@ fun NavGraphBuilder.chatGraph(
             val route = backStackEntry.toRoute<ChatGraphRoutes.ChatListDetailRoute>()
             ChatListDetailAdaptiveLayout(
                 initialChatId = route.chatId,
-                onLogout = {
-                    // TODO: Logout user
-                }
+                onLogout = onLogout
             )
         }
     }

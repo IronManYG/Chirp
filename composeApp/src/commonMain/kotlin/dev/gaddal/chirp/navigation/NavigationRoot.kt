@@ -22,6 +22,7 @@ import dev.gaddal.chat.presentation.navigation.chatGraph
  * - [chatGraph]: Manages chat-related navigation, including the chat list and detail views using
  *   an adaptive layout system.
  *
+ *
  * After successful login, the user is navigated to the chat list screen with the auth graph cleared
  * from the back stack.
  *
@@ -55,7 +56,14 @@ fun NavigationRoot(
             startAtLanguageSelection = startAtLanguageSelection
         )
         chatGraph(
-            navController = navController
+            navController = navController,
+            onLogout = {
+                navController.navigate(AuthGraphRoutes.Graph) {
+                    popUpTo(ChatGraphRoutes.Graph) {
+                        inclusive = true
+                    }
+                }
+            }
         )
     }
 }

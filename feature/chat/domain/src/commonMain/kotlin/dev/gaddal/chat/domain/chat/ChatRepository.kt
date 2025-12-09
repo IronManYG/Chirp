@@ -119,4 +119,16 @@ interface ChatRepository {
         chatId: String,
         userIds: List<String>
     ): Result<Chat, DataError.Remote>
+
+    /**
+     * Deletes all chats associated with the user.
+     *
+     * This method performs a complete removal of all chats from the data source.
+     * It can be used for scenarios where the user wants to reset or clear all chat data.
+     * The operation may include deletion of both local and remotely stored chat data,
+     * depending on the implementation.
+     *
+     * This is an asynchronous operation and should be called from a coroutine context.
+     */
+    suspend fun deleteAllChats()
 }
