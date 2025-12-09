@@ -65,6 +65,7 @@ class ChatDetailViewModel(
         .onEach { chatId ->
             if (chatId != null) {
                 setupPaginatorForChat(chatId)
+                loadNextItems()
             } else {
                 currentPaginator = null
             }
