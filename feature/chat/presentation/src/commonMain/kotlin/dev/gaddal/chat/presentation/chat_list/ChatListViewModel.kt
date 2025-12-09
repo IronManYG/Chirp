@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gaddal.chat.domain.chat.ChatRepository
 import dev.gaddal.chat.domain.notification.DeviceTokenService
+import dev.gaddal.chat.domain.participant.ChatParticipantRepository
 import dev.gaddal.chat.presentation.mappers.toUi
 import dev.gaddal.core.domain.auth.AuthService
 import dev.gaddal.core.domain.auth.SessionStorage
@@ -25,7 +26,8 @@ class ChatListViewModel(
     private val repository: ChatRepository,
     private val sessionStorage: SessionStorage,
     private val deviceTokenService: DeviceTokenService,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val chatParticipantRepository: ChatParticipantRepository
 ) : ViewModel() {
     private val eventChannel = Channel<ChatListEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -50,6 +52,7 @@ class ChatListViewModel(
         .onStart {
             if (!hasLoadedInitialData) {
                 loadChats()
+                fetchLocalUserParticipant()
                 hasLoadedInitialData = true
             }
         }
@@ -86,6 +89,7 @@ class ChatListViewModel(
                     )
                 }
             }
+
             ChatListAction.OnProfileSettingsClick,
             ChatListAction.OnDismissUserMenu -> {
                 _state.update {
@@ -172,6 +176,25 @@ class ChatListViewModel(
     private fun loadChats() {
         viewModelScope.launch {
             repository.fetchChats()
+        }
+    }
+
+    /**
+     * Fetches the local user participant for the current chat session.
+     *
+     * This method triggers the fetching process of the local participant's details by invoking
+     * the `fetchLocalParticipant` function from the `chatParticipantRepository`. It is executed
+     * within the `viewModelScope` to ensure proper lifecycle management and asynchronous execution.
+     *
+     * The operation retrieves user-related details such as username, user ID, and potentially other
+     * associated metadata that define the local participant in chats.
+     *
+     * This function does not return a result directly, as the fetched data is likely stored
+     * or processed further within the `ChatListViewModel`.
+     */
+    private fun fetchLocalUserParticipant() {
+        viewModelScope.launch {
+            chatParticipantRepository.fetchLocalParticipant()
         }
     }
 }
