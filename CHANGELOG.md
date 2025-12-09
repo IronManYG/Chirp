@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.19.0] - 2025-12-09
+
+### Added
+
+- Auth: Implement user logout functionality
+  ([3c70c0a](https://github.com/IronManYG/Chirp/commit/3c70c0a))
+
+### Changed
+
+- Chat: Reorder user menu actions in ChatListViewModel
+  ([fec4e89](https://github.com/IronManYG/Chirp/commit/fec4e89))
+
+[0.19.0]: https://github.com/IronManYG/Chirp/compare/47ca173...fec4e89
+
 ## [0.18.0] - 2025-12-09
 
 ### Added
