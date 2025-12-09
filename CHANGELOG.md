@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.18.0] - 2025-12-09
+
+### Added
+
+- Notifications (Android): Implement push notifications with FCM
+  ([67d279c](https://github.com/IronManYG/Chirp/commit/67d279c))
+- Notifications (iOS): Implement push notifications with Firebase
+  ([47ca173](https://github.com/IronManYG/Chirp/commit/47ca173))
+- Permissions: Implement notification permission request flow
+  ([6c2fc33](https://github.com/IronManYG/Chirp/commit/6c2fc33))
+
+### Changed
+
+- Docs: README — Add Room schema configuration details
+  ([2d9a209](https://github.com/IronManYG/Chirp/commit/2d9a209))
+
+[0.18.0]: https://github.com/IronManYG/Chirp/compare/e9f55de...47ca173
+
 ## [0.17.0] - 2025-12-08
 
 ### Added
