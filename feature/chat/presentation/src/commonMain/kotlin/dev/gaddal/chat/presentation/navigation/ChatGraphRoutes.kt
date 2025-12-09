@@ -3,7 +3,9 @@ package dev.gaddal.chat.presentation.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import dev.gaddal.chat.presentation.chat_list_detail.ChatListDetailAdaptiveLayout
 import kotlinx.serialization.Serializable
 
@@ -42,37 +44,57 @@ sealed interface ChatGraphRoutes {
     data object Graph : ChatGraphRoutes
 
     /**
-     * Represents a navigation route specific to the chat list detail screen
-     * within the ChatGraphRoutes.
+     * Represents the navigation route to the main chat screen, which adaptively displays
+     * both the chat list and chat detail views.
      *
-     * This object is used as a destination identifier within the chat
-     * navigation graph. It is primarily utilized to navigate to the
-     * detail view of a chat list, where users can interact with the
-     * chat items and view or manage them.
+     * This route is the primary destination within the chat graph. It can optionally accept a
+     * `chatId` to directly open a specific conversation. If `chatId` is `null`, it displays the
+     * chat list. On larger screens, it may show the chat list and a selected chat detail side-by-side.
      *
-     * As part of the ChatGraphRoutes, this route is integrated into the
-     * larger navigation structure of the chat feature.
+     * This class is part of the `ChatGraphRoutes` sealed interface, ensuring type-safe navigation
+     * for chat-related features.
+     *
+     * @property chatId An optional ID of the chat to be displayed. If `null`, no specific chat is
+     *           pre-selected, and the UI will typically show the chat list.
      */
     @Serializable
-    data object ChatListDetailRoute : ChatGraphRoutes
+    data class ChatListDetailRoute(val chatId: String? = null) : ChatGraphRoutes
 }
 
 /**
- * Defines the navigation graph for chat-related screens and manages the respective destinations within it.
+ * Defines the nested navigation graph for the chat feature.
  *
- * This function adds navigation routes for the chat list and detail screens to the navigation graph.
- * It utilizes an adaptive layout system to provide an optimized UI experience for different device types and orientations.
+ * This extension function on `NavGraphBuilder` sets up the chat-related navigation,
+ * including routes for chat list and detail screens. It uses a `navigation` block
+ * to group these routes under a common graph, identified by `ChatGraphRoutes.Graph`.
  *
- * @param navController The navigation controller used to manage navigation operations between the chat-related screens.
+ * The graph's starting destination is `ChatListDetailRoute`, which displays an adaptive
+ * layout for both the chat list and detail views. This adaptive layout, `ChatListDetailAdaptiveLayout`,
+ * is capable of showing a list-detail interface on larger screens or handling navigation between
+ * list and detail on smaller screens.
+ *
+ * It also configures a deep link to allow external navigation directly to a specific chat
+ * via a URI like `chirp://chat_detail/{chatId}`.
+ *
+ * @param navController The `NavController` for handling navigation actions within the graph,
+ *                      such as navigating to different chats or handling back navigation.
  */
 fun NavGraphBuilder.chatGraph(
     navController: NavController
 ) {
     navigation<ChatGraphRoutes.Graph>(
-        startDestination = ChatGraphRoutes.ChatListDetailRoute
+        startDestination = ChatGraphRoutes.ChatListDetailRoute(null)
     ) {
-        composable<ChatGraphRoutes.ChatListDetailRoute> {
+        composable<ChatGraphRoutes.ChatListDetailRoute>(
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "chirp://chat_detail/{chatId}"
+                }
+            )
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<ChatGraphRoutes.ChatListDetailRoute>()
             ChatListDetailAdaptiveLayout(
+                initialChatId = route.chatId,
                 onLogout = {
                     // TODO: Logout user
                 }

@@ -2,12 +2,16 @@ package dev.gaddal.chirp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.gaddal.chat.domain.notification.DeviceTokenService
+import dev.gaddal.chat.domain.notification.PushNotificationService
+import dev.gaddal.core.data.util.PlatformUtils
 import dev.gaddal.core.domain.auth.SessionStorage
 import dev.gaddal.core.domain.settings.SettingsStorage
 import dev.gaddal.core.presentation.util.LanguageManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -19,6 +23,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val sessionStorage: SessionStorage,
+    private val pushNotificationService: PushNotificationService,
+    private val deviceTokenService: DeviceTokenService,
     private val settingsStorage: SettingsStorage,
     private val languageManager: LanguageManager
 ) : ViewModel() {
@@ -43,6 +49,8 @@ class MainViewModel(
         )
 
     private var previousRefreshToken: String? = null
+    private var currentDeviceToken: String? = null
+    private var previousDeviceToken: String? = null
 
     init {
         loadInitialAuthState()
@@ -76,10 +84,21 @@ class MainViewModel(
                             isLoggedIn = false
                         )
                     }
+                    currentDeviceToken?.let {
+                        deviceTokenService.unregisterToken(it)
+                    }
                     eventChannel.send(MainEvent.OnSessionExpired)
                 }
 
                 previousRefreshToken = currentRefreshToken
+            }
+            .combine(
+                pushNotificationService.observeDeviceToken()
+            ) { authInfo, deviceToken ->
+                currentDeviceToken = deviceToken
+                if (authInfo != null && deviceToken != previousDeviceToken && deviceToken != null) {
+                    registerDeviceToken(deviceToken, PlatformUtils.getOSName())
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -98,10 +117,12 @@ class MainViewModel(
             settingsStorage.setLanguage(code)
             val ok = languageManager.setLanguage(code)
             if (ok) {
-                _state.update { it.copy(
-                    currentLanguage = languageManager.currentLanguage,
-                    hasChosenLanguage = true
-                ) }
+                _state.update {
+                    it.copy(
+                        currentLanguage = languageManager.currentLanguage,
+                        hasChosenLanguage = true
+                    )
+                }
             }
         }
     }
@@ -177,6 +198,12 @@ class MainViewModel(
             settingsStorage.observeSettings().collect { appSettings ->
                 _state.update { it.copy(hasChosenLanguage = appSettings.languageCode != null) }
             }
+        }
+    }
+
+    private fun registerDeviceToken(token: String, platform: String) {
+        viewModelScope.launch {
+            deviceTokenService.registerToken(token, platform)
         }
     }
 }

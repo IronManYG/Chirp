@@ -15,6 +15,7 @@ This README covers the stack, requirements, setup, run/build/test commands, usef
 - Concurrency/Time: kotlinx-coroutines, kotlinx-datetime
 - Images: Coil 3
 - Permissions (KMP): moko-permissions
+- Notifications: Firebase Cloud Messaging (Android/iOS)
 
 Key toolchain versions (from `gradle/libs.versions.toml`):
 - Kotlin: 2.2.0
@@ -92,6 +93,7 @@ composeApp
 - `:composeApp:assembleDebug` — builds Android debug APK
 - `:composeApp:assembleRelease` — builds Android release APK (signing must be configured locally)
 - `:composeApp:lint` / `:composeApp:lintFix` — run Android lint and attempt automatic fixes
+- `:composeApp:installDebug` — installs the debug APK on a connected device/emulator
 
 Testing tasks (see Tests section for details)
 - `:<module>:testDebugUnitTest` — Android JVM unit tests (debug variant)
@@ -139,6 +141,16 @@ Room schemas
 - Example present in repo: `feature/chat/database/schemas`.
 - Recommendation: commit schemas to version control to enable reliable migration testing.
 
+Firebase (FCM, Google Services)
+
+- The Android app applies `com.google.gms.google-services`. You need to provide
+  `composeApp/google-services.json` for your Firebase project to enable FCM and related services.
+  This file is intentionally git-ignored.
+- iOS push notifications use Firebase as well. Provide `GoogleService-Info.plist` in the iOS
+  target (under `iosApp` as required by your Xcode setup). Signing/capabilities (Push Notifications,
+  Background Modes, Remote notifications) must be configured locally. TODO: document exact file path
+  and capabilities once finalized.
+
 Potential future configuration
 - API endpoints/keys for Ktor — consider using BuildKonfig or another secure mechanism for non‑secret config; avoid committing secrets.
 - Android release signing — configure locally, do not commit keystores.
@@ -164,6 +176,9 @@ iOS tests
 Notes
 - The KMP library convention adds `commonTestImplementation(kotlin("test"))`. AGP maps `kotlin.test` to JUnit on Android unit tests.
 - Some modules may still use legacy `src/test/kotlin`; Gradle may print a deprecation notice recommending `src/androidUnitTest/kotlin`. Prefer the new path going forward.
+- On Windows, validated tasks include `:<module>:testDebugUnitTest` (for KMP Android unit tests).
+  Instrumented tests run via `:<module>:connectedDebugAndroidTest` when configured and when a device
+  is connected.
 
 ## Project structure
 Modules (from `settings.gradle.kts`)
@@ -347,6 +362,19 @@ flowchart LR
 Notes
 - After successful verification/reset via deep link, we route users back to the `Login` screen (or auto-navigate to `ChatList` if a valid session is present).
 - Ensure tokens are consumed server-side; the app treats the link as an entry point and updates UI state accordingly.
+
+## Push notifications
+
+- Android: Push notifications are implemented with Firebase Cloud Messaging (FCM). See
+  `feature/chat/data/.../ChirpFirebaseMessagingService.kt` and related FCM wiring. Ensure
+  `google-services.json` is present in `composeApp/` and the Firebase project is configured for FCM.
+  On Android 13+ (API 33+), the app requests the notification permission at runtime.
+- iOS: Push notifications are implemented with Firebase. Ensure APNs certificates/keys and
+  capabilities are configured in Xcode. Provide `GoogleService-Info.plist` and enable Push
+  Notifications + Background Modes (Remote notifications). TODO: document the exact steps and plist
+  locations.
+- Device token handling and backend registration are implemented in KMP (
+  `feature/chat/data/.../KtorDeviceTokenService.kt`).
 
 ## License
 No LICENSE file found in the repository.
