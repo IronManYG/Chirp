@@ -16,6 +16,7 @@ import dev.gaddal.core.domain.util.Result
  * - Handling secure communication with the authentication backend
  * - Password reset functionality
  * - Account password updates
+ * - User logout functionality
  *
  * All operations within this interface are asynchronous and return either a successful result
  * (with authentication data where applicable) or a [DataError.Remote] describing any failures
@@ -122,4 +123,16 @@ interface AuthService {
         currentPassword: String,
         newPassword: String
     ): EmptyResult<DataError.Remote>
+
+    /**
+     * Logs out the user by invalidating the provided refresh token.
+     *
+     * This function communicates with the authentication service to revoke the user's session
+     * associated with the given refresh token. It ensures the specified refresh token can no longer
+     * be used, effectively logging the user out of the system.
+     *
+     * @param refreshToken The refresh token to be invalidated for the logout process.
+     * @return An `EmptyResult` encapsulating either success or a `DataError.Remote` describing the failure type.
+     */
+    suspend fun logout(refreshToken: String): EmptyResult<DataError.Remote>
 }

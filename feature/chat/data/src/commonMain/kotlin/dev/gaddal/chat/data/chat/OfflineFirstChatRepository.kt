@@ -250,6 +250,20 @@ class OfflineFirstChatRepository(
     }
 
     /**
+     * Deletes all chat records from the local database.
+     *
+     * This method removes every chat entity stored in the `chatentity` table of the local database.
+     * The deletion is performed as a bulk operation, erasing all chat-related data. It is intended
+     * for scenarios where a full reset or cleanup of chats is necessary.
+     *
+     * Note that this action is irreversible and may impact related data such as participants
+     * and messages if cascading deletion rules are enforced by the database schema.
+     */
+    override suspend fun deleteAllChats() {
+        db.chatDao.deleteAllChats()
+    }
+
+    /**
      * Filters the list of chat participants to include only those who are active within a specified chat.
      *
      * This method compares the participants in the list against the active participants retrieved

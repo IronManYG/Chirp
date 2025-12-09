@@ -4,6 +4,7 @@ import dev.gaddal.core.data.dto.AuthInfoSerializable
 import dev.gaddal.core.data.dto.requests.ChangePasswordRequest
 import dev.gaddal.core.data.dto.requests.EmailRequest
 import dev.gaddal.core.data.dto.requests.LoginRequest
+import dev.gaddal.core.data.dto.requests.RefreshRequest
 import dev.gaddal.core.data.dto.requests.RegisterRequest
 import dev.gaddal.core.data.dto.requests.ResetPasswordRequest
 import dev.gaddal.core.data.mappers.toDomain
@@ -15,7 +16,10 @@ import dev.gaddal.core.domain.util.DataError
 import dev.gaddal.core.domain.util.EmptyResult
 import dev.gaddal.core.domain.util.Result
 import dev.gaddal.core.domain.util.map
+import dev.gaddal.core.domain.util.onSuccess
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 
 /**
  * Implementation of the [AuthService] interface using Ktor's [HttpClient] to handle
@@ -160,5 +164,22 @@ class KtorAuthService(
                 newPassword = newPassword
             )
         )
+    }
+
+    /**
+     * Logs out the currently authenticated user by invalidating the provided refresh token.
+     * This action clears the stored authentication token from the `authProvider`.
+     *
+     * @param refreshToken The refresh token to be invalidated during the logout process.
+     * @return An `EmptyResult` indicating the success or failure of the logout operation,
+     *         with a potential `DataError.Remote` specifying any errors encountered.
+     */
+    override suspend fun logout(refreshToken: String): EmptyResult<DataError.Remote> {
+        return httpClient.post<RefreshRequest, Unit>(
+            route = "/auth/logout",
+            body = RefreshRequest(refreshToken)
+        ).onSuccess {
+            httpClient.authProvider<BearerAuthProvider>()?.clearToken()
+        }
     }
 }
