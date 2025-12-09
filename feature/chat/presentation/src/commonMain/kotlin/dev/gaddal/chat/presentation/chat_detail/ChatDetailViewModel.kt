@@ -392,6 +392,8 @@ class ChatDetailViewModel(
                             bannerState = BannerState()
                         )
                     }
+
+                    eventChannel.send(ChatDetailEvent.OnChatLeft)
                 }
                 .onFailure { error ->
                     eventChannel.send(
