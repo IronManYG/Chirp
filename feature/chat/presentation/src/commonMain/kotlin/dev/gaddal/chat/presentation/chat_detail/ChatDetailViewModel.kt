@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -220,33 +219,53 @@ class ChatDetailViewModel(
     }
 
     /**
-     * Observes chat messages and integrates them into the application's state and event system.
+     * Observes and manages the stream of chat messages in the current chat context.
      *
-     * This method performs the following operations:
-     * - Tracks the current list of messages from the application's state and ensures updates only occur
-     *   when the message list changes.
-     * - Observes a flow of new messages for the current chat using the `messageRepository`.
-     * - Combines new messages with authentication information to transform the messages into UI models,
-     *   and updates the application state with these transformed messages.
-     * - Monitors whether the user is near the bottom of the chat view to handle new message notifications appropriately.
-     * - Combines the current messages, new messages, and the "is near bottom" flag to determine if a new message
-     *   notification event should be emitted. If the user is near the bottom of the chat and there are new messages,
-     *   a `ChatDetailEvent.OnNewMessage` event is sent to the event channel.
+     * This method combines multiple observable data sources including current messages,
+     * new messages from the repository, and the UI state indicating if the user is near the
+     * bottom of the chat. It emits events to notify when there's a new message received,
+     * and the view is scrolled near the bottom, ensuring real-time updates.
      *
-     * This method uses Kotlin Flows to handle real-time updates and ensure reactivity in the chat interface.
-     * The operations are scoped to the `viewModelScope` to manage coroutine lifecycle.
+     * Data sources:
+     * - Current messages: Tracks the currently displayed messages and observes changes.
+     * - New messages: Fetches messages for the given chat ID from the message repository.
+     * - IsNearBottom: Observes the state indicating if the UI is scrolled near the bottom.
+     *
+     * Events:
+     * - Emits `ChatDetailEvent.OnNewMessage` when a new message arrives in the current chat
+     *   and the user is near the bottom of the chat.
+     *
+     * This functionality is scoped to `viewModelScope` to ensure lifecycle-aware operation.
      */
     private fun observeChatMessages() {
-        state
-            .map { it.messages.firstOrNull()?.id }
+        val currentMessages = state
+            .map { it.messages }
             .distinctUntilChanged()
-            .drop(1)
-            .onEach { newestMessageId ->
-                if (newestMessageId != null && state.value.isNearBottom) {
-                    eventChannel.send(ChatDetailEvent.OnNewMessage)
-                }
+
+        val newMessages = _chatId.flatMapLatest { chatId ->
+            if (chatId != null) {
+                messageRepository.getMessagesForChat(chatId)
+            } else emptyFlow()
+        }
+
+        val isNearBottom = state.map { it.isNearBottom }.distinctUntilChanged()
+
+        combine(
+            currentMessages,
+            newMessages,
+            isNearBottom
+        ) { currentMessages, newMessages, isNearBottom ->
+            val newestMessageId = newMessages.firstOrNull()?.message?.id
+            val currentNewestId = currentMessages
+                .asSequence()
+                .filterNot { it is MessageUi.DateSeparator }
+                .firstOrNull()
+                ?.id
+
+            if (newestMessageId != null && newestMessageId != currentNewestId && isNearBottom) {
+                eventChannel.send(ChatDetailEvent.OnNewMessage)
             }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
     }
 
     /**
