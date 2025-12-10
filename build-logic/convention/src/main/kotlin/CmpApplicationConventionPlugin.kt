@@ -1,10 +1,13 @@
+import dev.gaddal.chirp.convention.applyHierarchyTemplate
 import dev.gaddal.chirp.convention.configureAndroidTarget
 import dev.gaddal.chirp.convention.configureDesktopTarget
 import dev.gaddal.chirp.convention.configureIosTargets
 import dev.gaddal.chirp.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
  * A Gradle plugin that sets up Kotlin Multiplatform configurations for projects utilizing Android, iOS and Desktop targets,
@@ -21,13 +24,14 @@ import org.gradle.kotlin.dsl.dependencies
  * By utilizing this plugin, projects gain predefined, reusable configurations for Android, iOS and Desktop,
  * reducing boilerplate and ensuring adherence to project standards.
  */
-class CmpApplicationConventionPlugin: Plugin<Project> {
+class CmpApplicationConventionPlugin : Plugin<Project> {
 
     /**
      * Applies the CMP Application Convention Plugin configuration to the specified Gradle project.
      *
      * This method applies required plugins and configures the project for Android, iOS, and desktop targets.
      * It integrates several plugins, including the Kotlin Multiplatform plugin and Compose-related plugins.
+     * It applies source set hierarchy templates for consistent project structure.
      * It also sets dependencies for Compose development.
      *
      * @param target the Gradle project to which the plugin and configurations are applied
@@ -45,6 +49,10 @@ class CmpApplicationConventionPlugin: Plugin<Project> {
             configureAndroidTarget()
             configureIosTargets()
             configureDesktopTarget()
+
+            extensions.configure<KotlinMultiplatformExtension> {
+                applyHierarchyTemplate()
+            }
 
             dependencies {
                 "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
