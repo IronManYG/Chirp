@@ -20,16 +20,21 @@ typealias DomainMessageWithSender = dev.gaddal.chat.domain.models.MessageWithSen
  *
  * This function maps the properties of the `ChatDto`, including its identifier, participants,
  * last activity timestamp, and last message (if present), to the equivalent properties in the
- * domain model `Chat`.
+ * domain model `Chat`. The username of the last message sender is also resolved from the list
+ * of participants based on the message's sender ID.
  *
  * @return The domain model `Chat` instance derived from the current `ChatDto`.
  */
 fun ChatDto.toDomain(): Chat {
+    val lastMessageSenderUsername = lastMessage?.let { message ->
+        participants.find { it.userId == message.senderId }?.username
+    }
     return Chat(
         id = id,
         participants = participants.map { it.toDomain() },
         lastActivityAt = Instant.parse(lastActivityAt),
-        lastMessage = lastMessage?.toDomain()
+        lastMessage = lastMessage?.toDomain(),
+        lastMessageSenderUsername = lastMessageSenderUsername
     )
 }
 
@@ -38,7 +43,8 @@ fun ChatDto.toDomain(): Chat {
  *
  * This method maps the properties of the `ChatEntity`, such as the unique chat identifier and the last
  * activity timestamp, along with additional information about chat participants and the last message,
- * to create a complete representation of a `Chat`.
+ * to create a complete representation of a `Chat`. The mapping also includes finding and setting the
+ * username of the last message sender from the participants list.
  *
  * @param participants A list of `ChatParticipant` representing all participants involved in the chat.
  * @param lastMessage The most recent `ChatMessage` in the chat, or null if no messages have been exchanged.
@@ -49,11 +55,15 @@ fun ChatEntity.toDomain(
     participants: List<ChatParticipant>,
     lastMessage: ChatMessage? = null
 ): Chat {
+    val lastMessageSenderUsername = lastMessage?.let { message ->
+        participants.find { it.userId == message.senderId }?.username
+    }
     return Chat(
         id = chatId,
         participants = participants,
         lastActivityAt = Instant.fromEpochMilliseconds(lastActivityAt),
-        lastMessage = lastMessage
+        lastMessage = lastMessage,
+        lastMessageSenderUsername = lastMessageSenderUsername
     )
 }
 
@@ -70,7 +80,8 @@ fun ChatWithParticipants.toDomain(): Chat {
         id = chat.chatId,
         participants = participants.map { it.toDomain() },
         lastActivityAt = Instant.fromEpochMilliseconds(chat.lastActivityAt),
-        lastMessage = lastMessage?.toDomain()
+        lastMessage = lastMessage?.toDomain(),
+        lastMessageSenderUsername = lastMessage?.senderUsername
     )
 }
 
