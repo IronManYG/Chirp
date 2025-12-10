@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -135,7 +137,8 @@ fun ChirpAdaptiveFormLayout(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(32.dp))
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(horizontal = 24.dp, vertical = 32.dp),
+                        .padding(horizontal = 24.dp, vertical = 32.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AuthHeaderSection(
