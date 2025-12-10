@@ -38,5 +38,21 @@ kotlin {
             implementation(libs.jetbrains.compose.viewmodel)
             implementation(libs.jetbrains.lifecycle.compose)
         }
+
+        desktopMain.dependencies {
+            implementation(projects.core.presentation)
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.kotlin.stdlib)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.jsystemthemedetector)
+        }
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "dev.gaddal.chirp.MainKt"
     }
 }

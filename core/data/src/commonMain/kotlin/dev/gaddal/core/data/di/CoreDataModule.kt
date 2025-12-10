@@ -26,7 +26,7 @@ expect val platformCoreDataModule: Module
  * Core Koin module for data-related dependencies.
  *
  * This module provides essential services for the data layer, including:
- * - A platform-specific `HttpClientEngine` via [platformCoreDataModule].
+ * - A platform-specific `HttpClientEngine` via [dev.gaddal.chirp.core.data.di.platformCoreDataModule].
  * - A [ChirpLogger] implementation using [KermitLogger].
  * - An `HttpClient` instance created by [HttpClientFactory].
  * - An [AuthService] implementation using [KtorAuthService].
