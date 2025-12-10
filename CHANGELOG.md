@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.20.0] - 2025-12-10
+
+### Added
+
+- Chat: Display last message sender username in chat list
+  ([6c01427](https://github.com/IronManYG/Chirp/commit/6c01427))
+- Chat: Preload initial messages when entering a chat
+  ([239f8d8](https://github.com/IronManYG/Chirp/commit/239f8d8))
+- Chat: Fetch local user participant on initial load
+  ([87c6fdd](https://github.com/IronManYG/Chirp/commit/87c6fdd))
+- Chat: Emit event on successful chat leave
+  ([8f0acc6](https://github.com/IronManYG/Chirp/commit/8f0acc6))
+- Network: Treat UnknownHostException as a retriable error
+  ([15b11e8](https://github.com/IronManYG/Chirp/commit/15b11e8))
+
+### Changed
+
+- Database: Order chats by the latest message timestamp for more relevant sorting
+  ([8af6ad6](https://github.com/IronManYG/Chirp/commit/8af6ad6))
+- Chat: Improve chat selection UX and fix visual overlap
+  ([8c99871](https://github.com/IronManYG/Chirp/commit/8c99871))
+- Chat: Improve chat input UX and keyboard handling
+  ([b3bd1e6](https://github.com/IronManYG/Chirp/commit/b3bd1e6))
+- Chat: Correct header visibility logic in landscape mode
+  ([06677b1](https://github.com/IronManYG/Chirp/commit/06677b1))
+- Docs: README — Add links to new documentation and clarify project details
+  ([c2b3034](https://github.com/IronManYG/Chirp/commit/c2b3034))
+
+### Fixed
+
+- Chat: Ensure auto‑scroll when selecting a different chat
+  ([6c865a5](https://github.com/IronManYG/Chirp/commit/6c865a5))
+- Chat: Handle chats with no other participants
+  ([bee4eae](https://github.com/IronManYG/Chirp/commit/bee4eae))
+- Chat: Resolve lingering logout dialog
+  ([f6b0324](https://github.com/IronManYG/Chirp/commit/f6b0324))
+- Chat: Fix potential null issues when showing last message sender
+  ([6c01427](https://github.com/IronManYG/Chirp/commit/6c01427))
+
+[0.20.0]: https://github.com/IronManYG/Chirp/compare/fec4e89...6c865a5
+
 ## [0.19.0] - 2025-12-09
 
 ### Added
