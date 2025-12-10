@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -104,6 +105,12 @@ fun ChatDetailRoot(
 
     LaunchedEffect(chatId) {
         viewModel.onAction(ChatDetailAction.OnSelectChat(chatId))
+    }
+
+    LaunchedEffect(chatId) {
+        if (chatId != null) {
+            messageListState.scrollToItem(0)
+        }
     }
 
     BackHandler(
@@ -295,6 +302,7 @@ fun ChatDetailScreen(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .imePadding()
                                     .padding(
                                         vertical = 8.dp,
                                         horizontal = 16.dp
@@ -323,6 +331,7 @@ fun ChatDetailScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .imePadding()
                                 .padding(8.dp)
                         )
                     }

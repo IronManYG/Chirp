@@ -68,6 +68,7 @@ actual class ConnectionErrorHandler {
      * - SocketTimeoutException
      * - WebSocketException
      * - SocketException
+     * - UnknownHostException
      * - EOFException
      *
      * All other error types are considered non-retriable, and `false` is returned.
@@ -80,6 +81,7 @@ actual class ConnectionErrorHandler {
             is SocketTimeoutException,
             is WebSocketException,
             is SocketException,
+            is UnknownHostException,
             is EOFException -> true
 
             else -> false

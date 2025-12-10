@@ -105,6 +105,7 @@ fun ChatMessage.toLastMessageView(): LastMessageView {
         messageId = id,
         chatId = chatId,
         senderId = senderId,
+        senderUsername = null,
         content = content,
         timestamp = createdAt.toEpochMilliseconds(),
         deliveryStatus = deliveryStatus.name

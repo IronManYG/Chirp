@@ -80,12 +80,24 @@ interface ChatDao {
      * Retrieves a flow of chats along with their associated participants, ordered by the last activity timestamp in descending order.
      *
      * This function allows observing a live list of chats and their participants using Kotlin's Flow API.
+     * Chats are ordered based on their most recent message timestamp or last activity timestamp if no messages exist.
      * Each emitted list contains composite data that includes chat details and the corresponding participants.
      *
      * @return A Flow emitting lists of `ChatWithParticipants` objects, where each object combines chat details
-     *         and its associated participants.
+     *         and its associated participants, sorted by latest activity.
      */
-    @Query("SELECT * FROM chatentity ORDER BY lastActivityAt DESC")
+    @Query(
+        """
+        SELECT c.*
+        FROM chatentity c
+        LEFT JOIN(
+            SELECT chatId, MAX(timestamp) AS latest_message_time
+            FROM chatmessageentity
+            GROUP BY chatId
+        ) lm ON c.chatId = lm.chatId
+        ORDER BY COALESCE(lm.latest_message_time, c.lastActivityAt) DESC
+    """
+    )
     @Transaction
     fun getChatsWithParticipants(): Flow<List<ChatWithParticipants>>
 
