@@ -1,5 +1,6 @@
 package dev.gaddal.chirp
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,12 +21,14 @@ import org.koin.compose.viewmodel.koinViewModel
 /**
  * Root composable function for the application. It sets up navigation, theme, and language support.
  *
+ * @param isDarkTheme Whether the application should use dark theme. Defaults to system preference.
  * @param onAuthenticationChecked A callback invoked when authentication checking is complete.
  * @param viewModel The main view model that provides the application state and handles business logic.
  */
 @Composable
 @Preview
 fun App(
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
     onAuthenticationChecked: () -> Unit = {},
     viewModel: MainViewModel = koinViewModel()
 ) {
@@ -54,6 +57,7 @@ fun App(
     val languageManager: LanguageManager = koinInject()
 
     ChirpTheme(
+        darkTheme = isDarkTheme,
         languageCode = languageManager.currentLanguage
     ) {
         if (!state.isCheckingAuth && !state.isCheckingLanguage) {

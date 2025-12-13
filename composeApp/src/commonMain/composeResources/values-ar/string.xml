@@ -2,4 +2,5 @@
 <resources>
     <string name="file">ملف</string>
     <string name="new_window">نافذة جديدة</string>
+    <string name="app_theme">مظهر التطبيق</string>
 </resources>
