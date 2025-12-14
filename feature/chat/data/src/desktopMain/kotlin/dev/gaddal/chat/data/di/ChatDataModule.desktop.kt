@@ -3,6 +3,7 @@ package dev.gaddal.chat.data.di
 import dev.gaddal.chat.data.lifecycle.AppLifecycleObserver
 import dev.gaddal.chat.data.network.ConnectionErrorHandler
 import dev.gaddal.chat.data.network.ConnectivityObserver
+import dev.gaddal.chat.data.notification.DesktopNotifier
 import dev.gaddal.chat.data.notification.FirebasePushNotificationService
 import dev.gaddal.chat.database.DatabaseFactory
 import dev.gaddal.chat.domain.notification.PushNotificationService
@@ -22,6 +23,8 @@ import org.koin.dsl.module
  * - `ConnectionErrorHandler`: Handles network-related errors and connection state mapping.
  * - `ConnectivityObserver`: Monitors the network connectivity status.
  * - `AppLifecycleObserver`: Observes the application's lifecycle to determine foreground state (not needed on desktop platforms but maintained since code is shared between mobile and desktop platforms so it needs to be injected).
+ * - `DesktopNotifier`: Manages desktop-specific notification functionality (specific to desktop platforms),
+ *   bound to the `PushNotificationService` interface (not needed on mobile platforms but maintained since code is shared between mobile and desktop platforms so it needs to be injected).
  * - `FirebasePushNotificationService`: Manages push notification functionality (specific to Firebase),
  *   bound to the `PushNotificationService` interface (not needed on desktop platforms but maintained since code is shared between mobile and desktop platforms so it needs to be injected).
  */
@@ -30,5 +33,6 @@ actual val platformChatDataModule = module {
     singleOf(::ConnectionErrorHandler)
     singleOf(::ConnectivityObserver)
     singleOf(::AppLifecycleObserver)
+    singleOf(::DesktopNotifier)
     singleOf(::FirebasePushNotificationService) bind PushNotificationService::class
 }

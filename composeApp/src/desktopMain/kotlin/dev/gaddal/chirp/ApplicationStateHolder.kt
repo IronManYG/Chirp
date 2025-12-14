@@ -1,5 +1,7 @@
 package dev.gaddal.chirp
 
+import androidx.compose.ui.window.Notification
+import dev.gaddal.chat.data.notification.DesktopNotifier
 import dev.gaddal.chirp.windows.WindowState
 import dev.gaddal.core.domain.preferences.ThemePreference
 import dev.gaddal.core.domain.preferences.ThemePreferences
@@ -15,13 +17,15 @@ import kotlinx.coroutines.launch
 
 class ApplicationStateHolder(
     private val applicationScope: CoroutineScope,
-    private val themePreferences: ThemePreferences
+    private val themePreferences: ThemePreferences,
+    private val desktopNotifier: DesktopNotifier
 ) {
 
     private val _state = MutableStateFlow(ApplicationState())
     val state = _state
         .onStart {
             observeThemePreference()
+            observeNewMessages()
         }
         .stateIn(
             applicationScope,
@@ -53,6 +57,63 @@ class ApplicationStateHolder(
                 }
             }
             .launchIn(applicationScope)
+    }
+
+    /**
+     * Observes and handles new incoming chat messages to notify the user via system notifications when the application is in the background.
+     *
+     * This method listens to notifications emitted from `desktopNotifier.observeNewNotifications`. When a new notification payload is received,
+     * it checks whether the application is in the background by determining if any application windows are currently focused. If the application
+     * is not in focus, a system tray notification is displayed with a title, message, and a notification type of `Info`.
+     *
+     * Workflow:
+     * 1. Subscribes to the `observeNewNotifications` flow from `desktopNotifier`.
+     * 2. For each emitted `NotificationPayload`, determines if the application is in the background by checking the active state of windows.
+     * 3. If the application is in the background, constructs and sends a system notification through `trayState.sendNotification`.
+     * 4. Operates within the `applicationScope` coroutine scope for lifecycle management.
+     */
+    private fun observeNewMessages() {
+        desktopNotifier
+            .observeNewNotifications()
+            .onEach { notificationPayload ->
+                val isAppInBackground = state.value.windows.none { it.isFocused }
+
+                if (isAppInBackground) {
+                    state.value.trayState.sendNotification(
+                        notification = Notification(
+                            title = notificationPayload.title,
+                            message = notificationPayload.message,
+                            type = Notification.Type.Info
+                        )
+                    )
+                }
+            }
+            .launchIn(applicationScope)
+    }
+
+    /**
+     * Updates the focus state of a specific window in the application state.
+     *
+     * This function modifies the current application state to toggle the `isFocused` property
+     * of a window identified by its unique `id`. If a window with the specified `id` exists
+     * in the state, its focus status is updated; otherwise, no changes are made. This method
+     * is useful for managing window focus changes and ensuring the application state remains
+     * consistent.
+     *
+     * @param id The unique identifier of the window whose focus state is to be updated.
+     * @param isFocused A boolean indicating the new focus state of the window. If `true`,
+     *                  the window is marked as focused; otherwise, it is marked as unfocused.
+     */
+    fun onWindowFocusChanged(id: String, isFocused: Boolean) {
+        _state.update {
+            it.copy(
+                windows = it.windows.map { currentWindow ->
+                    if (currentWindow.id == id) {
+                        currentWindow.copy(isFocused = isFocused)
+                    } else currentWindow
+                }
+            )
+        }
     }
 
     /**
