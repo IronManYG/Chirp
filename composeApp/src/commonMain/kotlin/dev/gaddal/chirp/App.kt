@@ -23,6 +23,7 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * @param isDarkTheme Whether the application should use dark theme. Defaults to system preference.
  * @param onAuthenticationChecked A callback invoked when authentication checking is complete.
+ * @param onDeepLinkListenerSetup A callback invoked when deep link listener setup is complete.
  * @param viewModel The main view model that provides the application state and handles business logic.
  */
 @Composable
@@ -30,6 +31,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun App(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     onAuthenticationChecked: () -> Unit = {},
+    onDeepLinkListenerSetup: () -> Unit = {},
     viewModel: MainViewModel = koinViewModel()
 ) {
     val navController = rememberNavController()
@@ -71,7 +73,7 @@ fun App(
                     },
                     startAtLanguageSelection = !state.hasChosenLanguage
                 )
-                DeepLinkListener(navController)
+                DeepLinkListener(navController, onDeepLinkListenerSetup)
             }
         }
     }

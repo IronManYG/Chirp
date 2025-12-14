@@ -26,13 +26,15 @@ import org.jetbrains.compose.resources.stringResource
  * @param onCloseRequest A callback function invoked when the user requests to close the window.
  * @param onAddWindowClick A callback function invoked when the user selects the "Add New Window" option.
  * @param onFocusChanged A callback function invoked with the focus state of the window as a parameter.
+ * @param onDeepLinkListenerSetup A callback function invoked to set up deep link handling for the window.
  */
 @Composable
 fun ChirpWindow(
     appTheme: AppTheme,
     onCloseRequest: () -> Unit,
     onAddWindowClick: () -> Unit,
-    onFocusChanged: (Boolean) -> Unit
+    onFocusChanged: (Boolean) -> Unit,
+    onDeepLinkListenerSetup: () -> Unit,
 ) {
     val windowState = rememberWindowState(
         width = 1200.dp,
@@ -66,7 +68,8 @@ fun ChirpWindow(
         }
 
         App(
-            isDarkTheme = appTheme == AppTheme.DARK
+            isDarkTheme = appTheme == AppTheme.DARK,
+            onDeepLinkListenerSetup = onDeepLinkListenerSetup
         )
     }
 }
