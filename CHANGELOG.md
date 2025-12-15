@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.21.0] - 2025-12-15
+
+### Added
+
+- Desktop: Configure Windows build and App URI handler
+  ([90387d4](https://github.com/IronManYG/Chirp/commit/90387d4))
+- Desktop: Add Conveyor for multi-platform packaging
+  ([fb0fd70](https://github.com/IronManYG/Chirp/commit/fb0fd70))
+- Desktop: Implement deep link handling
+  ([1b3fa2c](https://github.com/IronManYG/Chirp/commit/1b3fa2c))
+- Chat: Implement Ctrl/Cmd+Enter shortcut to send messages
+  ([8a96c25](https://github.com/IronManYG/Chirp/commit/8a96c25))
+- Desktop: Implement background notifications for new messages
+  ([7b49fbc](https://github.com/IronManYG/Chirp/commit/7b49fbc))
+- Desktop: Implement theme persistence and system tray menu
+  ([6277261](https://github.com/IronManYG/Chirp/commit/6277261))
+- Desktop: Implement multi-window support and state management
+  ([8434a0a](https://github.com/IronManYG/Chirp/commit/8434a0a))
+- Profile (Desktop): File picking and drag & drop for profile picture uploads
+  ([16ed394](https://github.com/IronManYG/Chirp/commit/16ed394))
+- Chat (Desktop): Robust desktop network connectivity observer
+  ([3db44db](https://github.com/IronManYG/Chirp/commit/3db44db))
+- Desktop: Core data and presentation layers for desktop
+  ([860765e](https://github.com/IronManYG/Chirp/commit/860765e))
+- Linux: Add Debian package configuration
+  ([27b5bcb](https://github.com/IronManYG/Chirp/commit/27b5bcb))
+
+### Changed
+
+- Build: Introduce KMP hierarchy template and unify source sets
+  ([aa8f8fe](https://github.com/IronManYG/Chirp/commit/aa8f8fe))
+- Refactor: Remove boilerplate code and introduce Desktop support
+  ([bed3848](https://github.com/IronManYG/Chirp/commit/bed3848))
+
+[0.21.0]: https://github.com/IronManYG/Chirp/compare/6c865a5...27b5bcb
+
 ## [0.20.0] - 2025-12-10
 
 ### Added
