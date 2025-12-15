@@ -7,8 +7,8 @@ environment variables, project structure, and licensing. Unknowns are explicitly
 also CHANGELOG.md for recent changes.
 
 ## Overview
-- Platforms: Android, iOS
-  - Note: Desktop/JVM target is not configured in `composeApp` (no desktop source set or entry point found). See TODO in Run/Build.
+
+- Platforms: Android, iOS, Desktop (JVM)
 - UI: JetBrains Compose Multiplatform
 - Language: Kotlin (KMP)
 - Dependency Injection: Koin
@@ -52,6 +52,9 @@ Notes
 
 ## Entry points
 - Android: `composeApp/src/androidMain/kotlin/dev/gaddal/chirp/MainActivity.kt` hosts the `App()` composable.
+- Desktop/JVM: `composeApp/src/desktopMain/kotlin/dev/gaddal/chirp/Main.kt` (`main` →
+  `dev.gaddal.chirp.MainKt`). Windows tray menu, deep links, and multi‑window are handled in desktop
+  sources (see `windows/ChirpWindow.kt`, `deeplink/DesktopDeepLinkHandler.kt`).
 - Shared UI root: `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/App.kt`.
 - Shared navigation root:
   `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/navigation/NavigationRoot.kt`.
@@ -81,7 +84,22 @@ iOS
 - On non‑macOS hosts, iOS targets are disabled at configuration time (expected and harmless).
 
 Desktop/JVM
-- TODO: No Desktop target/tasks are present (e.g., `:composeApp:run`, `:composeApp:packageDistributionForCurrentOS`). If Desktop support is desired, add a JVM/desktop target and entry point and document commands here.
+
+- Run Desktop app (current OS):
+    - Windows: `.\gradlew.bat :composeApp:run`
+    - macOS/Linux: `./gradlew :composeApp:run`
+- Package a distributable for the current OS via Compose Multiplatform:
+    - Windows: `.\gradlew.bat :composeApp:packageDistributionForCurrentOS`
+    - macOS/Linux: `./gradlew :composeApp:packageDistributionForCurrentOS`
+- Multi‑platform installers via Conveyor (requires Conveyor CLI):
+    - Ensure `conveyor.conf` is present (this repo has it) and run: `conveyor make`
+    - Notes: configured URL scheme `chirp`, Windows MSIX, Linux DEB, macOS app. Main class is
+      `dev.gaddal.chirp.MainKt`. See `conveyor.conf` for details.
+    - Targets/Installers: Windows (amd64, MSIX), Linux (aarch64/arm64, DEB), macOS (aarch64, app
+      bundle).
+    - JDK note: The project builds with Java 17. Desktop installers are produced with a JDK 21
+      runtime via Conveyor (see `conveyor.conf`). No changes are required to your local JDK to build
+      with Gradle.
 
 Clean / Build all
 - Windows: `.\gradlew.bat clean build`
@@ -98,6 +116,8 @@ composeApp
 - `:composeApp:assembleRelease` — builds Android release APK (signing must be configured locally)
 - `:composeApp:lint` / `:composeApp:lintFix` — run Android lint and attempt automatic fixes
 - `:composeApp:installDebug` — installs the debug APK on a connected device/emulator
+- `:composeApp:run` — runs the Desktop (JVM) app for the current OS
+- `:composeApp:packageDistributionForCurrentOS` — packages a Desktop distribution for the current OS
 
 Testing tasks (see Tests section for details)
 - `:<module>:testDebugUnitTest` — Android JVM unit tests (debug variant)
@@ -109,6 +129,12 @@ Testing tasks (see Tests section for details)
 - Package manager/build tool: Gradle (use the wrapper in the repo root). There are no additional
   script runners (e.g., npm/yarn) in this repository.
 - To list tasks for any module (Windows): `.\gradlew.bat :<module>:tasks`
+
+Packaging scripts/tools
+
+- Compose Multiplatform packaging: `:composeApp:packageDistributionForCurrentOS`
+- Conveyor packaging (install Conveyor CLI): run `conveyor make` from repo root. The build consumes
+  `composeApp/build/libs/composeApp-desktop-*.jar` as input and produces platform installers.
 
 Build logic
 Convention plugins live under `build-logic/convention` and are applied via the version catalog (see `gradle/libs.versions.toml`). Relevant plugin IDs registered in `build-logic`:
@@ -160,6 +186,12 @@ Firebase (FCM, Google Services)
   target (under `iosApp` as required by your Xcode setup). Signing/capabilities (Push Notifications,
   Background Modes, Remote notifications) must be configured locally. TODO: document exact file path
   and capabilities once finalized.
+
+Desktop Deep Links and URL Scheme
+
+- The app registers the custom URL scheme `chirp` for deep linking on desktop via Conveyor
+  configuration (`url-schemes = ["chirp"]`).
+- Windows App URI handler is configured for `chirp.pl-coding.com` in `conveyor.conf`.
 
 Potential future configuration
 - API endpoints/keys for Ktor — consider using BuildKonfig or another secure mechanism for non‑secret config; avoid committing secrets.
@@ -232,6 +264,7 @@ Root directories (repo top-level)
 - `iosApp/` — Xcode wrapper project
 - `docs/` — documentation
 - `gradle/`, `gradlew*`, `settings.gradle.kts`, `build.gradle.kts` — build system
+- `conveyor.conf`, `conveyorResources/` — Conveyor packaging configuration and assets
 
 Build and configuration conventions
 - Plugins are declared via the version catalog in the root `build.gradle.kts`; modules apply conventions per need.
@@ -303,6 +336,13 @@ Quick validation (manual)
 Build/run tips (Windows)
 - Build all: `.\\gradlew.bat build`
 - Run Android debug APK: `.\\gradlew.bat :composeApp:assembleDebug`
+- Run Desktop app: `.\\gradlew.bat :composeApp:run`
+- Package Desktop (current OS): `.\\gradlew.bat :composeApp:packageDistributionForCurrentOS`
+
+## License
+
+- License: MIT (as specified in `conveyor.conf`).
+- TODO: Add a `LICENSE` file at the repository root to mirror this.
 
 ## Authentication and Deep Links
 
