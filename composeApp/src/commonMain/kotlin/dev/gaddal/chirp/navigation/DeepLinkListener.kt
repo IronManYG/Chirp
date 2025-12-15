@@ -15,15 +15,19 @@ import androidx.navigation.NavUri
  *
  * @param navController The navigation controller used for managing app navigation
  * in response to deep link URIs.
+ * @param onSetup A callback invoked when deep link listener setup is complete.
  */
 @Composable
 fun DeepLinkListener(
-    navController: NavController
+    navController: NavController,
+    onSetup: () -> Unit
 ) {
     DisposableEffect(Unit) {
         ExternalUriHandler.listener = { uri ->
             navController.navigate(NavUri(uri))
         }
+
+        onSetup()
 
         onDispose {
             ExternalUriHandler.listener = null

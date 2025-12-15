@@ -49,6 +49,8 @@
     <string name="unknown_error">خطأ غير معروف</string>
     <string name="send_a_message">أرسل رسالة</string>
     <string name="send">إرسال</string>
+    <string name="select_a_profile_picture">اختر صورة الملف الشخصي</string>
+    <string name="drop_picture_info">أسقط الصورة هنا لرفعها كصورة جديدة للملف الشخصي</string>
     <string name="delete_for_everyone">حذف للكل</string>
     <string name="no_chats">لا توجد محادثات</string>
     <string name="no_chats_subtitle">إنشاء محادثة جديدة لبدء المراسلة</string>

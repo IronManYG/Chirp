@@ -49,6 +49,8 @@
     <string name="unknown_error">Unknown error</string>
     <string name="send_a_message">Send a message</string>
     <string name="send">Send</string>
+    <string name="select_a_profile_picture">Select a profile picture</string>
+    <string name="drop_picture_info">Drop your image here to upload as your new profile picture</string>
     <string name="delete_for_everyone">Delete for everyone</string>
     <string name="no_chats">No chats</string>
     <string name="no_chats_subtitle">Create new chat to start messaging</string>
