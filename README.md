@@ -1,445 +1,368 @@
 # Chirp
 
-A Kotlin Multiplatform (KMP) application targeting Android and iOS using Compose Multiplatform. The repository is organized as a multi-module project with shared core modules and feature modules.
+<p align="center">  
+  <img src="conveyorResources/logo.png" alt="Chirp Logo" width="120">  
+</p>  
 
-This README covers the stack, requirements, setup, run/build/test commands, useful Gradle tasks,
-environment variables, project structure, and licensing. Unknowns are explicitly marked as TODO. See
-also CHANGELOG.md for recent changes.
+<p align="center">  
+  A modern, cross-platform messaging application built with Kotlin Multiplatform and Compose Multiplatform, targeting Android, iOS, and Desktop.  
+</p>  
 
-## Overview
+<p align="center">  
+  <img src="https://img.shields.io/badge/JDK-17-4479A1?style=flat-square" alt="JDK 17" />  
+  <img src="https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin 2.2.0" />  
+  <img src="https://img.shields.io/badge/Compose%20MPP-1.9.0--beta01-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white" alt="Compose Multiplatform" />  
+  <img src="https://img.shields.io/badge/AGP-8.11.1-3DDC84?style=flat-square&logo=android&logoColor=white" alt="AGP 8.11.1" />  
+</p>  
 
-- Platforms: Android, iOS, Desktop (JVM)
-- UI: JetBrains Compose Multiplatform
-- Language: Kotlin (KMP)
-- Dependency Injection: Koin
-- Networking: Ktor Client
-- Persistence: Room (with SQLite bundled) and AndroidX DataStore
-- Concurrency/Time: kotlinx-coroutines, kotlinx-datetime
-- Images: Coil 3
-- Permissions (KMP): moko-permissions
-- Notifications: Firebase Cloud Messaging (Android/iOS)
+<p align="center">  
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Android" />  
+  <img src="https://img.shields.io/badge/Platform-iOS-000000?style=flat-square&logo=apple&logoColor=white" alt="iOS" />  
+  <img src="https://img.shields.io/badge/Platform-Desktop-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Desktop" />  
+</p> 
 
-Key toolchain versions (from `gradle/libs.versions.toml`):
-- Kotlin: 2.2.0
-- Compose Multiplatform: 1.9.0-beta01 (Compose BOM 2025.07.00)
-- Android Gradle Plugin (AGP): 8.13.0
-- KSP: 2.2.0-2.0.2
-- Room: 2.7.2; SQLite bundle: 2.5.2
-- Min SDK: 26, Target/Compile SDK: 36
-- Java toolchain: 17
+## About This Project
 
-## Requirements
-- JDK: Java 17. Ensure your IDE and Gradle toolchain use JDK 17.
-- Gradle Wrapper (included)
-  - Windows: `.\gradlew.bat`
-  - macOS/Linux: `./gradlew`
-- Android Studio with Android SDK Platform 36 and matching build tools
-- Xcode (for building/running iOS on macOS)
+This application is a comprehensive implementation of a cross-platform chat solution, built to
+demonstrate mastery of **Kotlin Multiplatform (KMP)** and **Compose Multiplatform (CMP)**.
 
-### Package manager and build tooling
-- Build system: Gradle 8.x (wrapper checked in), Kotlin DSL with a version catalog (`gradle/libs.versions.toml`).
-- Plugins and dependency versions are controlled via the catalog and custom convention plugins under `build-logic/convention`.
+It implements industry-standard practices including:
 
-Notes
-- On non‑macOS machines, iOS Kotlin/Native targets will be disabled during configuration. This is expected and harmless for Android work.
+- **Kotlin Multiplatform (KMP)** architecture for shared business logic.
 
-## Setup
-1. Clone the repository.
-2. Open in Android Studio (recommended) or IntelliJ IDEA with KMP support.
-3. Let Gradle sync and download dependencies.
-4. Ensure local Android SDK is configured (Android Studio manages `local.properties`).
-5. For iOS, open `iosApp/iosApp.xcodeproj` in Xcode when running on macOS.
+- **Compose Multiplatform (CMP)** for 100% shared UI across platforms.
 
-## Entry points
-- Android: `composeApp/src/androidMain/kotlin/dev/gaddal/chirp/MainActivity.kt` hosts the `App()` composable.
-- Desktop/JVM: `composeApp/src/desktopMain/kotlin/dev/gaddal/chirp/Main.kt` (`main` →
-  `dev.gaddal.chirp.MainKt`). Windows tray menu, deep links, and multi‑window are handled in desktop
-  sources (see `windows/ChirpWindow.kt`, `deeplink/DesktopDeepLinkHandler.kt`).
-- Shared UI root: `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/App.kt`.
-- Shared navigation root:
-  `composeApp/src/commonMain/kotlin/dev/gaddal/chirp/navigation/NavigationRoot.kt`.
-- iOS: `composeApp/src/iosMain/kotlin/dev/gaddal/chirp/MainViewController.kt` provides the view controller; frameworks are produced from `composeApp` and the `iosApp` Xcode project wraps and launches the UI.
+- **Multi-module** Gradle setup following best practices.
 
-## Run / Build
-The application module is `:composeApp`.
+- **Offline-first** architecture with robust data synchronization.
 
-Android (assemble debug APK)
-- Windows: `.\gradlew.bat :composeApp:assembleDebug`
-- macOS/Linux: `./gradlew :composeApp:assembleDebug`
+- **Real-time** messaging using WebSockets.
 
-Android (install/run on connected device or emulator)
-- Windows: `.\gradlew.bat :composeApp:installDebug`
-- macOS/Linux: `./gradlew :composeApp:installDebug`
-- Then launch from the device/emulator apps list.
+## Table of Contents
 
-Android (release builds)
-- Assemble: `.\gradlew.bat :composeApp:assembleRelease` (configure signing locally)
-- Bundle AAB: `.\gradlew.bat :composeApp:bundleRelease`
+- [Features](#features)
+- [Roadmap (Extended Features)](#roadmap)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Acknowledgment](#acknowledgment)
+- [License](#license)
+- [Changelog](#changelog)
 
-List tasks
-- Per-module: `.\gradlew.bat :composeApp:tasks`
+## Features
 
-iOS
-- Open `iosApp` in Xcode and run on Simulator or device. Frameworks are produced from `composeApp` iOS targets.
-- On non‑macOS hosts, iOS targets are disabled at configuration time (expected and harmless).
+### Authentication & Profile
 
-Desktop/JVM
+- 🔐 **Secure Auth** — Registration, Login, and Session Management with auto-refresh.
 
-- Run Desktop app (current OS):
-    - Windows: `.\gradlew.bat :composeApp:run`
-    - macOS/Linux: `./gradlew :composeApp:run`
-- Package a distributable for the current OS via Compose Multiplatform:
-    - Windows: `.\gradlew.bat :composeApp:packageDistributionForCurrentOS`
-    - macOS/Linux: `./gradlew :composeApp:packageDistributionForCurrentOS`
-- Multi‑platform installers via Conveyor (requires Conveyor CLI):
-    - Ensure `conveyor.conf` is present (this repo has it) and run: `conveyor make`
-    - Notes: configured URL scheme `chirp`, Windows MSIX, Linux DEB, macOS app. Main class is
-      `dev.gaddal.chirp.MainKt`. See `conveyor.conf` for details.
-    - Targets/Installers: Windows (amd64, MSIX), Linux (aarch64/arm64, DEB), macOS (aarch64, app
-      bundle).
-    - JDK note: The project builds with Java 17. Desktop installers are produced with a JDK 21
-      runtime via Conveyor (see `conveyor.conf`). No changes are required to your local JDK to build
-      with Gradle.
+- 📧 **Email Verification** — Deep linking support for verifying email addresses.
 
-Clean / Build all
-- Windows: `.\gradlew.bat clean build`
-- macOS/Linux: `./gradlew clean build`
+- 🔄 **Password Recovery** — "Forgot Password" flow via email and deep links.
 
-## Useful Gradle tasks
-Root/common tasks
-- `:clean` — cleans the build
-- `:build` — builds all modules
-- `:test` — runs unit tests across modules
+- 📸 **Profile Management** — Native photo picking (Android/iOS/Desktop) and image uploads.
 
-composeApp
-- `:composeApp:assembleDebug` — builds Android debug APK
-- `:composeApp:assembleRelease` — builds Android release APK (signing must be configured locally)
-- `:composeApp:lint` / `:composeApp:lintFix` — run Android lint and attempt automatic fixes
-- `:composeApp:installDebug` — installs the debug APK on a connected device/emulator
-- `:composeApp:run` — runs the Desktop (JVM) app for the current OS
-- `:composeApp:packageDistributionForCurrentOS` — packages a Desktop distribution for the current OS
+### Messaging & Connectivity
 
-Testing tasks (see Tests section for details)
-- `:<module>:testDebugUnitTest` — Android JVM unit tests (debug variant)
-- `:<module>:testReleaseUnitTest` — Android JVM unit tests (release variant)
-- `:<module>:connectedDebugAndroidTest` — instrumented tests on device/emulator (if configured)
+- ⚡ **Real-time Chat** — WebSockets for instant message delivery.
 
-## Scripts
+- 📡 **Offline-First** — Local database caching (Room/SQLite) allows full app usage without internet.
 
-- Package manager/build tool: Gradle (use the wrapper in the repo root). There are no additional
-  script runners (e.g., npm/yarn) in this repository.
-- To list tasks for any module (Windows): `.\gradlew.bat :<module>:tasks`
+- 📄 **Pagination** — Efficient data loading for chat history and lists.
 
-Packaging scripts/tools
+- 🔔 **Push Notifications** — Firebase Cloud Messaging (Android/iOS) and local notifications (
+  Desktop).
 
-- Compose Multiplatform packaging: `:composeApp:packageDistributionForCurrentOS`
-- Conveyor packaging (install Conveyor CLI): run `conveyor make` from repo root. The build consumes
-  `composeApp/build/libs/composeApp-desktop-*.jar` as input and produces platform installers.
+- 📱 **Cross-platform Sync** — Seamless state synchronization across all 5 platforms.
 
-Build logic
-Convention plugins live under `build-logic/convention` and are applied via the version catalog (see `gradle/libs.versions.toml`). Relevant plugin IDs registered in `build-logic`:
-- `dev.gaddal.convention.android.application` — Android app basics (namespace, packaging, build types, versioning from the catalog); delegates to shared Kotlin/Android config.
-- `dev.gaddal.convention.android.application.compose` — Adds Compose build features and BOM/tooling to Android app modules.
-- `dev.gaddal.convention.cmp.application` — KMP app with Android + iOS targets, Compose plugins; Android target JVM 17; iOS targets configured as static frameworks.
-- `dev.gaddal.convention.kmp.library` — KMP library with Android + iOS targets, Kotlin serialization, common test deps; sets Android `resourcePrefix` and enables Android resources in KMP CLI builds; configures compiler opt-ins.
-- `dev.gaddal.convention.cmp.library` — Adds Compose deps/plugins for KMP libraries (UI, Foundation, Material3, Material Icons); debug tooling on Android.
-- `dev.gaddal.convention.cmp.feature` — Convenience plugin to set up a Compose-enabled KMP feature library (composes `kmp.library` + Compose plugins/deps).
-- `dev.gaddal.convention.buildkonfig` — Wires BuildKonfig with package name derived from project path and expects an `API_KEY` in `local.properties`.
-- `dev.gaddal.convention.room` — Wires Room + KSP across Android/iOS (runtime + sqlite-bundled; KSP for Android and iOS targets); sets `schemas` dir per module.
+### Internationalization & UI
 
-Notable conventions and helpers
-- Android/Kotlin settings: Java/Kotlin toolchains target JVM 17; core library desugaring enabled with `android-desugarJdkLibs`.
-- KMP Android target: `jvmTarget = 17` via `configureAndroidTarget`.
-- KMP compiler flags: `-Xexpect-actual-classes`, opt-ins for `kotlin.RequiresOptIn` and `kotlin.time.ExperimentalTime`.
-- Namespaces/resource prefixes: library modules derive `namespace` and `resourcePrefix` from Gradle path using helpers in `PathUtil.kt`.
-  - `pathToPackageName()` converts `:core:domain` -> `dev.gaddal.core.domain`.
-  - `pathToResourcePrefix()` converts `:feature:chat:data` -> `feature_chat_data_`.
-- iOS framework names:
-  - App plugin (`cmp.application`): static frameworks with baseName `ComposeApp`.
-  - Library plugin (`kmp.library`): baseName derived from module path via `pathToFrameworkName()` (camel-cased).
-- Compose BOM/tooling: app and Compose-enabled modules import the BOM; debug-only UI tooling and previews added for Android.
+- 🌍 **Multilingual** — Full support for English and Arabic (RTL).
 
-## Environment variables and configuration
-No global environment variables are required for a basic build.
+- 🌗 **Theming** — 100% responsive UI with Light and Dark modes.
 
-BuildKonfig (per-module, optional)
-- Some modules apply `dev.gaddal.convention.buildkonfig`. When applied, you MUST define `API_KEY` in `local.properties` at the repo root, or the build will fail.
-  - Example entry in `local.properties` (do not commit this file):
-    - `API_KEY=your_value_here`
-  - Modules applying this convention include:
-      - `core:data`
-      - `feature:chat:data`
-  - Generated package name for BuildKonfig is derived from the module path via `pathToPackageName()`.
+- 🔤 **Dynamic Typography** — Cairo font for Arabic, Plus Jakarta Sans for Latin scripts.
 
-Room schemas
+### Platform Features
 
-- The Room convention plugin configures `schemaDirectory` to `<module>/schemas`.
-- Example present in repo: `feature/chat/database/schemas`.
-- Recommendation: commit schemas to version control to enable reliable migration testing.
+- 🖥️ **Desktop Support** — Native Windows, macOS, and Linux apps.
 
-Firebase (FCM, Google Services)
+- 📦 **Distribution** — Installers via Conveyor.
 
-- The Android app applies `com.google.gms.google-services`. You need to provide
-  `composeApp/google-services.json` for your Firebase project to enable FCM and related services.
-  This file is intentionally git-ignored.
-- iOS push notifications use Firebase as well. Provide `GoogleService-Info.plist` in the iOS
-  target (under `iosApp` as required by your Xcode setup). Signing/capabilities (Push Notifications,
-  Background Modes, Remote notifications) must be configured locally. TODO: document exact file path
-  and capabilities once finalized.
+# Roadmap: Extended Features
 
-Desktop Deep Links and URL Scheme
+Having established the core foundation, I am now focused on integrating advanced features to further
+refine the architecture and tackle complex, real-world engineering challenges.
 
-- The app registers the custom URL scheme `chirp` for deep linking on desktop via Conveyor
-  configuration (`url-schemes = ["chirp"]`).
-- Windows App URI handler is configured for `chirp.pl-coding.com` in `conveyor.conf`.
+### 🔐 Advanced Security
 
-Potential future configuration
-- API endpoints/keys for Ktor — consider using BuildKonfig or another secure mechanism for non‑secret config; avoid committing secrets.
-- Android release signing — configure locally, do not commit keystores.
+- [ ] **Local Data Encryption**
+    - [ ] Android: Encrypt data using Android Keystore System
+    - [ ] iOS: Secure storage via Keychain Services
+    - [ ] Desktop: Integration with Windows Credential Manager, macOS Keychain, and Linux Secret
+      Service
 
-TODO
-- Document any additional environment variables or service credentials once integrated.
+### 🎤 Rich Media & Audio
+
+- [ ] **Voice Messages**
+    - [ ] Audio recording implementation
+    - [ ] Waveform visualization
+    - [ ] Scrubbing and playback controls
+    - [ ] Background playback support
+- [ ] **Image Attachments**
+    - [ ] Multiple image selection (up to 10)
+    - [ ] Automatic compression
+    - [ ] Upload progress indicators
+    - [ ] Full-screen interactive viewer
+
+### ⚡ Real-Time Enhancements
+
+- [ ] **Typing Indicators**
+    - [ ] Visual cues for single user typing
+    - [ ] "Several people are typing" support
+- [ ] **Smart Verification**
+    - [ ] Auto-detection of unverified users during login
+    - [ ] Automatic trigger for verification emails
+
+### 👮 Chat Administration
+
+- [ ] **Admin Roles**
+    - [ ] Group creator assignment as Admin
+- [ ] **Moderation**
+    - [ ] Member removal functionality
+- [ ] **Group Management**
+    - [ ] Cascade deletion logic (if Admin leaves)
+    - [ ] Warning dialogs for destructive actions
+
+## Screenshots
+
+### Splash Screen
+
+<p align="center">
+  <img src="previews/1-[Mobile Portrait Light] Splash Screen.png" width="280" alt="Splash Screen" />
+</p>
+
+### Authorization
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>Register</strong><br/>
+      <img src="previews/2-Authorization - [Mobile Portrait] Register.png" width="280" alt="Register Screen" />
+    </td>
+    <td align="center">
+      <strong>Register + Success</strong><br/>
+      <img src="previews/3-Authorization - [Mobile Portrait Light] Register + Success.png" width="280" alt="Register Success" />
+    </td>
+    <td align="center">
+      <strong>Login (Tablet)</strong><br/>
+      <img src="previews/4-Authorization - [Tablet Light] Login.png" width="400" alt="Login Screen - Tablet" />
+    </td>
+  </tr>
+</table>
+
+### Profile Settings
+
+<p align="center">
+  <img src="previews/5-Profile Settings - [Mobile Portrait - Light].png" width="280" alt="Profile Settings" />
+</p>
+
+### Chat
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>Empty Chat</strong><br/>
+      <img src="previews/6-Chat - [Mobile Portrait Dark] Chat - Empty.png" width="280" alt="Empty Chat - Dark Mode" />
+    </td>
+    <td align="center">
+      <strong>Chat List</strong><br/>
+      <img src="previews/7-Chat - [Mobile Portrait Light] Chat List.png" width="280" alt="Chat List" />
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>Inside Chat (Desktop)</strong><br/>
+      <img src="previews/8-Chat - [Desktop Light] Inside Chat.png" width="500" alt="Inside Chat - Desktop Light" />
+    </td>
+    <td align="center">
+      <strong>Chat Members (Desktop)</strong><br/>
+      <img src="previews/9-Chat - [Desktop Dark] Chat Members.png" width="500" alt="Chat Members - Desktop Dark" />
+    </td>
+  </tr>
+</table>
+
+## Tech Stack
+
+### Core Technologies
+
+| Category              | Technology                                                                   | Version      |  
+|-----------------------|------------------------------------------------------------------------------|--------------|  
+| Language              | [Kotlin](https://kotlinlang.org/)                                            | 2.2.0        |  
+| UI Framework          | [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) | 1.9.0-beta01 |  
+| Compose BOM           | [Jetpack Compose BOM](https://developer.android.com/jetpack/compose/bom)     | 2025.07.00   |  
+| Android Gradle Plugin | AGP                                                                          | 8.11.1       |  
+| KSP                   | [Kotlin Symbol Processing](https://github.com/google/ksp)                    | 2.2.0-2.0.2  |  
+
+### Libraries & Frameworks
+
+| Category             | Library                                                                           | Purpose                           |  
+|----------------------|-----------------------------------------------------------------------------------|-----------------------------------|  
+| Dependency Injection | [Koin](https://insert-koin.io/)                                                   | Multiplatform DI                  |  
+| Networking           | [Ktor Client](https://ktor.io/)                                                   | REST & WebSockets                 |  
+| Database             | [Room](https://developer.android.com/training/data-storage/room)                  | Local persistence (Offline-first) |  
+| SQLite               | [SQLite Bundled](https://github.com/nicbell/sqlite-android)                       | 2.5.2                             |  
+| Preferences          | [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) | Key-value storage                 |  
+| Async                | [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) + Flow         | Concurrency                       |  
+| Date/Time            | [kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime)                    | Multiplatform dates               |  
+| Images               | [Coil 3](https://coil-kt.github.io/coil/)                                         | Image loading & Caching           |  
+| Permissions          | [moko-permissions](https://github.com/icerockdev/moko-permissions)                | Cross-platform permissions        |  
+| Push                 | [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)      | Notifications                     |  
+
+### Build & Tooling
+
+| Tool               | Purpose                                |  
+|--------------------|----------------------------------------|  
+| Gradle             | Build system with Kotlin DSL           |  
+| Version Catalog    | Centralized dependency management      |  
+| Convention Plugins | Reusable build logic in `build-logic/` |  
+| Conveyor           | Desktop app packaging                  |  
+
+## Architecture
+
+Chirp follows a **multi-module clean architecture** with clear separation of concerns:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        composeApp                           │
+│              (Android + iOS + Desktop entry)                │
+└─────────────────────────────────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          ▼                   ▼                   ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│  feature:auth   │ │  feature:chat   │ │     core        │
+│  ├─presentation │ │  ├─presentation │ │  ├─presentation │
+│  └─domain       │ │  ├─domain       │ │  ├─domain       │
+└─────────────────┘ │  ├─data         │ │  ├─data         │
+                    │  └─database     │ │  └─designsystem │
+                    └─────────────────┘ └─────────────────┘
+```
+
+**Key Principles:**
+
+- **Unidirectional Data Flow** — State flows down, events flow up
+- **Repository Pattern** — Abstract data sources behind interfaces
+- **Dependency Injection** — Koin for multiplatform DI
+- **Platform Abstraction** — expect/actual for platform-specific code
+
+📖 **Learn more:** [Architecture Documentation](docs/architecture.md)
+
+## Quick Start
+
+### Prerequisites
+
+| Requirement    | Version | Notes                |  
+|----------------|---------|----------------------|  
+| JDK            | 17      | Required for Gradle  |  
+| Android Studio | Latest  | With SDK Platform 36 |  
+| Xcode          | Latest  | macOS only, for iOS  |  
+
+### Clone & Build
+
+```bash  
+# Clone the repository  
+git clone https://github.com/IronManYG/Chirp.git  
+cd Chirp  
+  
+# Build all modules  
+.\gradlew.bat build          # Windows  
+./gradlew build              # macOS/Linux  
+```  
+
+### Run
+
+```bash  
+# Android (debug APK)  
+.\gradlew.bat :composeApp:assembleDebug  
+  
+# Desktop  
+.\gradlew.bat :composeApp:run  
+  
+# iOS — Open iosApp in Xcode and run  
+```  
+
+### Package Desktop App
+
+```bash  
+# Compose Multiplatform packaging  
+.\gradlew.bat :composeApp:packageDistributionForCurrentOS  
+  
+# Conveyor (cross-platform installers)  
+conveyor make  
+```  
+
+📖 **Detailed setup:** [Installation Guide](docs/installation.md)
 
 ## Documentation
 
-- Internationalization (i18n): `docs/i18n.md`
-- i18n implementation plan and tasks: `docs/i18n-implementation-plan.md`
-- Android-specific multilingual support notes (older draft):
-  `docs/MultilingualSupportGuideOnAndroid(old).md`
+| Document                                             | Description                                       |  
+|------------------------------------------------------|---------------------------------------------------|  
+| [Installation](docs/installation.md)                 | Environment setup, IDE configuration, first build |  
+| [Usage](docs/usage.md)                               | Run, build, and test commands for all platforms   |  
+| [Architecture](docs/architecture.md)                 | Module design, DI, navigation, build conventions  |  
+| [Project Structure](docs/project-structure.md)       | Module breakdown, directory layout, entry points  |  
+| [Configuration](docs/configuration.md)               | BuildKonfig, Firebase, Room schemas, signing      |  
+| [Testing](docs/testing.md)                           | Test commands, source locations, best practices   |  
+| [Internationalization](docs/internationalization.md) | i18n, RTL support, typography, adding locales     |  
+| [Deep Links & Auth](docs/deep-links-and-auth.md)     | Auth flows, deep link routing, diagrams           |  
+| [Notifications](docs/notifications.md)               | FCM setup for Android and iOS                     |  
+| [Contributing](docs/contributing.md)                 | Contribution guidelines, code style, PR process   |  
 
-If you add more docs under the `docs/` directory, please link them here.
+## Contributing
 
-## Tests
-Global unit tests
-- Windows: `.\gradlew.bat test`
-- macOS/Linux: `./gradlew test`
+We welcome contributions! Please read our [Contributing Guide](docs/contributing.md) before
+submitting a PR.
 
-Module‑specific Android JVM unit tests
-- Debug: `.\\gradlew.bat :<module>:testDebugUnitTest`
-- Release: `.\\gradlew.bat :<module>:testReleaseUnitTest`
+### Quick Checklist
 
-Instrumented/device tests (when configured for a module)
-- Windows: `.\\gradlew.bat :<module>:connectedDebugAndroidTest`
+```bash  
+# Before opening a PR  
+.\gradlew.bat build                    # Build all  
+.\gradlew.bat test                     # Run tests  
+.\gradlew.bat :composeApp:lint         # Lint check  
+```  
 
-iOS tests
-- Tasks like `:<module>:iosX64Test` or `:<module>:iosSimulatorArm64Test` will run only on macOS with proper toolchains.
+## Acknowledgment
 
-Notes
-- The KMP library convention adds `commonTestImplementation(kotlin("test"))`. AGP maps `kotlin.test` to JUnit on Android unit tests.
-- Some modules may still use legacy `src/test/kotlin`; Gradle may print a deprecation notice recommending `src/androidUnitTest/kotlin`. Prefer the new path going forward.
-- On Windows, validated tasks include `:<module>:testDebugUnitTest` (for KMP Android unit tests).
-  Instrumented tests run via `:<module>:connectedDebugAndroidTest` when configured and when a device
-  is connected.
+This project was built as part of the [**CMP Android & iOS Course
+**](https://pl-coding.com/cmp-mobile "null") by **Philipp Lackner**, created in collaboration with *
+*JetBrains**..
 
-## Project structure
-Modules (from `settings.gradle.kts`)
-- `composeApp` — KMP application module (Android + iOS)
-- core
-  - `core:presentation`
-  - `core:domain`
-  - `core:data`
-  - `core:designsystem`
-- feature:auth
-  - `feature:auth:presentation`
-  - `feature:auth:domain`
-- feature:chat
-  - `feature:chat:presentation`
-  - `feature:chat:domain`
-  - `feature:chat:data`
-  - `feature:chat:database`
-- `iosApp` — Xcode project wrapper to run the iOS app
+Special thanks to Philipp Lackner and JetBrains for the comprehensive curriculum and resources.
 
-Notable source locations
-- `composeApp/src/commonMain/kotlin` — shared UI/logic
-- `composeApp/src/androidMain` — Android sources and `AndroidManifest.xml`
-- `composeApp/src/iosMain` — iOS Kotlin code and interop
-- `iosApp/` — Swift/SwiftUI wrapper and app entry for iOS
+Thank you for checking out Chirp!
 
-Root directories (repo top-level)
-
-- `build-logic/` — custom Gradle convention plugins
-- `composeApp/` — KMP application sources
-- `core/` — shared core modules (data/domain/designsystem/presentation)
-- `feature/` — feature modules (auth, chat, etc.)
-- `iosApp/` — Xcode wrapper project
-- `docs/` — documentation
-- `gradle/`, `gradlew*`, `settings.gradle.kts`, `build.gradle.kts` — build system
-- `conveyor.conf`, `conveyorResources/` — Conveyor packaging configuration and assets
-
-Build and configuration conventions
-- Plugins are declared via the version catalog in the root `build.gradle.kts`; modules apply conventions per need.
-- Reusable convention plugins: `build-logic/convention` (applied via aliases from the catalog).
-
-## Multilingual support
-Chirp ships with multilingual support and right-to-left (RTL) handling. The current, validated locales are English (`en`) and Arabic (`ar`).
-
-What’s implemented
-- Centralized language state via `LanguageManager` (validation, normalization, and state): `core/presentation/.../LanguageManager.kt`.
-- Platform locale application via `LocaleApplier` (expect/actual) injected into `LanguageManager`.
-    - Android: uses `AppCompatDelegate.setApplicationLocales(...)` for per‑app locales on API 33+
-      with a sensible fallback for host JVM/Desktop parity:
-      `core/presentation/.../Language.android.kt`.
-    - iOS: updates `AppleLanguages` in `NSUserDefaults`: `core/presentation/.../Language.ios.kt`.
-- RTL layout direction via `ProvideMultilingualSupport(languageCode)` which sets `LocalLayoutDirection` based on known RTL languages (`ar`, `fa`, `he`, `ur`): `core/presentation/.../Rtl.kt`.
-- Typography mapping with Arabic-script friendly `Cairo` when language is Arabic-like; `PlusJakartaSans` otherwise: `core/designsystem/.../Type.kt` (`typographyForLanguage`).
-- Language lifecycle: `MainViewModel` loads persisted language on startup and applies it before UI renders; exposes `changeLanguage(code)`.
-- Resource parity maintained across modules that own UI strings (e.g., `core/presentation`, `feature/auth/presentation`).
-- Platform DI provides `LocaleApplier` in:
-  `core/presentation/.../di/CorePresentationModule.(android|ios).kt`.
-
-Where strings live (Compose Multiplatform resources)
-- Per module, under `src/commonMain/composeResources/values/strings.xml`.
-- Localized variants go under `values-<lang>` (e.g., `values-ar/strings.xml`).
-- Example:
-  - `core/presentation/src/commonMain/composeResources/values/strings.xml`
-  - `core/presentation/src/commonMain/composeResources/values-ar/strings.xml`
-  - `feature/auth/presentation/src/commonMain/composeResources/values/strings.xml`
-  - `feature/auth/presentation/src/commonMain/composeResources/values-ar/strings.xml`
-
-How to add a new locale
-1) Mirror base strings in each module that owns UI strings: create `values-<lang>` and copy keys 1:1, translating values.
-2) Keep plurals/arrays in parity across locales.
-3) If the new locale is RTL (e.g., `fa`, `he`, `ur`), ensure `isRtlLanguage` includes its primary language code.
-4) If the locale uses Arabic script, typography will already switch to `Cairo` via `typographyForLanguage`.
-5) Add the language label(s) to any selection UI (e.g., `feature/auth/presentation` language picker).
-
-How language is applied at runtime
-
-- On app start, `MainViewModel` reads `SettingsStorage` and calls
-  `LanguageManager.setLanguage(initCode)`, which in turn delegates to the injected `LocaleApplier`
-  and updates state.
-- Root UI is wrapped with `ChirpTheme(languageCode)` and `ProvideMultilingualSupport(languageCode)` so fonts and layout direction reflect the current language.
-- In-app switching calls `MainViewModel.changeLanguage(code)` which persists the choice and applies it immediately.
-
-Supported locales today
-- `en` (default)
-- `ar`
-
-Android per‑app locales
-
-- Implemented via `LocaleApplier` using `AppCompatDelegate.setApplicationLocales(...)` on API 33+
-  with fallback behavior retained for parity. See `docs/i18n.md` and
-  `docs/i18n-implementation-plan.md` task 7.
-
-Troubleshooting
-- Layout direction doesn’t flip: ensure `ProvideMultilingualSupport(languageCode)` wraps your root and that the `languageCode` is the normalized primary tag (e.g., `ar`).
-- Fonts look off for Arabic: verify `typographyForLanguage(languageCode)` is used by your theme and Cairo fonts are present in generated resources.
-- Strings don’t change after switching: confirm `LanguageManager.setLanguage(code)` returns `true` (supported), and `SettingsStorage.setLanguage(code)` is called.
-- Tests show unresolved opt-ins for coroutines: add appropriate kotlinx-coroutines test deps or remove unused opt-ins (harmless for simple unit tests).
-
-Quick validation (manual)
-- First run with no saved language: gate to Language Selection → pick `ar` → Continue → no pre-content flicker.
-- Relaunch persists `ar`, RTL direction is applied, Cairo typography visible.
-- Switch back to `en` in-app; changes apply instantly and persist.
-- Auth screens show localized strings; representative error messages are localized.
-
-Build/run tips (Windows)
-- Build all: `.\\gradlew.bat build`
-- Run Android debug APK: `.\\gradlew.bat :composeApp:assembleDebug`
-- Run Desktop app: `.\\gradlew.bat :composeApp:run`
-- Package Desktop (current OS): `.\\gradlew.bat :composeApp:packageDistributionForCurrentOS`
+If you have any questions or suggestions, feel free to open an issue or reach out to the maintainer.
+Happy coding!
 
 ## License
 
-- License: MIT (as specified in `conveyor.conf`).
-- TODO: Add a `LICENSE` file at the repository root to mirror this.
+This project is licensed under the **MIT License**.
 
-## Authentication and Deep Links
-
-- Flows (see CHANGELOG 0.5.0–0.7.0): Register → Register Success → Email Verification (deep link), Login (session persistence), Forgot Password, Reset Password (deep link). Session uses DataStore with auto refresh/expiration.
-- Navigation: Auth graph starts at `AuthGraphRoutes.Login`; on successful login, navigate to `ChatListRoute` and clear the auth back stack.
-- Deep links handled in `authGraph`:
-  - Verify: `https://chirp.pl-coding.com/api/auth/verify?token={token}` and `chirp://chirp.pl-coding.com/api/auth/verify?token={token}`
-  - Reset: `https://chirp.pl-coding.com/api/auth/reset-password?token={token}` and `chirp://chirp.pl-coding.com/api/auth/reset-password?token={token}`
-- Platform setup:
-  - Android: `MainActivity` intent filters for HTTPS (App Links, `android:autoVerify="true"`) and `chirp://` scheme; host `chirp.pl-coding.com`, paths `/api/auth/verify` and `/api/auth/reset-password`.
-  - iOS: custom URL scheme `chirp` present in Info.plist; Universal Links for HTTPS are TODO (Associated Domains + AASA).
-- References: `feature/auth/presentation/.../AuthGraph.kt`, `composeApp/.../NavigationRoot.kt`, `CHANGELOG.md`.
-
-### Auth flow diagram (navigation/state)
-```mermaid
-stateDiagram-v2
-  [*] --> Login
-  Login --> Register: "Create account"
-  Register --> RegisterSuccess: "Submitted"
-  RegisterSuccess --> EmailVerificationPending: "Await email"
-
-  EmailVerificationPending --> Login: "Open verify link (deep link)\n-> verified server-side"
-
-  Login --> ChatList: "Login success\n(clear auth back stack)"
-
-  Login --> ForgotPassword: "Forgot password"
-  ForgotPassword --> ResetPasswordPending: "Email sent"
-  ResetPasswordPending --> Login: "Open reset link (deep link)\n-> set new password"
-
-  ChatList --> [*]
-
-  state ChatList {
-    [*] --> ChatListScreen
-    ChatListScreen --> [*]
-  }
-
-  note right of Login
-    Session persisted in DataStore
-    with auto refresh/expiration.
-  end note
-
-  ChatList --> Login: "Logout / Session expired\n(clear to auth graph)"
-```
-
-### Deep link routing diagram
-```mermaid
-flowchart LR
-  subgraph URLs
-    A1["https://chirp.pl-coding.com/api/auth/verify?token={t}"]
-    A2["chirp://chirp.pl-coding.com/api/auth/verify?token={t}"]
-    B1["https://chirp.pl-coding.com/api/auth/reset-password?token={t}"]
-    B2["chirp://chirp.pl-coding.com/api/auth/reset-password?token={t}"]
-  end
-
-  subgraph Platform_handlers
-    H1["Android Intent Filters\n(MainActivity)"]
-    H2["iOS URL scheme 'chirp'\n(+ Universal Links TODO)"]
-  end
-
-  subgraph App_routing_authGraph
-    R1["VerifyEmailDestination"]
-    R2["ResetPasswordDestination"]
-  end
-
-  URLs --> H1
-  URLs --> H2
-  H1 --> R1
-  H1 --> R2
-  H2 --> R1
-  H2 --> R2
-
-  R1 --> Login
-  R2 --> ResetPasswordScreen --> Login
-```
-
-Notes
-- After successful verification/reset via deep link, we route users back to the `Login` screen (or auto-navigate to `ChatList` if a valid session is present).
-- Ensure tokens are consumed server-side; the app treats the link as an entry point and updates UI state accordingly.
-
-## Push notifications
-
-- Android: Push notifications are implemented with Firebase Cloud Messaging (FCM). See
-  `feature/chat/data/.../ChirpFirebaseMessagingService.kt` and related FCM wiring. Ensure
-  `google-services.json` is present in `composeApp/` and the Firebase project is configured for FCM.
-  On Android 13+ (API 33+), the app requests the notification permission at runtime.
-- iOS: Push notifications are implemented with Firebase. Ensure APNs certificates/keys and
-  capabilities are configured in Xcode. Provide `GoogleService-Info.plist` and enable Push
-  Notifications + Background Modes (Remote notifications). TODO: document the exact steps and plist
-  locations.
-- Device token handling and backend registration are implemented in KMP (
-  `feature/chat/data/.../KtorDeviceTokenService.kt`).
-
-## License
-No LICENSE file found in the repository.
-
-TODO
-- Add a LICENSE file (e.g., Apache‑2.0 or MIT) and update this section.
+> **Note:** A `LICENSE` file should be added to the repository root.
 
 ## Changelog
-See `CHANGELOG.md` for notable changes.
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+  
+---  
+
+<p align="center">  
+  Built with ❤️ using Kotlin Multiplatform and Compose Multiplatform  
+</p>
