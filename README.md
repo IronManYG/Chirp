@@ -344,8 +344,7 @@ submitting a PR.
 ## Acknowledgment
 
 This project was built as part of the [**CMP Android & iOS Course
-**](https://pl-coding.com/cmp-mobile "null") by **Philipp Lackner**, created in collaboration with *
-*JetBrains**..
+**](https://pl-coding.com/cmp-mobile "null") by **Philipp Lackner**, created in collaboration with **JetBrains**.
 
 Special thanks to Philipp Lackner and JetBrains for the comprehensive curriculum and resources.
 
