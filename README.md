@@ -42,6 +42,7 @@ It implements industry-standard practices including:
 
 - [Features](#features)
 - [Roadmap (Extended Features)](#roadmap-extended-features)
+- [Backend](#backend)
 - [Screenshots](#screenshots)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
@@ -135,6 +136,10 @@ refine the architecture and tackle complex, real-world engineering challenges.
 - [ ] **Group Management**
     - [ ] Cascade deletion logic (if Admin leaves)
     - [ ] Warning dialogs for destructive actions
+
+## Backend
+
+This application is powered by a custom backend service. You can visit the backend repository here: [**Chirp Backend API**](https://github.com/IronManYG/chirp-api "null")
 
 ## Screenshots
 
