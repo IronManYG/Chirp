@@ -41,7 +41,7 @@ It implements industry-standard practices including:
 ## Table of Contents
 
 - [Features](#features)
-- [Roadmap (Extended Features)](#roadmap)
+- [Roadmap (Extended Features)](#roadmap-extended-features)
 - [Screenshots](#screenshots)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
@@ -138,10 +138,13 @@ refine the architecture and tackle complex, real-world engineering challenges.
 
 ## Screenshots
 
+> **Note:** These screenshots showcase key features but do not represent every screen in the
+> application.
+
 ### Splash Screen
 
 <p align="center">
-  <img src="previews/1-[Mobile Portrait Light] Splash Screen.png" width="280" alt="Splash Screen" />
+  <img src="previews/1-mobile-portrait-light-splash-screen.png" width="280" alt="Splash Screen" />
 </p>
 
 ### Authorization
@@ -150,15 +153,15 @@ refine the architecture and tackle complex, real-world engineering challenges.
   <tr>
     <td align="center">
       <strong>Register</strong><br/>
-      <img src="previews/2-Authorization - [Mobile Portrait] Register.png" width="280" alt="Register Screen" />
+      <img src="previews/2-authorization-mobile-portrait-register.png" width="280" alt="Register Screen" />
     </td>
     <td align="center">
       <strong>Register + Success</strong><br/>
-      <img src="previews/3-Authorization - [Mobile Portrait Light] Register + Success.png" width="280" alt="Register Success" />
+      <img src="previews/3-authorization-mobile-portrait-light-register-success.png" width="280" alt="Register Success" />
     </td>
     <td align="center">
       <strong>Login (Tablet)</strong><br/>
-      <img src="previews/4-Authorization - [Tablet Light] Login.png" width="400" alt="Login Screen - Tablet" />
+      <img src="previews/4-authorization-tablet-light-login.png" width="400" alt="Login Screen - Tablet" />
     </td>
   </tr>
 </table>
@@ -166,7 +169,7 @@ refine the architecture and tackle complex, real-world engineering challenges.
 ### Profile Settings
 
 <p align="center">
-  <img src="previews/5-Profile Settings - [Mobile Portrait - Light].png" width="280" alt="Profile Settings" />
+  <img src="previews/5-profile-settings-mobile-portrait-light.png" width="280" alt="Profile Settings" />
 </p>
 
 ### Chat
@@ -175,11 +178,11 @@ refine the architecture and tackle complex, real-world engineering challenges.
   <tr>
     <td align="center">
       <strong>Empty Chat</strong><br/>
-      <img src="previews/6-Chat - [Mobile Portrait Dark] Chat - Empty.png" width="280" alt="Empty Chat - Dark Mode" />
+      <img src="previews/6-chat-mobile-portrait-dark-empty.png" width="280" alt="Empty Chat - Dark Mode" />
     </td>
     <td align="center">
       <strong>Chat List</strong><br/>
-      <img src="previews/7-Chat - [Mobile Portrait Light] Chat List.png" width="280" alt="Chat List" />
+      <img src="previews/7-chat-mobile-portrait-light-list.png" width="280" alt="Chat List" />
     </td>
   </tr>
 </table>
@@ -188,11 +191,11 @@ refine the architecture and tackle complex, real-world engineering challenges.
   <tr>
     <td align="center">
       <strong>Inside Chat (Desktop)</strong><br/>
-      <img src="previews/8-Chat - [Desktop Light] Inside Chat.png" width="500" alt="Inside Chat - Desktop Light" />
+      <img src="previews/8-chat-desktop-light-inside.png" width="500" alt="Inside Chat - Desktop Light" />
     </td>
     <td align="center">
       <strong>Chat Members (Desktop)</strong><br/>
-      <img src="previews/9-Chat - [Desktop Dark] Chat Members.png" width="500" alt="Chat Members - Desktop Dark" />
+      <img src="previews/9-chat-desktop-dark-members.png" width="500" alt="Chat Members - Desktop Dark" />
     </td>
   </tr>
 </table>
