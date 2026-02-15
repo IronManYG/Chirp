@@ -1,28 +1,20 @@
 package dev.gaddal.chirp.convention
 
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.gradle.kotlin.dsl.dependencies
 
 /**
- * Configures the Kotlin Multiplatform Android target for the Gradle project.
+ * Configures Gradle settings specific to Android library modules.
  *
- * This method sets up the Android target within the Kotlin Multiplatform plugin and configures
- * the Kotlin compiler options to use Java 17 (JVM Target 17) for the Android target compilation.
- * This configuration ensures that the Android module adheres to the specified JVM target version.
+ * This method adds a dependency for core library desugaring, enabling the support
+ * of Java 8+ API desugaring in Android projects. It utilizes the version and library
+ * details defined in the custom version catalog (`libs`).
  *
- * It utilizes the `androidTarget` function provided by Kotlin Multiplatform, and applies
- * experimental Kotlin Gradle Plugin API settings where necessary.
+ * This configuration is intended to be used for Android library modules within
+ * modularized Gradle projects.
  */
-internal fun Project.configureAndroidTarget() {
-    extensions.configure<KotlinMultiplatformExtension> {
-        androidTarget {
-            @OptIn(ExperimentalKotlinGradlePluginApi::class)
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_17)
-            }
-        }
+internal fun Project.configureAndroidLibraryTarget() {
+    dependencies {
+        "coreLibraryDesugaring"(libs.findLibrary("android-desugarJdkLibs").get())
     }
 }

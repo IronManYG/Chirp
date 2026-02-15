@@ -1,6 +1,6 @@
 package dev.gaddal.chirp.convention
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
@@ -11,12 +11,12 @@ import org.gradle.kotlin.dsl.dependencies
  * for Jetpack Compose. It includes the Compose BOM (Bill of Materials) for managing
  * dependency versions and adds debug-specific dependencies for Compose UI tooling.
  *
- * @param commonExtension the Android CommonExtension instance used to define shared Android build configurations
+ * @param applicationExtension the Android ApplicationExtension instance used to define Android-specific build configurations
  */
 internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *, *, *>
+    applicationExtension: ApplicationExtension
 ) {
-    with(commonExtension) {
+    with(applicationExtension) {
         buildFeatures {
             compose = true
         }

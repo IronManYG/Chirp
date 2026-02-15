@@ -1,13 +1,19 @@
 plugins {
     alias(libs.plugins.convention.cmp.application)
     alias(libs.plugins.compose.hot.reload)
-    alias(libs.plugins.google.services)
     alias(libs.plugins.conveyor)
 }
 
 version = "1.0.0"
 
 kotlin {
+    androidLibrary {
+        compileSdk = 36
+        minSdk = 26
+        namespace = "dev.gaddal.chirp.composeapp"
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+    }
+    
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)

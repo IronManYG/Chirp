@@ -1,5 +1,5 @@
 import dev.gaddal.chirp.convention.applyHierarchyTemplate
-import dev.gaddal.chirp.convention.configureAndroidTarget
+import dev.gaddal.chirp.convention.configureAndroidLibraryTarget
 import dev.gaddal.chirp.convention.configureDesktopTarget
 import dev.gaddal.chirp.convention.configureIosTargets
 import dev.gaddal.chirp.convention.libs
@@ -10,43 +10,40 @@ import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
- * A Gradle plugin that sets up Kotlin Multiplatform configurations for projects utilizing Android, iOS and Desktop targets,
- * with additional Jetpack Compose features enabled for Android.
+ * A Gradle plugin to configure conventions for a Kotlin Multiplatform application utilizing Compose Multiplatform.
  *
- * This plugin applies necessary build conventions and dependencies for all platforms
- * to streamline the development process in a Kotlin Multiplatform project. Specifically, it:
- * - Configures the Kotlin Multiplatform Android target with Java 17 compatibility.
- * - Sets up iOS targets (`iosX64`, `iosArm64`, `iosSimulatorArm64`) with static frameworks for interoperability.
- * - Configures Desktop target with JVM 17 compatibility.
- * - Applies Compose-specific plugins and dependencies for Android.
- * - Uses a centralized dependency management mechanism (version catalog).
+ * The `CmpApplicationConventionPlugin` streamlines the setup of a Kotlin Multiplatform project by:
+ * - Applying the necessary plugins for Kotlin Multiplatform, Compose, and serialization support.
+ * - Configuring targets for Android, iOS, and desktop platforms.
+ * - Adding platform-specific dependencies as required.
+ * - Applying hierarchical source set configurations to enable code sharing across platforms.
  *
- * By utilizing this plugin, projects gain predefined, reusable configurations for Android, iOS and Desktop,
- * reducing boilerplate and ensuring adherence to project standards.
+ * This plugin is designed to reduce boilerplate and enforce consistent configurations for Kotlin Multiplatform applications.
  */
 class CmpApplicationConventionPlugin : Plugin<Project> {
 
     /**
-     * Applies the CMP Application Convention Plugin configuration to the specified Gradle project.
+     * Applies the CMP Application Convention Plugin to the specified Gradle project.
      *
-     * This method applies required plugins and configures the project for Android, iOS, and desktop targets.
-     * It integrates several plugins, including the Kotlin Multiplatform plugin and Compose-related plugins.
-     * It applies source set hierarchy templates for consistent project structure.
-     * It also sets dependencies for Compose development.
+     * This method configures the project for Kotlin Multiplatform development by:
+     * - Applying the necessary plugins, such as Android, Kotlin Multiplatform, Jetpack Compose, and Kotlin Serialization.
+     * - Setting up platform-specific targets for Android, iOS, and desktop environments by invoking configuration methods.
+     * - Configuring dependencies required for project compilation and runtime.
+     * - Applying a predefined source set hierarchy template for shared code organization.
      *
-     * @param target the Gradle project to which the plugin and configurations are applied
+     * @param target the Gradle project to which the CMP Application Convention Plugin is applied
      */
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("dev.gaddal.convention.android.application.compose")
+                apply("com.android.kotlin.multiplatform.library")
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
                 apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
-            configureAndroidTarget()
+            configureAndroidLibraryTarget()
             configureIosTargets()
             configureDesktopTarget()
 
@@ -55,7 +52,7 @@ class CmpApplicationConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
+                "androidMainImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
             }
         }
     }

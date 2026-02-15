@@ -1,34 +1,37 @@
 package dev.gaddal.chirp.convention
 
-import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
- * Configures Kotlin Multiplatform for the current Gradle project.
+ * Configures the Kotlin Multiplatform setup for the current Gradle project.
  *
- * This method sets up the Kotlin Multiplatform plugin and adjusts its settings specific
- * to an iOS and Android target configuration. It handles the following tasks:
+ * This function defines platform-specific targets and configurations for Android, iOS, and Desktop
+ * within a Kotlin Multiplatform project. It includes the following configuration steps:
  *
- * - Configures the Android target by invoking `configureAndroidTarget`.
- * - Configures the Desktop target by invoking `configureDesktopTarget`.
- * - Sets the namespace for the project based on the project path, utilizing `pathToPackageName`.
- * - Configures iOS targets (iosX64, iosArm64, iosSimulatorArm64) and their binary frameworks,
- *   setting their base name using `pathToFrameworkName`.
- * - Applies source set hierarchy templates for consistent project structure.
- * - Adjusts Kotlin compiler options, enabling experimental features and opt-ins
- *   such as `kotlin.RequiresOptIn` and `kotlin.time.ExperimentalTime`.
+ * - Configures the Android library target with compile SDK, minimum SDK, namespace, and experimental properties.
+ * - Configures the desktop target with JVM 17 compatibility.
+ * - Defines iOS targets (X64, ARM64, and Simulator ARM64) and sets the base name for their binary frameworks.
+ * - Applies a predefined source set hierarchy template to align with Kotlin Multiplatform conventions.
+ * - Adds compiler options to enable expect/actual classes and experimental features such as time APIs.
+ *
+ * The method is designed to streamline the setup process for Kotlin Multiplatform projects, ensuring
+ * consistent configurations for all applicable platforms.
  */
 internal fun Project.configureKotlinMultiplatform() {
-    extensions.configure<LibraryExtension> {
-        namespace = this@configureKotlinMultiplatform.pathToPackageName()
-    }
-
-    configureAndroidTarget()
+    configureAndroidLibraryTarget()
     configureDesktopTarget()
 
     extensions.configure<KotlinMultiplatformExtension> {
+        extensions.configure<KotlinMultiplatformAndroidLibraryExtension> {
+            compileSdk = 36
+            minSdk = 26
+            namespace = pathToPackageName()
+            experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+        }
+
         listOf(
             iosX64(),
             iosArm64(),

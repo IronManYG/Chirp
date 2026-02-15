@@ -1,58 +1,41 @@
-import com.android.build.api.dsl.LibraryExtension
-import dev.gaddal.chirp.convention.configureKotlinAndroid
 import dev.gaddal.chirp.convention.configureKotlinMultiplatform
 import dev.gaddal.chirp.convention.libs
-import dev.gaddal.chirp.convention.pathToResourcePrefix
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
 /**
- * A Gradle plugin that configures a Kotlin Multiplatform library module with Android and iOS targets.
+ * A Gradle plugin to configure a Kotlin Multiplatform (KMP) library project with standardized conventions.
  *
- * This plugin applies common conventions, dependencies, and settings for Kotlin Multiplatform library modules
- * in a Gradle project. Specifically, it:
- * - Applies required Gradle plugins, including the Android library plugin, Kotlin Multiplatform plugin,
- *   and Kotlin serialization plugin.
- * - Configures the Kotlin Multiplatform extension with settings specific to Android and iOS targets,
- *   using the `configureKotlinMultiplatform` helper function.
- * - Configures Android-specific settings for the library module via the `configureKotlinAndroid` helper function.
- * - Sets a consistent resource prefix for Android resources derived from the project's path.
- * - Configures experimental properties to support Android resource usage in command-line builds
- *   and iOS simulator deployments.
- * - Declares common dependencies for the `commonMain` and `commonTest` source sets, such as Kotlin Serialization
- *   and Kotlin Test libraries.
+ * This plugin simplifies the setup of a KMP library by automating the following tasks:
+ * - Applying necessary Gradle plugins for Kotlin Multiplatform, Android libraries, and Kotlin Serialization.
+ * - Configuring Kotlin Multiplatform project targets and dependencies.
+ * - Ensuring consistent dependency management by adding libraries like kotlinx-serialization-json and kotlin-test.
+ *
+ * The KmpLibraryConventionPlugin is designed to support building shared Kotlin codebases for multiple platforms,
+ * including Android, iOS, and Desktop, while enforcing project-level conventions to ensure compatibility
+ * and maintainability.
  */
-class KmpLibraryConventionPlugin: Plugin<Project> {
+class KmpLibraryConventionPlugin : Plugin<Project> {
 
     /**
-     * Applies the `KmpLibraryConventionPlugin` configuration to the specified Gradle project.
+     * Configures the given Gradle project to align with the Kotlin Multiplatform Library conventions.
      *
-     * This method sets up the project to use Kotlin Multiplatform and Android targets, configuring
-     * necessary plugins and dependencies. It also defines custom build settings, such as resource prefixes
-     * and experimental properties required for Kotlin Multiplatform projects with Android and iOS targets.
+     * This method applies essential Gradle plugins and sets up dependencies specific to Kotlin Multiplatform projects.
+     * It incorporates support for Android, Kotlin Multiplatform, and Kotlin Serialization. Additionally, it invokes
+     * project-specific configurations for a Kotlin Multiplatform setup and declares dependencies for common source sets.
      *
-     * @param target the Gradle project to which this plugin's configuration is applied
+     * @param target the Gradle project to which the Kotlin Multiplatform Library conventions are applied
      */
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("com.android.library")
+                apply("com.android.kotlin.multiplatform.library")
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
             configureKotlinMultiplatform()
-
-            extensions.configure<LibraryExtension> {
-                configureKotlinAndroid(this)
-
-                resourcePrefix = this@with.pathToResourcePrefix()
-
-                // Required to make debug build of app run in iOS simulator
-                experimentalProperties["android.experimental.kmp.enableAndroidResources"] = "true"
-            }
 
             dependencies {
                 "commonMainImplementation"(libs.findLibrary("kotlinx-serialization-json").get())

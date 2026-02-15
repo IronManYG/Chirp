@@ -1,4 +1,4 @@
-package dev.gaddal.chirp
+package dev.gaddal.chirp.androidapp
 
 import android.app.Application
 import dev.gaddal.chirp.di.initKoin

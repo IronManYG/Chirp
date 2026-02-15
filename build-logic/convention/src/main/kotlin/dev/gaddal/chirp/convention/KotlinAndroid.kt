@@ -1,6 +1,6 @@
 package dev.gaddal.chirp.convention
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
@@ -15,12 +15,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * and enables core library desugaring. It also applies additional Kotlin-specific compiler configurations.
  * A dependency for core library desugaring is added to the project.
  *
- * @param commonExtension the Android CommonExtension instance used to define shared Android build configurations
+ * @param applicationExtension the Android ApplicationExtension instance used to define Android-specific build configurations
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>
+    applicationExtension: ApplicationExtension
 ) {
-    with(commonExtension) {
+    with(applicationExtension) {
         compileSdk = libs.findVersion("projectCompileSdkVersion").get().toString().toInt()
 
         defaultConfig.minSdk = libs.findVersion("projectMinSdkVersion").get().toString().toInt()

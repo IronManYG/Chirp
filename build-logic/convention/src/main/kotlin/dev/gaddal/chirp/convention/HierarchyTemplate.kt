@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
  *
  * The structure includes:
  * - A source set tree for common and test sources.
- * - Group definitions for `mobile`, `jvmCommon`, and `native`.
+ * - Group definitions for `mobile` and `native`.
  * - Sub-groups for targets like `apple` (including `ios` and `macos`) within the `native` group.
  */
 private val hierarchyTemplate = KotlinHierarchyTemplate {
@@ -37,11 +37,6 @@ private val hierarchyTemplate = KotlinHierarchyTemplate {
             group("ios") {
                 withIos()
             }
-        }
-
-        group("jvmCommon") {
-            withAndroidTarget()
-            withJvm()
         }
 
         group("native") {

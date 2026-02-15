@@ -18,6 +18,7 @@ kotlin {
 
                 implementation(libs.coil.compose)
                 implementation(libs.coil.network.ktor)
+                implementation(libs.touchlab.kermit)
 
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
